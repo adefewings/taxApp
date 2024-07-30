@@ -62,11 +62,15 @@ ui <- fluidPage(
           margin-bottom: 1px;
         }
         .input-group-ltt label{
-          width: 200px;
+          width: 250px;
+          margin-right: 5px;
         }
         .input-group-ltt input {
           width: 100px; 
         }
+        
+        
+        
         .input-group-council {
         display: flex;
         align-items: center;
@@ -95,6 +99,18 @@ ui <- fluidPage(
         margin-right: 5px;
         }
         .input-group-ndr input {
+          width: 100px;
+        }
+        .input-group-landfill {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+        .input-group-landfill label{
+          width: 100px;
+        margin-right: 5px;
+        }
+       .input-group-landfill input {
           width: 100px;
         }
         .ndr-selection {
@@ -136,6 +152,12 @@ ui <- fluidPage(
           display: inline-block; 
           padding-left: 20px; 
           padding-right: 20px;
+          }
+        .radio-inline {
+            font-size: 20px;
+        }
+        label {
+          font-size: 20px;
         }
       ")
     )
@@ -439,6 +461,41 @@ ui <- fluidPage(
              )
              
     )
+  ),
+  tabPanel("Landfill Disposal tax", value = "more info", h4("Levy paid by Landfill owners, usually pased on to those paying to use the landfill"),
+           div(style = "height: 20px;", p("")), # Empty placeholder
+           
+           selectInput("landfillChoice", "Select Income Tax System:",
+                       choices = c("Wales", "Scotland", "England"),
+                       selected = "Wales"),
+           radioButtons("landfillButtonChoice", "Please select a Country", choices = c("Wales", "Scotland", "England"), selected = "Wales", inline = FALSE,
+                        width = NULL),
+           div(style = "height: 20px;", p("")), # Empty placeholder
+           
+           fluidRow(
+             column(6,
+                    tabPanel("landfills",
+                             
+                             #tags$p("Band 1:", style = "font-size: 18px;font-weight: bold;"),
+                             
+                             div(class = "input-group-landfill",
+                                 tags$label("Lower Rate:", `for` = "lowRateLandfill"),
+                                 sliderInput("lowRateLandfill", NULL, min = 0, max = 200, value = 3.1 , step = 0.1)),
+                             
+                             
+                             div(class = "input-group-landfill",
+                                 tags$label("Standard rate", `for` = "stdRateLandfill"),
+                                 sliderInput("stdRateLandfill", NULL, min = 0, max = 200, value = 98.6, step = 0.1)),
+                             
+                            
+                             
+                             
+                             
+                    )
+             ),
+             
+             
+           )
   )
 )
 )
@@ -603,6 +660,20 @@ server <- function(input, output, session) {
       updateSliderInput(session, "LTTrate2Lease", min = 0, max = 1, value = 0.01,step = 0.01)
       updateSliderInput(session, "LTTrate3Lease", min = 0, max = 1, value = 0.02,step = 0.01)
       }
+  })
+  
+  
+  #lowRateLandfill/std
+  
+  
+  observe({
+    if (input$landfillButtonChoice == "Wales"){
+      updateSliderInput(session, "lowRateLandfill",  NULL, min = 0, max = 200, value = 3.1 , step = 0.1)
+      updateSliderInput(session, "stdRateLandfill",  NULL, min = 0, max = 200, value = 98.6 , step = 0.1)
+    } else if (input$landfillButtonChoice == "England"){
+      updateSliderInput(session, "lowRateLandfill",  NULL, min = 0, max = 200, value = 6.1 , step = 0.1)
+      updateSliderInput(session, "stdRateLandfill",  NULL, min = 0, max = 200, value = 80 , step = 0.1)
+    }
   })
   
   latest_value <- reactiveVal(0)
