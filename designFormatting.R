@@ -56,17 +56,6 @@ ui <- fluidPage(
           align-items: center;
           margin-bottom: 2px; /* Space between input groups */
         }
-        .input-group-ltt {
-          display: flex;
-          align-items: center;
-          margin-bottom: 1px;
-        }
-        .input-group-ltt label{
-          width: 200px;
-        }
-        .input-group-ltt input {
-          width: 100px; 
-        }
         .input-group-council {
         display: flex;
         align-items: center;
@@ -156,7 +145,7 @@ ui <- fluidPage(
                          selected = "current"),
              div(style = "height: 30px;", p("")), # Empty placeholder
              fluidRow(
-               column(5,
+               column(6,
                       tabPanel("incomeTax",
                                div(class = "input-group",
                                    tags$label("Personal Allowance:", `for` = "PA"),
@@ -289,7 +278,7 @@ ui <- fluidPage(
     tabPanel("Non Domestic Rates", value = "more info", h4("This is a tax levied on non-domestic property"),
              div(style = "height: 20px;", p("")), # Empty placeholder
              div(style = "ndr-selection",
-                 selectInput("ndrCountry", "Select Income Tax System:",
+                 selectInput("tax_choice", "Select Income Tax System:",
                              choices = c("Wales", "Scotland", "England"),
                              selected = "Wales")),
              div(style = "height: 20px;", p("")), # Empty placeholder
@@ -313,134 +302,13 @@ ui <- fluidPage(
              
     ),
     
-    tabPanel("Land Transactional Tax", value = "more info", h4("This is a tax on property transactions in Wales. Replaced Stamp Duty which is still in place in England"),
+    tabPanel("Non Domestic Rates", value = "more info", h4("This is a tax levied on non-domestic property"),
              div(style = "height: 20px;", p("")), # Empty placeholder
-             
-             selectInput("LTTchoice", "Select Income Tax System:",
-                         choices = c("Wales", "Scotland", "England"),
-                         selected = "Wales"),
-             div(style = "height: 20px;", p("")), # Empty placeholder
-             
-             fluidRow(
-               column(3,
-                      tabPanel("LTT",
-                               tags$p("Residential Property Tax", style = "font-size: 21px;font-weight: bold;margin-left: 70px;"),
-                               tags$p("Band 1:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band1Limit","Band 1 Limit:", `for` = "band1LimitRes"),
-                                   numericInput("band1LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate1Res"),
-                                   sliderInput("LTTrate1Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 2:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band2Limit","Band 2 Limit:", `for` = "band2LimitRes"),
-                                   numericInput("band2LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrateRes"),
-                                   sliderInput("LTTrate2Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 3:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band3Limit","Band 3 Limit:", `for` = "band3LimitRes"),
-                                   numericInput("band3LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate3Res"),
-                                   sliderInput("LTTrate3Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 4:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band4Limit","Band 4 Limit:", `for` = "band4LimitRes"),
-                                   numericInput("band4LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate4Res"),
-                                   sliderInput("LTTrate4Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 5:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band5Limit","Band 5 Limit:", `for` = "band5LimitRes"),
-                                   numericInput("band5LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate5Res"),
-                                   sliderInput("LTTrate5Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 6:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate6Res"),
-                                   sliderInput("LTTrate6Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01))
-                               
-                      )
-               ),
-               column(3,
-                      tabPanel("LTT",
-                               tags$p("Non-Residential Property Tax (Purchase)", style = "font-size: 21px;font-weight: bold;margin-left: 10px;"),
-                               tags$p("Band 1:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band1Limit","Band 1 Limit:", `for` = "band1LimitPurchase"),
-                                   numericInput("band1LimitPurchase", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate1Purchase"),
-                                   sliderInput("LTTrate1Purchase", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 2:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band2Limit","Band 2 Limit:", `for` = "band2LimitPurchase"),
-                                   numericInput("band2LimitPurchase", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTratePurchase"),
-                                   sliderInput("LTTrate2Purchase", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 3:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band3Limit","Band 3 Limit:", `for` = "band3LimitPurchase"),
-                                   numericInput("band3LimitPurchase", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate3Purchase"),
-                                   sliderInput("LTTrate3Purchase", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 4:", style = "font-size: 18px;font-weight: bold;"),
-                               
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate4Purchase"),
-                                   sliderInput("LTTrate4Purchase", NULL, min = 0, max = 1, value = 0.19, step = 0.01))
-                               
-                               
-                      )
-               ),
-                column(3,
-                      tabPanel("LTT",
-                               tags$p("Non-Residential Property Tax (Lease)", style = "font-size: 21px;font-weight: bold;margin-left: 10px;"),
-                               tags$p("Band 1:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band1Limit","Band 1 Limit:", `for` = "band1LimitLease"),
-                                   numericInput("band1LimitLease", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate1Lease"),
-                                   sliderInput("LTTrate1Lease", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 2:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band2Limit","Band 2 Limit:", `for` = "band2LimitLease"),
-                                   numericInput("band2LimitLease", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrateLease"),
-                                   sliderInput("LTTrate2Lease", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 3:", style = "font-size: 18px;font-weight: bold;"),
-                                  div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate3Lease"),
-                                   sliderInput("LTTrate3Lease", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               
-                               
-                               
-                      )
-             )
-             
+             selectInput("tax_choice", "Select Income Tax System:",
+                         choices = c("current", "scottish", "fully devolved"),
+                         selected = "current"),
     )
   )
-)
 )
 
 
@@ -550,59 +418,6 @@ server <- function(input, output, session) {
       updateNumericInput(session, "bandF", value = 160000)
       updateNumericInput(session, "bandG", value = 320000)
     }
-  })
-  
-  
-  observe({
-    if (input$LTTchoice == "Wales"){
-      updateNumericInput(session, "band1LimitRes", value = 180000)
-      updateNumericInput(session, "band2LimitRes", value = 250000)
-      updateNumericInput(session, "band3LimitRes", value = 400000)
-      updateNumericInput(session, "band4LimitRes", value = 750000)
-      updateNumericInput(session, "band5LimitRes", value = 1500000)
-      updateSliderInput(session, "LTTrate1Res", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Res", min = 0, max = 1, value = 0.035,step = 0.01)
-      updateSliderInput(session, "LTTrate3Res", min = 0, max = 1, value = 0.05,step = 0.01)
-      updateSliderInput(session, "LTTrate4Res", min = 0, max = 1, value = 0.075,step = 0.01)
-      updateSliderInput(session, "LTTrate5Res", min = 0, max = 1, value = 0.1,step = 0.01)
-      updateSliderInput(session, "LTTrate6Res", min = 0, max = 1, value = 0.12,step = 0.01)
-      updateNumericInput(session, "band1LimitPurchase", value = 225000)
-      updateNumericInput(session, "band2LimitPurchase", value = 250000)
-      updateNumericInput(session, "band3LimitPurchase", value = 1000000)
-      updateSliderInput(session, "LTTrate1Purchase", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Purchase", min = 0, max = 1, value = 0.01,step = 0.01)
-      updateSliderInput(session, "LTTrate3Purchase", min = 0, max = 1, value = 0.05,step = 0.01)
-      updateSliderInput(session, "LTTrate4Purchase", min = 0, max = 1, value = 0.06,step = 0.01)
-      updateNumericInput(session, "band1LimitLease", value = 225000)
-      updateNumericInput(session, "band2LimitLease", value = 2000000)
-      updateSliderInput(session, "LTTrate1Lease", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Lease", min = 0, max = 1, value = 0.01,step = 0.01)
-      updateSliderInput(session, "LTTrate3Lease", min = 0, max = 1, value = 0.02,step = 0.01)
-    }else if (input$LTTchoice == "England"){
-      updateNumericInput(session, "band1LimitRes", value = 200000)
-      updateNumericInput(session, "band2LimitRes", value = 260000)
-      updateNumericInput(session, "band3LimitRes", value = 500000)
-      updateNumericInput(session, "band4LimitRes", value = 900000)
-      updateNumericInput(session, "band5LimitRes", value = 1800000)
-      updateSliderInput(session, "LTTrate1Res", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Res", min = 0, max = 1, value = 0.03,step = 0.01)
-      updateSliderInput(session, "LTTrate3Res", min = 0, max = 1, value = 0.05,step = 0.01)
-      updateSliderInput(session, "LTTrate4Res", min = 0, max = 1, value = 0.08,step = 0.01)
-      updateSliderInput(session, "LTTrate5Res", min = 0, max = 1, value = 0.11,step = 0.01)
-      updateSliderInput(session, "LTTrate6Res", min = 0, max = 1, value = 0.14,step = 0.01)
-      updateNumericInput(session, "band1LimitPurchase", value = 240000)
-      updateNumericInput(session, "band2LimitPurchase", value = 280000)
-      updateNumericInput(session, "band3LimitPurchase", value = 1500000)
-      updateSliderInput(session, "LTTrate1Purchase", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Purchase", min = 0, max = 1, value = 0.02,step = 0.01)
-      updateSliderInput(session, "LTTrate3Purchase", min = 0, max = 1, value = 0.04,step = 0.01)
-      updateSliderInput(session, "LTTrate4Purchase", min = 0, max = 1, value = 0.05,step = 0.01)
-      updateNumericInput(session, "band1LimitLease", value = 200000)
-      updateNumericInput(session, "band2LimitLease", value = 2500000)
-      updateSliderInput(session, "LTTrate1Lease", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Lease", min = 0, max = 1, value = 0.01,step = 0.01)
-      updateSliderInput(session, "LTTrate3Lease", min = 0, max = 1, value = 0.02,step = 0.01)
-      }
   })
   
   latest_value <- reactiveVal(0)
