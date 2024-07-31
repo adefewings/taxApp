@@ -154,10 +154,10 @@ ui <- fluidPage(
           padding-right: 20px;
           }
         .radio-inline {
-            font-size: 20px;
+            font-size: 15px;
         }
         label {
-          font-size: 20px;
+          font-size: 15px;
         }
       ")
     )
@@ -226,10 +226,8 @@ ui <- fluidPage(
                column(5,
                       div(style = "height: 60px;", p("")), # Empty placeholder
                       div(style = "height: 60px;", p("")), # Empty placeholder
-                      div(style = "height: 60px;", p("")), # Empty placeholder
-                      div(style = "height: 60px;", p("")), # Empty placeholder
-                      div(style = "height: 60px;", p("")), # Empty placeholder
-                      div(style = "height: 60px;", p("")), # Empty placeholder
+                      
+                      plotlyOutput("pieChart"),
                       
                       div(class = "output-container",
                           verbatimTextOutput("totalTaxOutput")
@@ -453,12 +451,10 @@ ui <- fluidPage(
                                   div(class = "input-group-ltt",
                                    tags$label("LTT rate", `for` = "LTTrate3Lease"),
                                    sliderInput("LTTrate3Lease", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               
-                               
-                               
+                                                                                       
                       )
              )
+             
              
     )
   ),
@@ -487,12 +483,13 @@ ui <- fluidPage(
                                  tags$label("Standard rate", `for` = "stdRateLandfill"),
                                  sliderInput("stdRateLandfill", NULL, min = 0, max = 200, value = 98.6, step = 0.1)),
                              
-                            
-                             
-                             
-                             
                     )
              ),
+             column(4,
+                    tabPanel("pieChart",
+                             tags$p("Non-Residential Property Tax (Lease)", style = "font-size: 21px;font-weight: bold;margin-left: 5px;margin-right:10px; margin-bottom: 10px;")
+                             )
+                    )
              
              
            )
@@ -502,7 +499,9 @@ ui <- fluidPage(
 
 
 server <- function(input, output, session) {
-  #obersvations for Income tax:
+  
+  
+  
   observe({
     enabled_ids <- character(0)
     disabled_ids <- character(0)
@@ -514,6 +513,7 @@ server <- function(input, output, session) {
       updateNumericInput(session, "HRthreshold", value = 112500)
       updateSliderInput(session, "HR", min = 0, max = 1, value = 0.40,step = 0.01)
       updateSliderInput(session, "AR", min = 0, max = 1, value = 0.45,step = 0.01)
+      
       #sliderInput("AR", NULL, min = 0, max = 1, value = 0.46, step = 0.01))
       
     } else if (input$tax_choice == "scottish" || input$tax_choice == "fully devolved") {
@@ -521,8 +521,10 @@ server <- function(input, output, session) {
       disabled_ids <- character(0)
       updateNumericInput(session, "BRthreshold", value = 11000)
       updateNumericInput(session, "HRthreshold", value = 107000)
+      updateSliderInput(session, "BR", min = 0, max = 1, value = 0.2,step = 0.01)
       updateSliderInput(session, "HR", min = 0, max = 1, value = 0.41,step = 0.01)
       updateSliderInput(session, "AR", min = 0, max = 1, value = 0.46,step = 0.01)
+      
     }
     
     # Enable sliders
@@ -680,6 +682,13 @@ server <- function(input, output, session) {
   saved_value <- reactiveVal(0)
   
   calculateTax <- function(){
+    #-----------------------
+    
+    
+    # Observe tax choice changes and update pie chart
+    
+    #-----------------------
+    
     # Define Parameters from inputs
     PA <- input$PA
     PAlimit <- input$PAlimit
@@ -699,7 +708,9 @@ server <- function(input, output, session) {
     
     # Calculate Income by tax bracket
     
-    if (input$tax_choice == "scottish"){
+    if (input$tax_choice == "scottish" || input$tax_choice == "fully devolved"){
+      
+    
       TIDist$PA <- NA
       TIDist$PA[TIDist$TaxableIncome <= PAlimit] <- PA
       TIDist$PA[TIDist$TaxableIncome > PAlimit] <- pmax(0, PA - 0.5 * (TIDist$TaxableIncome[TIDist$TaxableIncome > PAlimit] - PAlimit))
@@ -738,9 +749,24 @@ server <- function(input, output, session) {
       
       TIDist$TotalTax <- (TIDist$SRtax + TIDist$BRtax + TIDist$IRtax + TIDist$HRtax + TIDist$ARtax) * TIDist$N
       total_tax_sum <- sum(TIDist$TotalTax, na.rm = TRUE)
+      
+      
+      reactive_fruit_data <- reactive({
+        #req(input$tax_choice)  # Ensure tax_choice is available
+        
+        # Determine fruit counts based on tax choice
+        
+        data.frame(
+          fruit = c("Starter", "Basic","Intermediate","Higher", "Additional"),
+          count = c(TIDist$SRtax * TIDist$N, TIDist$BRtax * TIDist$N, TIDist$IRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
+        )
+        
+      })
       #latest_value(total_tax_sum)
       #paste("Total tax return from income tax = ", total_tax_sum)
     } else if (input$tax_choice == "current"){
+      
+      
       
       TIDist$PA <- NA
       TIDist$PA[TIDist$TaxableIncome <= PAlimit] <- PA
@@ -776,9 +802,32 @@ server <- function(input, output, session) {
       total_tax_sum <- sum(TIDist$TotalTax, na.rm = TRUE)
       #latest_value(total_tax_sum)
       #paste("tax return from income tax with current filters= ", total_tax_sum)
-      
+      reactive_fruit_data <- reactive({
+        #req(input$tax_choice)  # Ensure tax_choice is available
+        
+        # Determine fruit counts based on tax choice
+        
+        data.frame(
+          fruit = c("Basic", "Higher", "Additional"),
+          count = c( TIDist$BRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
+        )
+        
+      })
       
     }
+    
+    output$pieChart <- renderPlotly({
+      fruit_data <- reactive_fruit_data()
+      
+      plot_ly(fruit_data, labels = ~fruit, values = ~count, type = 'pie') %>%
+        layout(
+          title = 'Tax income distribution',
+          margin = list(l = 20, r = 20, b = 20, t = 30),  # Adjust margins
+          paper_bgcolor = 'lightgray',  # Background color of the plot area
+          plot_bgcolor = 'white'  # Background color of the chart area
+        )
+    })
+    
     total_tax_sum
   }
   
@@ -802,6 +851,11 @@ server <- function(input, output, session) {
     # Save the current latest value when the button is clicked
     saved_value(latest_value())
   })
+  
+  
+  
+  
+  
   
 }
 
