@@ -75,12 +75,19 @@ ui <- fluidPage(
         display: flex;
         align-items: center;
          margin-bottom: 2px;
+         marigin-right: 10px
         }
         .input-group-council label {
+        width: 200px;
         margin-right: 5px; 
+      
         }
         .input-group-council input {
         margin-left: 10px; 
+        padding: 20px
+        }
+        .input-group-council .shiny-input-container {
+        flex-grow:0.2
         }
         .input-group label {
           width: 200px; /* Fixed width for labels */
@@ -89,18 +96,34 @@ ui <- fluidPage(
         .input-group .shiny-input-container {
           flex-grow: 0.2; /* Let inputs take the remaining space */
         }
-        .input-group-ndr{
-        display: flex;
-        align-items: center;
-        margin-bottom: 2px;
+       
+        .input-group-ndr {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px; /* Increased spacing between input groups */
+            padding: 5px; /* Added padding for better spacing */
+            border: 1px solid #ddd; /* Light border to define input group */
+            border-radius: 5px; /* Rounded corners for a softer look */
+            background-color: #f9f9f9; /* Light background for contrast */
         }
+
+
         .input-group-ndr label {
-        width: 250px;
-        margin-right: 5px;
+            width: 1000px; /* Adjusted to a more standard width */
+            margin-right: 15px; /* Increased margin for better separation */
+            font-weight: bold; /* Make labels more prominent */
+            text-align: left; /* Align labels to the right for consistency */
         }
+        
+        
         .input-group-ndr input {
-          width: 100px;
+            /*flex: 1;  Allow inputs to take up remaining space */
+            margin-right: 0; /* Removed margin-right to use full width */
+            padding: 8px; /* Added padding for better input readability */
+            border: 1px solid #ccc; /* Light border for inputs */
+            border-radius: 4px; /* Rounded corners for inputs */
         }
+
         .input-group-landfill {
           display: flex;
           align-items: center;
@@ -136,11 +159,12 @@ ui <- fluidPage(
           border-radius: 5px;
         }
           .output-container {
+          display: flex;
           background-color: #f0f0f0; 
           padding: 10px;
-          border-radius: 5px;
-          margin-top: 10px;
-          margin-right: 120px;
+          #border-radius: 5px;
+          #margin-top: 10px;
+          #margin-right: 120px;
           }
           .calculate-button-container{
           background-color: #f0f0f0;
@@ -179,6 +203,7 @@ ui <- fluidPage(
              div(style = "height: 30px;", p("")), # Empty placeholder
              fluidRow(
                column(5,
+                      style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
                       tabPanel("incomeTax",
                                div(class = "input-group",
                                    tags$label("Personal Allowance:", `for` = "PA"),
@@ -224,8 +249,9 @@ ui <- fluidPage(
                       )
                ),
                column(5,
-                      div(style = "height: 60px;", p("")), # Empty placeholder
-                      div(style = "height: 60px;", p("")), # Empty placeholder
+                      style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
+                      #div(style = "height: 60px;", p("")), # Empty placeholder
+                      #div(style = "height: 60px;", p("")), # Empty placeholder
                       
                       plotlyOutput("pieChart"),
                       
@@ -256,7 +282,8 @@ ui <- fluidPage(
              #Now need to include the different bands (A-H) with I only included for Wales:
              div(style = "height: 30px;", p("")), # Empty placeholder
              fluidRow(
-               column(4,
+               column(3,
+                      style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
                       tabPanel("councilTax",
                                div(class = "input-group-council",
                                    tags$label(id = "bandA-label","Band A limit", `for` = "bandA"),
@@ -286,10 +313,8 @@ ui <- fluidPage(
                       )
                ),
                column(5,
-                      div(style = "height: 60px;", p("")), # Empty placeholder
-                      div(style = "height: 60px;", p("")), # Empty placeholder
-                      div(style = "height: 60px;", p("")), # Empty placeholder
-                      
+                      #div(style = "height: 60px;", p("")), # Empty placeholder
+                    
                       div(class = "output-container",
                           verbatimTextOutput("councilTaxOutput")
                       ),
@@ -314,9 +339,9 @@ ui <- fluidPage(
                              selected = "Wales")),
              div(style = "height: 20px;", p("")), # Empty placeholder
              fluidRow(
-               column(6,
+               column(4,
                       tabPanel("NDR",
-                               
+                               style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
                                div(class = "input-group-ndr",
                                    tags$label(id = "rateableValue-label","Proposed change for rateable values:", `for` = "rateableValueChange"),
                                    numericInput("rateableValueChange", NULL, 0)),
@@ -743,6 +768,14 @@ server <- function(input, output, session) {
       TIDist$HRtax <- HR * TIDist$HRincome
       TIDist$ARtax <- AR * TIDist$ARincome
       
+      starter_total <- sum((TIDist$SRtax) * TIDist$N, na.rm = TRUE)
+      
+      basic_total <- sum((TIDist$BRtax) * TIDist$N, na.rm = TRUE)
+      inter_total <- sum((TIDist$IRtax) * TIDist$N, na.rm = TRUE)
+      
+      higher_total <- sum((TIDist$HRtax) * TIDist$N, na.rm = TRUE)
+
+      additional_total <- sum((TIDist$ARtax) * TIDist$N, na.rm = TRUE)
       
       
       # Calculate total income tax payable
@@ -758,7 +791,9 @@ server <- function(input, output, session) {
         
         data.frame(
           fruit = c("Starter", "Basic","Intermediate","Higher", "Additional"),
-          count = c(TIDist$SRtax * TIDist$N, TIDist$BRtax * TIDist$N, TIDist$IRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
+          #count = c(TIDist$SRtax * TIDist$N, TIDist$BRtax * TIDist$N, TIDist$IRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
+          count = c(starter_total, basic_total, inter_total,higher_total, additional_total)
+          
         )
         
       })
@@ -794,7 +829,9 @@ server <- function(input, output, session) {
       TIDist$HRtax <- HR * TIDist$HRincome
       TIDist$ARtax <- AR * TIDist$ARincome
       
-      
+      basic_total <- sum((TIDist$BRtax) * TIDist$N, na.rm = TRUE)
+      higher_total <- sum((TIDist$HRtax) * TIDist$N, na.rm = TRUE)
+      additional_total <- sum((TIDist$ARtax) * TIDist$N, na.rm = TRUE)
       
       # Calculate total income tax payable
       
@@ -803,13 +840,10 @@ server <- function(input, output, session) {
       #latest_value(total_tax_sum)
       #paste("tax return from income tax with current filters= ", total_tax_sum)
       reactive_fruit_data <- reactive({
-        #req(input$tax_choice)  # Ensure tax_choice is available
-        
-        # Determine fruit counts based on tax choice
         
         data.frame(
           fruit = c("Basic", "Higher", "Additional"),
-          count = c( TIDist$BRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
+          count = c( basic_total, higher_total, additional_total)
         )
         
       })
@@ -822,9 +856,10 @@ server <- function(input, output, session) {
       plot_ly(fruit_data, labels = ~fruit, values = ~count, type = 'pie') %>%
         layout(
           title = 'Tax income distribution',
-          margin = list(l = 20, r = 20, b = 20, t = 30),  # Adjust margins
+          margin = list(l = 20, r = 20, b = 10, t = 30),  # Adjust margins
           paper_bgcolor = 'lightgray',  # Background color of the plot area
           plot_bgcolor = 'white'  # Background color of the chart area
+          #width = 200px
         )
     })
     

@@ -5,7 +5,7 @@ BRthreshold <- 37500 # limit for basic rate
 
 HRthreshold <- 150000 # limit for higher rate
 SR <- 0.19 # starter rate
-BR <- 0.2 # basic rate
+BR <- 0.3 # basic rate
 IR <- 0.21 #intermediate rate
 HR <- 0.4 # higher rate
 AR <- 0.45 # additional rate
@@ -36,5 +36,11 @@ TIDist$ARtax <- AR * TIDist$ARincome
 # Calculate total income tax payable
 TIDist$TotalTax <- (TIDist$BRtax + TIDist$HRtax + TIDist$ARtax) * TIDist$N
 total_tax_sum <- sum(TIDist$TotalTax, na.rm = TRUE)
+basic_total <- sum((TIDist$BRtax) * TIDist$N, na.rm = TRUE)
+higher_total <- sum((TIDist$HRtax) * TIDist$N, na.rm = TRUE)
+additional_total <- sum((TIDist$ARtax) * TIDist$N, na.rm = TRUE)
+print(basic_total/1000000000)
+print(higher_total/1000000000)
+print(additional_total/1000000000)
 print(total_tax_sum)
 
