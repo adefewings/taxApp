@@ -963,7 +963,8 @@ server <- function(input, output, session) {
         if (values$show_sum) {
           list(
             stacked = rbind(vector1, vector2, vector3,vector4, vector5),
-            labels = labels
+            labels = labels,
+            legend_vector = legend_vector
           )
         } else {
           # Calculate sum of vectors
@@ -1119,7 +1120,8 @@ server <- function(input, output, session) {
         if (values$show_sum) {
           list(
             stacked = rbind(vector1, vector2, vector3),
-            labels = labels
+            labels = labels,
+            legend_vector = legend_vector
           )
         } else {
           # Calculate sum of vectors
