@@ -257,14 +257,13 @@ ui <- fluidPage(
                       div(class = "output-container",
                           verbatimTextOutput("newTotalTaxOutput")
                       ),
-                      div(class = "calculate-button-container",
-                          actionButton("calculate", label = "update with new filters")
-                      ),
                       plotlyOutput("pieChart"),
-                      plotlyOutput("stackedPlot"),
                       div(class = "calculate-button-container",
-                          actionButton("divideByPeople", label = "Divide By people per range")
+                          #actionButton("calculate", label = "update with new filters")
+                          actionButton("toggleButton", "Divide by people per band")
                       ),
+                      plotlyOutput("stackedPlot"),
+                      
                )
              )        
              
@@ -942,19 +941,22 @@ server <- function(input, output, session) {
         }
       }
       
+      divisor <- if (values$divide) num_people else 1
+      
       #barchart:
       bar_data <- reactive({
-        vector1 <- c(starter_list/num_people)
-        vector2 <- c(basic_list/num_people)
-        vector3 <- c(inter_list/num_people)
-        vector4 <- c(higher_list/num_people)
-        vector5 <- c(additional_list/num_people)
+        vector1 <- c(starter_list/divisor)
+        vector2 <- c(basic_list/divisor)
+        vector3 <- c(inter_list/divisor)
+        vector4 <- c(higher_list/divisor)
+        vector5 <- c(additional_list/divisor)
         labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
-
+        legend_vector <- c("Starter", "Basic", "Intermediate", "Higher", "Additional")
         
         list(
           stacked = rbind(vector1, vector2, vector3, vector4, vector5),
-          labels = labels
+          labels = labels,
+          legend_vector = legend_vector
         )
       })
       
@@ -1081,18 +1083,20 @@ server <- function(input, output, session) {
         }
       }
       
+      divisor <- if (values$divide) num_people else 1
       
       #barchart:
       bar_data <- reactive({
-        vector1 <- c(basic_list/num_people)
-        vector2 <- c(higher_list/num_people)
-        vector3 <- c(additional_list/num_people)
+        vector1 <- c(basic_list/divisor)
+        vector2 <- c(higher_list/divisor)
+        vector3 <- c(additional_list/divisor)
         labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
-
+        legend_vector <- c("basic", "higher", "additional")
         
         list(
           stacked = rbind(vector1, vector2, vector3),
-          labels = labels
+          labels = labels,
+          legend_vector = legend_vector
         )
       })
       
@@ -1128,17 +1132,17 @@ server <- function(input, output, session) {
         x = x_categories,
         y = ~data$stacked[1,],
         type = 'bar',
-        name = 'Starter',
+        name = ~data$legend_vector[1],
         marker = list(color = 'rgba(255, 99, 132, 0.6)')
       ) %>%
         add_trace(
           y = ~data$stacked[2,],
-          name = 'Basic',
+          name = ~data$legend_vector[2],
           marker = list(color = 'rgba(54, 162, 235, 0.6)')
         ) %>%
         add_trace(
           y = ~data$stacked[3,],
-          name = 'Inter',
+          name = ~data$legend_vector[3],
           marker = list(color = 'rgba(75, 192, 192, 0.6)')
         )
       
@@ -1147,12 +1151,12 @@ server <- function(input, output, session) {
         p <- p %>%
           add_trace(
             y = ~data$stacked[4,],
-            name = 'Higher',
+            name = ~data$legend_vector[4],
             marker = list(color = 'rgba(223, 192, 192, 0.6)')
           ) %>%
           add_trace(
             y = ~data$stacked[5,],
-            name = 'add',
+            name = ~data$legend_vector[5],
             marker = list(color = 'rgba(23, 192, 192, 0.6)')
           )
       }
@@ -1295,7 +1299,18 @@ server <- function(input, output, session) {
     saved_value(latest_value())
   })
   
+  #toggle button for incometax barchart:
+  # Reactive value to keep track of button state
+  values <- reactiveValues(divide = FALSE)
   
+  observeEvent(input$toggleButton, {
+    values$divide <- !values$divide
+    if (values$divide) {
+      updateActionButton(session, "toggleButton", label = "Revert")
+    } else {
+      updateActionButton(session, "toggleButton", label = "Divide by people per band")
+    }
+  })
   
   
   
