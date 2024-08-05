@@ -9,7 +9,8 @@ ui <- fluidPage(
       selectInput("dataset", "Choose Dataset:", 
                   choices = c("Dataset 1", "Dataset 2"), 
                   selected = "Dataset 1"),
-      actionButton("toggleButton", "Divide by 10")
+      actionButton("toggleButton", "Divide by 10"),
+      actionButton("viewButton", "Show Sum")
     ),
     
     mainPanel(
@@ -20,8 +21,11 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  # Reactive value to keep track of button state
-  values <- reactiveValues(divide = FALSE)
+  # Reactive values to keep track of button states
+  values <- reactiveValues(
+    divide = FALSE,
+    show_sum = FALSE
+  )
   
   observeEvent(input$toggleButton, {
     values$divide <- !values$divide
@@ -32,9 +36,26 @@ server <- function(input, output, session) {
     }
   })
   
-  # Reactive expression to return data based on selected dataset and button state
+  observeEvent(input$viewButton, {
+    values$show_sum <- !values$show_sum
+    if (values$show_sum) {
+      updateActionButton(session, "viewButton", label = "Revert")
+    } else {
+      updateActionButton(session, "viewButton", label = "Show Sum")
+    }
+  })
+  
+  observeEvent(input$PracButton, {
+    values$show_sum <- !values$show_sum
+    if (values$show_sum) {
+      updateActionButton(session, "viewButton", label = "Revert")
+    } else {
+      updateActionButton(session, "viewButton", label = "Show Sum")
+    }
+  })
+  
+  # Reactive expression to return data based on selected dataset and button states
   data_reactive <- reactive({
-    # Define constants
     divisor <- if (values$divide) 10 else 1
     
     if (input$dataset == "Dataset 1") {
@@ -48,43 +69,93 @@ server <- function(input, output, session) {
     }
     labels <- c("10", "20", "30", "40", "50", "60", "70", "80", "90", "100", "110", "120", "120+")
     
-    list(
-      stacked = rbind(vector1, vector2, vector3),
-      labels = labels
-    )
+    if (values$show_sum) {
+      list(
+        stacked = rbind(vector1, vector2, vector3),
+        labels = labels
+      )
+    } else {
+      # Calculate sum of vectors
+      summed <- vector1 + vector2 + vector3
+      list(
+        stacked = summed,
+        labels = labels
+      )
+      #
+      
+    }
   })
   
-  # Generate Stacked Bar Chart using Plotly
+  # Generate Stacked Bar Chart or Sum Chart using Plotly
   output$stackedPlot <- renderPlotly({
     data <- data_reactive()
     
     # Ensure x-axis categories are factors with the correct order
     x_categories <- factor(data$labels, levels = data$labels)
     
-    plot_ly(
-      type = 'bar',
-      x = x_categories,
-      y = ~data$stacked[1,],
-      name = 'Vector 1',
-      marker = list(color = 'rgba(255, 99, 132, 0.6)')
-    ) %>%
-      add_trace(
-        y = ~data$stacked[2,],
-        name = 'Vector 2',
-        marker = list(color = 'rgba(54, 162, 235, 0.6)')
+    
+    if (values$show_sum) {
+      # Plot stacked bars
+      p <- plot_ly(
+        x = x_categories,
+        y = ~data$stacked[1,],
+        type = 'bar',
+        name = 'Vector 1',
+        marker = list(color = 'rgba(255, 99, 132, 0.6)')
       ) %>%
-      add_trace(
-        y = ~data$stacked[3,],
-        name = 'Vector 3',
-        marker = list(color = 'rgba(75, 192, 192, 0.6)')
+        add_trace(
+          y = ~data$stacked[2,],
+          name = 'Vector 2',
+          marker = list(color = 'rgba(54, 162, 235, 0.6)')
+        ) %>%
+        add_trace(
+          y = ~data$stacked[3,],
+          name = 'Vector 3',
+          marker = list(color = 'rgba(75, 192, 192, 0.6)')
+        )
+      
+      # Conditionally add additional traces based on input$tax_choice
+      if (input$tax_choice != "current" && nrow(data$stacked) > 3) {
+        p <- p %>%
+          add_trace(
+            y = ~data$stacked[4,],
+            name = 'Higher',
+            marker = list(color = 'rgba(223, 192, 192, 0.6)')
+          ) %>%
+          add_trace(
+            y = ~data$stacked[5,],
+            name = 'Add',
+            marker = list(color = 'rgba(23, 192, 192, 0.6)')
+          )
+      }
+      
+      p %>%
+        layout(
+          barmode = 'stack',
+          title = "Stacked Bar Chart with Plotly",
+          xaxis = list(title = "Categories"),
+          yaxis = list(title = "Values")
+        )
+      
+    } else {
+      # Plot summed values
+      plot_ly(
+        x = x_categories,
+        y = ~data$stacked,
+        type = 'bar',
+        name = 'Sum',
+        marker = list(color = 'rgba(255, 99, 132, 0.6)')
       ) %>%
-      layout(
-        barmode = 'stack',
-        title = "Stacked Bar Chart with Plotly",
-        xaxis = list(title = "Categories"),
-        yaxis = list(title = "Values")
-      )
+        layout(
+          barmode = 'group',
+          title = "Sum of Values",
+          xaxis = list(title = "Categories"),
+          yaxis = list(title = "Sum")
+        )
+      
+    }
   })
 }
+
 
 shinyApp(ui, server)

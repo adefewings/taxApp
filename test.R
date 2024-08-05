@@ -260,7 +260,8 @@ ui <- fluidPage(
                       plotlyOutput("pieChart"),
                       div(class = "calculate-button-container",
                           #actionButton("calculate", label = "update with new filters")
-                          actionButton("toggleButton", "Divide by people per band")
+                          actionButton("toggleButton", "Divide by people per band"),
+                          actionButton("viewButton", "Show tax breakdown")
                       ),
                       plotlyOutput("stackedPlot"),
                       
@@ -953,11 +954,27 @@ server <- function(input, output, session) {
         labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
         legend_vector <- c("Starter", "Basic", "Intermediate", "Higher", "Additional")
         
-        list(
-          stacked = rbind(vector1, vector2, vector3, vector4, vector5),
-          labels = labels,
-          legend_vector = legend_vector
-        )
+        #list(
+        #  stacked = rbind(vector1, vector2, vector3, vector4, vector5),
+        #  labels = labels,
+        #  legend_vector = legend_vector
+        #)
+        
+        if (values$show_sum) {
+          list(
+            stacked = rbind(vector1, vector2, vector3,vector4, vector5),
+            labels = labels
+          )
+        } else {
+          # Calculate sum of vectors
+          summed <- vector1 + vector2 + vector3 + vector4 + vector5
+          list(
+            stacked = summed,
+            labels = labels
+          )
+          #
+          
+        }
       })
       
       
@@ -1093,11 +1110,28 @@ server <- function(input, output, session) {
         labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
         legend_vector <- c("basic", "higher", "additional")
         
-        list(
-          stacked = rbind(vector1, vector2, vector3),
-          labels = labels,
-          legend_vector = legend_vector
-        )
+        #list(
+        #  stacked = rbind(vector1, vector2, vector3),
+        #  labels = labels,
+        #  legend_vector = legend_vector
+        #)
+        
+        if (values$show_sum) {
+          list(
+            stacked = rbind(vector1, vector2, vector3),
+            labels = labels
+          )
+        } else {
+          # Calculate sum of vectors
+          summed <- vector1 + vector2 + vector3
+          list(
+            stacked = summed,
+            labels = labels
+          )
+          #
+          
+        }
+        
       })
       
   
@@ -1127,50 +1161,70 @@ server <- function(input, output, session) {
       # Ensure x-axis categories are factors with the correct order
       x_categories <- factor(data$labels, levels = data$labels)
       
-      # Initialize plotly object with the base traces
-      p <- plot_ly(
-        x = x_categories,
-        y = ~data$stacked[1,],
-        type = 'bar',
-        name = ~data$legend_vector[1],
-        marker = list(color = 'rgba(255, 99, 132, 0.6)')
-      ) %>%
-        add_trace(
-          y = ~data$stacked[2,],
-          name = ~data$legend_vector[2],
-          marker = list(color = 'rgba(54, 162, 235, 0.6)')
-        ) %>%
-        add_trace(
-          y = ~data$stacked[3,],
-          name = ~data$legend_vector[3],
-          marker = list(color = 'rgba(75, 192, 192, 0.6)')
-        )
       
-      # Conditionally add additional traces based on input$tax_choice
-      if (input$tax_choice != "current") {
-        p <- p %>%
-          add_trace(
-            y = ~data$stacked[4,],
-            name = ~data$legend_vector[4],
-            marker = list(color = 'rgba(223, 192, 192, 0.6)')
+      if (values$show_sum){
+      
+          # Initialize plotly object with the base traces
+          p <- plot_ly(
+            x = x_categories,
+            y = ~data$stacked[1,],
+            type = 'bar',
+            name = ~data$legend_vector[1],
+            marker = list(color = 'rgba(255, 99, 132, 0.6)')
           ) %>%
-          add_trace(
-            y = ~data$stacked[5,],
-            name = ~data$legend_vector[5],
-            marker = list(color = 'rgba(23, 192, 192, 0.6)')
+            add_trace(
+              y = ~data$stacked[2,],
+              name = ~data$legend_vector[2],
+              marker = list(color = 'rgba(54, 162, 235, 0.6)')
+            ) %>%
+            add_trace(
+              y = ~data$stacked[3,],
+              name = ~data$legend_vector[3],
+              marker = list(color = 'rgba(75, 192, 192, 0.6)')
+            )
+          
+          # Conditionally add additional traces based on input$tax_choice
+          if (input$tax_choice != "current" && nrow(data$stacked) > 3) {
+            p <- p %>%
+              add_trace(
+                y = ~data$stacked[4,],
+                name = ~data$legend_vector[4],
+                marker = list(color = 'rgba(223, 192, 192, 0.6)')
+              ) %>%
+              add_trace(
+                y = ~data$stacked[5,],
+                name = ~data$legend_vector[5],
+                marker = list(color = 'rgba(23, 192, 192, 0.6)')
+              )
+          }
+          
+          # Finalize layout
+          p <- p %>%
+            layout(
+              barmode = 'stack',
+              title = "Stacked Bar Chart with Plotly",
+              xaxis = list(title = "Categories"),
+              yaxis = list(title = "Values")
+            )
+          
+          p
+      }else {
+        # Plot summed values
+        plot_ly(
+          x = x_categories,
+          y = ~data$stacked,
+          type = 'bar',
+          name = 'Sum',
+          marker = list(color = 'rgba(255, 99, 132, 0.6)')
+        ) %>%
+          layout(
+            barmode = 'group',
+            title = "Sum of Values",
+            xaxis = list(title = "Categories"),
+            yaxis = list(title = "Sum")
           )
+        
       }
-      
-      # Finalize layout
-      p <- p %>%
-        layout(
-          barmode = 'stack',
-          title = "Stacked Bar Chart with Plotly",
-          xaxis = list(title = "Categories"),
-          yaxis = list(title = "Values")
-        )
-      
-      p
     })
     
     total_tax_sum
@@ -1301,7 +1355,10 @@ server <- function(input, output, session) {
   
   #toggle button for incometax barchart:
   # Reactive value to keep track of button state
-  values <- reactiveValues(divide = FALSE)
+  values <- reactiveValues(
+    divide = FALSE,
+    show_sum = FALSE
+  )
   
   observeEvent(input$toggleButton, {
     values$divide <- !values$divide
@@ -1312,11 +1369,14 @@ server <- function(input, output, session) {
     }
   })
   
-  
-  
-  
-  
-  
+  observeEvent(input$viewButton, {
+    values$show_sum <- !values$show_sum
+    if (values$show_sum) {
+      updateActionButton(session, "viewButton", label = "Revert")
+    } else {
+      updateActionButton(session, "viewButton", label = "Show Tax")
+    }
+  })
 }
 
 shinyApp(ui = ui, server = server)
