@@ -1,5 +1,7 @@
 library(shiny)
 library(shinyjs)
+library(plotly) 
+library(ggplot2)
 
 ui <- fluidPage(
   useShinyjs(),  # Initialize shinyjs
@@ -69,26 +71,20 @@ ui <- fluidPage(
           width: 100px; 
         }
         
-        
-        
         .input-group-council {
         display: flex;
         align-items: center;
          margin-bottom: 2px;
-         marigin-right: 10px
         }
         .input-group-council label {
-        width: 200px;
+        width: 150px;
         margin-right: 5px; 
       
         }
         .input-group-council input {
-        margin-left: 10px; 
-        padding: 20px
+        width: 100px; 
         }
-        .input-group-council .shiny-input-container {
-        flex-grow:0.2
-        }
+       
         .input-group label {
           width: 200px; /* Fixed width for labels */
           margin-right: 5px; /* Space between label and input */
@@ -227,7 +223,7 @@ ui <- fluidPage(
                                    numericInput("BRthreshold", NULL, 0)),
                                div(class = "input-group",
                                    tags$label("Intermediate Rate Threshold:", `for` = "IRthreshold"),
-                                   numericInput("IRthreshold", NULL, 8000)),
+                                   numericInput("IRthreshold", NULL, 18000)),
                                div(class = "input-group",
                                    tags$label(id="HRThreshold","Higher Rate Threshold:", `for` = "HRthreshold"),
                                    numericInput("HRthreshold", NULL, 0)),
@@ -253,8 +249,6 @@ ui <- fluidPage(
                       #div(style = "height: 60px;", p("")), # Empty placeholder
                       #div(style = "height: 60px;", p("")), # Empty placeholder
                       
-                      plotlyOutput("pieChart"),
-                      
                       div(class = "output-container",
                           verbatimTextOutput("totalTaxOutput")
                       ),
@@ -265,7 +259,12 @@ ui <- fluidPage(
                       ),
                       div(class = "calculate-button-container",
                           actionButton("calculate", label = "update with new filters")
-                      )
+                      ),
+                      plotlyOutput("pieChart"),
+                      plotlyOutput("stackedPlot"),
+                      div(class = "calculate-button-container",
+                          actionButton("divideByPeople", label = "Divide By people per range")
+                      ),
                )
              )        
              
@@ -279,37 +278,88 @@ ui <- fluidPage(
              selectInput("councilTaxCountry", "Select Country for Council tax calculations",
                          choices = c("Wales", "Scotland", "England"),
                          selected = "Wales"),
-             #Now need to include the different bands (A-H) with I only included for Wales:
+             #numericInput("top band council tax amount:", 0, 2000),
+             div(class = "input-group-council",
+                 tags$label("Top Band Value = ", `for` = "topBandValue"),
+                 numericInput("topBandValue", NULL, 2000)),
+                              #Now need to include the different bands (A-H) with I only included for Wales:
              div(style = "height: 30px;", p("")), # Empty placeholder
              fluidRow(
-               column(3,
+               column(4,
                       style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
                       tabPanel("councilTax",
+                               tags$p("Band A:", style = "font-size: 18px;font-weight: bold;"),
                                div(class = "input-group-council",
                                    tags$label(id = "bandA-label","Band A limit", `for` = "bandA"),
                                    numericInput("bandA", NULL, 0)),
                                div(class = "input-group-council",
+                                   tags$label("% top band:", `for` = "bandArate"),
+                                   sliderInput("bandArate", NULL, min = 1, max = 100, value = 5.4, step = 0.1)),
+                              
+                               tags$p("Band B:", style = "font-size: 18px;font-weight: bold;"), 
+                               div(class = "input-group-council",
                                    tags$label(id="bandB-label","Band B limit", `for` = "bandB"),
                                    numericInput("bandB", NULL, 0)),
                                div(class = "input-group-council",
-                                   tags$label(id="bandC-label","Band C limit", `for` = "bandC"),
+                                   tags$label("% top band:", `for` = "bandBrate"),
+                                   sliderInput("bandBrate", NULL, min = 1, max = 100, value = 10.1, step = 0.1)),
+                               
+                               tags$p("Band C:", style = "font-size: 18px;font-weight: bold;"),
+                               div(class = "input-group-council",
+                                   tags$label(id="bandC-council","Band C limit", `for` = "bandC"),
                                    numericInput("bandC", NULL, 0)),
+                               div(class = "input-group-council",
+                                   tags$label("% top band:", `for` = "bandCrate"),
+                                   sliderInput("bandCrate", NULL, min = 1, max = 100, value = 20.4, step = 0.1)),
+                               
+                               tags$p("Band D:", style = "font-size: 18px;font-weight: bold;"),
                                div(class = "input-group-council",
                                    tags$label(id="bandD-label","Band D limit", `for` = "bandD"),
                                    numericInput("bandD", NULL, 0)),
                                div(class = "input-group-council",
+                                   tags$label("% top band:", `for` = "bandDrate"),
+                                   sliderInput("bandDrate", NULL, min = 1, max = 100, value = 30.0, step = 0.1)),
+                               
+                               tags$p("Band E:", style = "font-size: 18px;font-weight: bold;"),
+                               div(class = "input-group-council",
                                    tags$label(id = "bandE-label", "Band E limit",`for` = "bandE"),
                                    numericInput("bandE", NULL, 0)),
+                               div(class = "input-group-council",
+                                   tags$label("% top band:", `for` = "bandErate"),
+                                   sliderInput("bandErate", NULL, min = 1, max = 100, value = 50.4, step = 0.1)),
+                               
+                               tags$p("Band F:", style = "font-size: 18px;font-weight: bold;"),
                                div(class = "input-group-council",
                                    tags$label(id="bandF-label","Band F limit", `for` = "bandF"),
                                    numericInput("bandF", NULL, 223000)),
                                div(class = "input-group-council",
+                                   tags$label("% top band:", `for` = "bandFrate"),
+                                   sliderInput("bandFrate", NULL, min = 1, max = 100, value = 60.7, step = 0.1)),
+                               
+                               tags$p("Band G:", style = "font-size: 18px;font-weight: bold;"),
+                               div(class = "input-group-council",
                                    tags$label(id="bandG-label","Band G limit", `for` = "bandH"),
                                    numericInput("bandG", NULL, 324000)),
+                               div(class = "input-group-council",
+                                   tags$label("% top band:", `for` = "bandGrate"),
+                                   sliderInput("bandGrate", NULL, min = 1, max = 100, value = 75.4, step = 0.1)),
+                               
+                               tags$p("Band H:", style = "font-size: 18px;font-weight: bold;"),
                                div(id = "bandH-container",
                                    div(class = "input-group-council",
                                        tags$label("Band H limit", `for` = "bandH"),
                                        numericInput("bandH", NULL, 424000))),
+                               div(class = "input-group-council",
+                                   tags$label("% top band:", `for` = "bandHrate"),
+                                   sliderInput("bandHrate", NULL, min = 1, max = 100, value = 80.4, step = 0.1)),
+                               
+                               tags$p("Band I:", style = "font-size: 18px;font-weight: bold;"),
+                               
+                               div(id="bandI-container",
+                                  div(class = "input-group-council",
+                                      tags$label("% top band:", `for` = "bandIrate"),
+                                      sliderInput("bandIrate", NULL, min = 1, max = 100, value = 80.4, step = 0.1))),
+                               
                       )
                ),
                column(5,
@@ -318,6 +368,7 @@ ui <- fluidPage(
                       div(class = "output-container",
                           verbatimTextOutput("councilTaxOutput")
                       ),
+                      plotlyOutput("pieChartCouncil"),
                       
                       
                       #div(class = "output-container",
@@ -588,8 +639,10 @@ server <- function(input, output, session) {
   observe({
     if (input$councilTaxCountry == "Wales") {
       show("bandH-container")
+      show("bandI-container")
     } else {
       hide("bandH-container")
+      hide("bandI-container")
     }
   })
   
@@ -792,11 +845,123 @@ server <- function(input, output, session) {
         data.frame(
           fruit = c("Starter", "Basic","Intermediate","Higher", "Additional"),
           #count = c(TIDist$SRtax * TIDist$N, TIDist$BRtax * TIDist$N, TIDist$IRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
-          count = c(starter_total, basic_total, inter_total,higher_total, additional_total)
+          count = c(starter_total, basic_total,inter_total, higher_total, additional_total)
           
         )
         
       })
+      
+      #barchart stuff:
+      num_rows <- nrow(TIDist)
+      counter <- 1
+      band_sum <- 0
+      
+      results <-numeric(13)
+      num_people <-numeric(13)
+      band_people <- 0
+      
+      
+      #now we want to do a break down of the different taxes too.
+      basic_list <-numeric(13)
+      higher_list <- numeric(13)
+      additional_list <- numeric(13)
+      
+      #scotland only
+      starter_list <- numeric(13)
+      inter_list <- numeric(13)
+      
+      basic_sum <- 0
+      higher_sum <- 0
+      addional_sum <- 0
+      
+      starter_sum <- 0
+      inter_sum <- 0
+      
+      
+      for (i in 1:num_rows){
+        
+        if (TIDist$TaxableIncome[i] <= (counter * 10000)){
+          band_sum <- band_sum + (TIDist$TotalTax[i])
+          band_people <- band_people + (TIDist$N[i])
+          basic_sum <- basic_sum + (TIDist$BRtax[i] * TIDist$N[i])
+          higher_sum <- higher_sum + (TIDist$HRtax[i] * TIDist$N[i])
+          addional_sum <- addional_sum + (TIDist$ARtax[i] * TIDist$N[i])
+          
+          starter_sum <- starter_sum + (TIDist$SRtax[i] * TIDist$N[i])
+          inter_sum <- inter_sum + (TIDist$IRtax[i] * TIDist$N[i])
+          
+        } else {
+          if (counter < 13){
+            results[counter] <- band_sum
+            num_people[counter] <- band_people
+            basic_list[counter] <- basic_sum
+            higher_list[counter] <- higher_sum
+            additional_list[counter] <- addional_sum
+            
+            starter_list[counter] <- starter_sum
+            inter_list[counter] <- inter_sum
+            
+            counter <- counter + 1
+            
+            band_sum <- TIDist$TotalTax[i]
+            band_people <- TIDist$N[i]
+            basic_sum <- (TIDist$BRtax[i] * TIDist$N[i])
+            higher_sum <- (TIDist$HRtax[i] * TIDist$N[i])
+            addional_sum <- (TIDist$ARtax[i] * TIDist$N[i])
+            
+            starter_sum <- (TIDist$SRtax[i] * TIDist$N[i])
+            inter_sum <- (TIDist$IRtax[i] * TIDist$N[i])
+            
+            
+            
+            
+          }
+          else{
+            band_sum <- band_sum + (TIDist$TotalTax[i])
+            band_people <- band_people + (TIDist$N[i])
+            basic_sum <- basic_sum + (TIDist$BRtax[i] * TIDist$N[i])
+            higher_sum <- higher_sum + (TIDist$HRtax[i] * TIDist$N[i])
+            addional_sum <- addional_sum + (TIDist$ARtax[i] * TIDist$N[i])
+            starter_sum <- starter_sum + (TIDist$SRtax[i] * TIDist$N[i])
+            inter_sum <- inter_sum + (TIDist$IRtax[i] * TIDist$N[i])
+            
+            
+            if (i == num_rows){
+              results[counter] <- band_sum
+              num_people[counter] <- band_people
+              basic_list[counter] <- basic_sum
+              higher_list[counter] <- higher_sum
+              additional_list[counter] <- addional_sum
+              
+              starter_list[counter] <- starter_sum
+              inter_list[counter] <- inter_sum
+              
+            }
+          }
+          
+        }
+      }
+      
+      #barchart:
+      bar_data <- reactive({
+        vector1 <- c(starter_list/num_people)
+        vector2 <- c(basic_list/num_people)
+        vector3 <- c(inter_list/num_people)
+        vector4 <- c(higher_list/num_people)
+        vector5 <- c(additional_list/num_people)
+        labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
+
+        
+        list(
+          stacked = rbind(vector1, vector2, vector3, vector4, vector5),
+          labels = labels
+        )
+      })
+      
+      
+      
+      
+      
       #latest_value(total_tax_sum)
       #paste("Total tax return from income tax = ", total_tax_sum)
     } else if (input$tax_choice == "current"){
@@ -848,8 +1013,94 @@ server <- function(input, output, session) {
         
       })
       
+      
+      #Logic for barchart:
+      num_rows <- nrow(TIDist)
+      counter <- 1
+      band_sum <- 0
+      
+      results <-numeric(13)
+      num_people <-numeric(13)
+      band_people <- 0
+      
+      
+      #now we want to do a break down of the different taxes too.
+      basic_list <-numeric(13)
+      higher_list <- numeric(13)
+      additional_list <- numeric(13)
+      
+      basic_sum <- 0
+      higher_sum <- 0
+      addional_sum <- 0
+      
+      
+      
+      for (i in 1:num_rows){
+        
+        if (TIDist$TaxableIncome[i] <= (counter * 10000)){
+          band_sum <- band_sum + (TIDist$TotalTax[i])
+          band_people <- band_people + (TIDist$N[i])
+          basic_sum <- basic_sum + (TIDist$BRtax[i] * TIDist$N[i])
+          higher_sum <- higher_sum + (TIDist$HRtax[i] * TIDist$N[i])
+          addional_sum <- addional_sum + (TIDist$ARtax[i] * TIDist$N[i])
+          
+        } else {
+          if (counter < 13){
+            results[counter] <- band_sum
+            num_people[counter] <- band_people
+            basic_list[counter] <- basic_sum
+            higher_list[counter] <- higher_sum
+            additional_list[counter] <- addional_sum
+            
+            counter <- counter + 1
+            
+            band_sum <- TIDist$TotalTax[i]
+            band_people <- TIDist$N[i]
+            basic_sum <- (TIDist$BRtax[i] * TIDist$N[i])
+            higher_sum <- (TIDist$HRtax[i] * TIDist$N[i])
+            addional_sum <- (TIDist$ARtax[i] * TIDist$N[i])
+            
+            
+          }
+          else{
+            band_sum <- band_sum + (TIDist$TotalTax[i])
+            band_people <- band_people + (TIDist$N[i])
+            basic_sum <- basic_sum + (TIDist$BRtax[i] * TIDist$N[i])
+            higher_sum <- higher_sum + (TIDist$HRtax[i] * TIDist$N[i])
+            addional_sum <- addional_sum + (TIDist$ARtax[i] * TIDist$N[i])
+            
+            if (i == num_rows){
+              results[counter] <- band_sum
+              num_people[counter] <- band_people
+              basic_list[counter] <- basic_sum
+              higher_list[counter] <- higher_sum
+              additional_list[counter] <- addional_sum
+            }
+          }
+          
+        }
+      }
+      
+      
+      #barchart:
+      bar_data <- reactive({
+        vector1 <- c(basic_list/num_people)
+        vector2 <- c(higher_list/num_people)
+        vector3 <- c(additional_list/num_people)
+        labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
+
+        
+        list(
+          stacked = rbind(vector1, vector2, vector3),
+          labels = labels
+        )
+      })
+      
+  
+      
     }
     
+    #piechart:
     output$pieChart <- renderPlotly({
       fruit_data <- reactive_fruit_data()
       
@@ -861,6 +1112,61 @@ server <- function(input, output, session) {
           plot_bgcolor = 'white'  # Background color of the chart area
           #width = 200px
         )
+    })
+    
+    
+    
+    # Generate Stacked Bar Chart using Plotly
+    output$stackedPlot <- renderPlotly({
+      data <- bar_data()
+      
+      # Ensure x-axis categories are factors with the correct order
+      x_categories <- factor(data$labels, levels = data$labels)
+      
+      # Initialize plotly object with the base traces
+      p <- plot_ly(
+        x = x_categories,
+        y = ~data$stacked[1,],
+        type = 'bar',
+        name = 'Starter',
+        marker = list(color = 'rgba(255, 99, 132, 0.6)')
+      ) %>%
+        add_trace(
+          y = ~data$stacked[2,],
+          name = 'Basic',
+          marker = list(color = 'rgba(54, 162, 235, 0.6)')
+        ) %>%
+        add_trace(
+          y = ~data$stacked[3,],
+          name = 'Inter',
+          marker = list(color = 'rgba(75, 192, 192, 0.6)')
+        )
+      
+      # Conditionally add additional traces based on input$tax_choice
+      if (input$tax_choice != "current") {
+        p <- p %>%
+          add_trace(
+            y = ~data$stacked[4,],
+            name = 'Higher',
+            marker = list(color = 'rgba(223, 192, 192, 0.6)')
+          ) %>%
+          add_trace(
+            y = ~data$stacked[5,],
+            name = 'add',
+            marker = list(color = 'rgba(23, 192, 192, 0.6)')
+          )
+      }
+      
+      # Finalize layout
+      p <- p %>%
+        layout(
+          barmode = 'stack',
+          title = "Stacked Bar Chart with Plotly",
+          xaxis = list(title = "Categories"),
+          yaxis = list(title = "Values")
+        )
+      
+      p
     })
     
     total_tax_sum
@@ -878,14 +1184,118 @@ server <- function(input, output, session) {
     paste("Previous income tax return = ", newAmount, "(", round(newAmount/1000000000, digits = 2), " billion)")
   })
   
+  
+  
+  #Function to calculate the reactive council tax from user inputs.
+  calcCounciltax <- function(){
+    
+    #top band value:
+    topBandValue <- input$topBandValue
+    
+    #Band inputs:
+    bandAlimit <- input$bandA
+    bandBlimit <- input$bandB
+    bandClimit <- input$bandC
+    bandDlimit <- input$bandD
+    bandElimit <- input$bandE
+    bandFlimit <- input$bandF
+    bandGlimit <- input$bandG
+    bandHlimit <- input$bandH
+    
+    #rate inputs:
+    bandArate <- input$bandArate
+    bandBrate <- input$bandBrate
+    bandCrate <- input$bandCrate
+    bandDrate <- input$bandDrate
+    bandErate <- input$bandErate
+    bandFrate <- input$bandFrate
+    bandGrate <- input$bandGrate
+    bandHrate <- input$bandHrate
+    
+
+    
+    CTdata <- read.csv("councilTaxEnglandAndWales.csv", sep=",")
+    bandAtax <- CTdata$N[1] * topBandValue * bandArate
+    bandBtax <- CTdata$N[2] * topBandValue * bandBrate
+    bandCtax <- CTdata$N[3] * topBandValue * bandCrate
+    bandDtax <- CTdata$N[4] * topBandValue * bandDrate
+    bandEtax <- CTdata$N[5] * topBandValue * bandErate
+    bandFtax <- CTdata$N[6] * topBandValue * bandFrate
+    bandGtax <- CTdata$N[7] * topBandValue * bandGrate
+    bandHtax <- CTdata$N[8] * topBandValue * bandHrate
+    
+    
+    
+
+
+    if (input$councilTaxCountry == "Wales"){
+      bandIrate <- input$bandIrate
+      #print("hello")
+      bandItax <- CTdata$N[9] * topBandValue  * bandIrate
+      
+      councilTax <- bandAtax + bandBtax + bandCtax + bandDtax + bandEtax + bandFtax + bandFtax + bandGtax + bandHtax+ bandItax
+      reactive_council_values <- reactive({
+        #req(input$tax_choice)  # Ensure tax_choice is available
+        
+        # Determine fruit counts based on tax choice
+        
+        data.frame(
+          band_label = c("A", "B","C","D", "E","F","G","H","I"),
+          #count = c(TIDist$SRtax * TIDist$N, TIDist$BRtax * TIDist$N, TIDist$IRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
+          band = c(bandAtax, bandBtax,bandCtax, bandDtax, bandEtax,bandFtax,bandGtax, bandHtax,bandItax)
+          #band = c(1,2,3,4,5,6,7,8,9)
+        )
+        
+      })
+    }else{
+      councilTax <- bandAtax + bandBtax + bandCtax + bandDtax + bandEtax + bandFtax + bandFtax + bandGtax + bandHtax
+      
+      reactive_council_values <- reactive({
+        #req(input$tax_choice)  # Ensure tax_choice is available
+        
+        # Determine fruit counts based on tax choice
+        
+        data.frame(
+          band_label = c("A", "B","C","D", "E","F","G","H"),
+          #count = c(TIDist$SRtax * TIDist$N, TIDist$BRtax * TIDist$N, TIDist$IRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
+          band = c(bandAtax, bandBtax,bandCtax, bandDtax, bandEtax,bandFtax,bandGtax, bandHtax)
+          #band = c(1,2,3,4,5,6,7,8)
+        )
+        
+      })
+    }
+        
+    #plotPychart:
+    #piechart:
+    output$pieChartCouncil <- renderPlotly({
+      reactive_council_values <- reactive_council_values()
+      
+      plot_ly(reactive_council_values, labels = ~band_label, values = ~band, type = 'pie') %>%
+        layout(
+          title = 'Council Tax income distribution',
+          margin = list(l = 20, r = 20, b = 10, t = 30),  # Adjust margins
+          paper_bgcolor = 'lightgray',  # Background color of the plot area
+          plot_bgcolor = 'white'  # Background color of the chart area
+          #width = 200px
+        )
+    })
+    
+    #return councilTax:
+    councilTax
+  }
+  
+  
   output$councilTaxOutput <- renderText({
-    paste("Council Tax return = ", "need info Data")
+    councilTax <- calcCounciltax()
+    paste("Council Tax return = ", councilTax)
   })
   
   observeEvent(input$calculate, {
     # Save the current latest value when the button is clicked
     saved_value(latest_value())
   })
+  
+  
   
   
   
