@@ -1,16 +1,50 @@
 library(shiny)
 library(plotly)
 
+text_data <- read.csv("translations.csv", stringsAsFactors = FALSE)
+
+# Step 2: Define the function to convert the dataframe to the nested list
+text_resources_func <- function(df) {
+  # Ensure 'key', 'english', and 'welsh' columns exist
+  if (!all(c("key", "english", "welsh") %in% names(df))) {
+    stop("CSV file must contain 'key', 'english', and 'welsh' columns.")
+  }
+  
+  # Extract unique keys
+  keys <- df$key
+  
+  # Create lists for each language
+  english_list <- setNames(as.list(df$english), keys)
+  welsh_list <- setNames(as.list(df$welsh), keys)
+  
+  # Combine into a named list
+  list(
+    English = english_list,
+    Welsh = welsh_list
+  )
+}
+
+# Apply the function to create the 'text_resources' list
+text_resources <- text_resources_func(text_data)
 ui <- fluidPage(
-  titlePanel("Reactive Stacked Bar Chart"),
+  # Title and button layout
+  fluidRow(
+    column(10, 
+           titlePanel(textOutput("title"))
+    ),
+    column(2, 
+           align = "right",
+           actionButton("translateButton", textOutput("translate_button"))
+    )
+  ),
   
   sidebarLayout(
     sidebarPanel(
-      selectInput("dataset", "Choose Dataset:", 
+      selectInput("dataset", textOutput("dataset_label"), 
                   choices = c("Dataset 1", "Dataset 2"), 
                   selected = "Dataset 1"),
-      actionButton("toggleButton", "Divide by 10"),
-      actionButton("viewButton", "Show Sum")
+      actionButton("toggleButton", textOutput("divide_button")),
+      actionButton("viewButton", textOutput("show_sum_button"))
     ),
     
     mainPanel(
@@ -21,37 +55,24 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  # Reactive values to keep track of button states
+  # Reactive value to keep track of button states and language
   values <- reactiveValues(
     divide = FALSE,
-    show_sum = FALSE
+    show_sum = FALSE,
+    language = "English"
   )
+  
+  # Observe the "Translate" button to switch language
+  observeEvent(input$translateButton, {
+    values$language <- ifelse(values$language == "English", "Welsh", "English")
+  })
   
   observeEvent(input$toggleButton, {
     values$divide <- !values$divide
-    if (values$divide) {
-      updateActionButton(session, "toggleButton", label = "Revert")
-    } else {
-      updateActionButton(session, "toggleButton", label = "Divide by 10")
-    }
   })
   
   observeEvent(input$viewButton, {
     values$show_sum <- !values$show_sum
-    if (values$show_sum) {
-      updateActionButton(session, "viewButton", label = "Revert")
-    } else {
-      updateActionButton(session, "viewButton", label = "Show Sum")
-    }
-  })
-  
-  observeEvent(input$PracButton, {
-    values$show_sum <- !values$show_sum
-    if (values$show_sum) {
-      updateActionButton(session, "viewButton", label = "Revert")
-    } else {
-      updateActionButton(session, "viewButton", label = "Show Sum")
-    }
   })
   
   # Reactive expression to return data based on selected dataset and button states
@@ -71,32 +92,61 @@ server <- function(input, output, session) {
     
     if (values$show_sum) {
       list(
-        stacked = rbind(vector1, vector2, vector3),
+        stacked = vector1 + vector2 + vector3,
         labels = labels
       )
     } else {
-      # Calculate sum of vectors
-      summed <- vector1 + vector2 + vector3
       list(
-        stacked = summed,
+        stacked = rbind(vector1, vector2, vector3),
         labels = labels
       )
-      #
-      
     }
+  })
+  
+  # Dynamic text output based on selected language
+  output$title <- renderText({
+    text_resources[[values$language]]$title
+  })
+  
+  output$dataset_label <- renderText({
+    text_resources[[values$language]]$dataset
+  })
+  
+  output$divide_button <- renderText({
+    text_resources[[values$language]]$divide_button
+  })
+  
+  output$show_sum_button <- renderText({
+    text_resources[[values$language]]$show_sum_button
+  })
+  
+  output$translate_button <- renderText({
+    text_resources[[values$language]]$translate_button
   })
   
   # Generate Stacked Bar Chart or Sum Chart using Plotly
   output$stackedPlot <- renderPlotly({
     data <- data_reactive()
     
-    # Ensure x-axis categories are factors with the correct order
     x_categories <- factor(data$labels, levels = data$labels)
     
-    
     if (values$show_sum) {
-      # Plot stacked bars
-      p <- plot_ly(
+      plot_ly(
+        x = x_categories,
+        y = ~data$stacked,
+        type = 'bar',
+        name = text_resources[[values$language]]$sum_plot_title,
+        marker = list(color = 'rgba(255, 99, 132, 0.6)')
+      ) %>%
+        layout(
+          barmode = 'group',
+          title = text_resources[[values$language]]$sum_plot_title,
+          xaxis = list(title = text_resources[[values$language]]$xaxis_title),
+          yaxis = list(title = text_resources[[values$language]]$yaxis_title_sum)
+        )
+      
+    } else {
+      plot_ly(
         x = x_categories,
         y = ~data$stacked[1,],
         type = 'bar',
@@ -112,50 +162,15 @@ server <- function(input, output, session) {
           y = ~data$stacked[3,],
           name = 'Vector 3',
           marker = list(color = 'rgba(75, 192, 192, 0.6)')
-        )
-      
-      # Conditionally add additional traces based on input$tax_choice
-      if (input$tax_choice != "current" && nrow(data$stacked) > 3) {
-        p <- p %>%
-          add_trace(
-            y = ~data$stacked[4,],
-            name = 'Higher',
-            marker = list(color = 'rgba(223, 192, 192, 0.6)')
-          ) %>%
-          add_trace(
-            y = ~data$stacked[5,],
-            name = 'Add',
-            marker = list(color = 'rgba(23, 192, 192, 0.6)')
-          )
-      }
-      
-      p %>%
+        ) %>%
         layout(
           barmode = 'stack',
-          title = "Stacked Bar Chart with Plotly",
-          xaxis = list(title = "Categories"),
-          yaxis = list(title = "Values")
+          title = text_resources[[values$language]]$stacked_plot_title,
+          xaxis = list(title = text_resources[[values$language]]$xaxis_title),
+          yaxis = list(title = text_resources[[values$language]]$yaxis_title_stacked)
         )
-      
-    } else {
-      # Plot summed values
-      plot_ly(
-        x = x_categories,
-        y = ~data$stacked,
-        type = 'bar',
-        name = 'Sum',
-        marker = list(color = 'rgba(255, 99, 132, 0.6)')
-      ) %>%
-        layout(
-          barmode = 'group',
-          title = "Sum of Values",
-          xaxis = list(title = "Categories"),
-          yaxis = list(title = "Sum")
-        )
-      
     }
   })
 }
-
 
 shinyApp(ui, server)

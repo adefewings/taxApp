@@ -3,6 +3,34 @@ library(shinyjs)
 library(plotly) 
 library(ggplot2)
 
+#input csv file for translation:
+text_data <- read.csv("translations.csv", stringsAsFactors = FALSE)
+
+# Step 2: Define the function to convert the dataframe to the nested list
+text_resources_func <- function(df) {
+  # Ensure 'key', 'english', and 'welsh' columns exist
+  if (!all(c("key", "english", "welsh") %in% names(df))) {
+    stop("CSV file must contain 'key', 'english', and 'welsh' columns.")
+  }
+  
+  # Extract unique keys
+  keys <- df$key
+  
+  # Create lists for each language
+  english_list <- setNames(as.list(df$english), keys)
+  welsh_list <- setNames(as.list(df$welsh), keys)
+  
+  # Combine into a named list
+  list(
+    English = english_list,
+    Welsh = welsh_list
+  )
+}
+
+# Apply the function to create the 'text_resources' list
+text_resources <- text_resources_func(text_data)
+
+
 ui <- fluidPage(
   useShinyjs(),  # Initialize shinyjs
   
@@ -183,7 +211,18 @@ ui <- fluidPage(
     )
   ),
   
-  titlePanel("Income Tax Calculator 2022/23"),
+  fluidRow(
+    column(10, 
+           #titlePanel(textOutput("title"))
+           titlePanel(textOutput("title"))
+    ),
+    column(2, 
+           align = "right",
+           actionButton("translateButton", textOutput("translate_button"))
+    )
+  ),
+  
+  
   
   # Dropdown menu above the tabs
   
@@ -191,7 +230,7 @@ ui <- fluidPage(
   # Tabs for different content
   tabsetPanel(
     id = "tabs",
-    tabPanel("Income Tax", value = "incomeTab", h4("Income tax is paid by employers to the gov via employee salary"),
+    tabPanel("Income Tax", value = "incomeTab", h4(textOutput("income_tax_intro")),
              div(style = "height: 20px;", p("")), # Empty placeholder
              selectInput("tax_choice", "Select Income Tax System:",
                          choices = c("current", "scottish", "fully devolved"),
@@ -257,11 +296,14 @@ ui <- fluidPage(
                       div(class = "output-container",
                           verbatimTextOutput("newTotalTaxOutput")
                       ),
+                      div(class = "calculate-button-container",
+                          actionButton("calculate", label = "update with new filters")
+                      ),
                       plotlyOutput("pieChart"),
                       div(class = "calculate-button-container",
                           #actionButton("calculate", label = "update with new filters")
                           actionButton("toggleButton", "Divide by people per band"),
-                          actionButton("viewButton", "Show tax breakdown")
+                          actionButton("viewButton", "Show Tax Breakdown")
                       ),
                       plotlyOutput("stackedPlot"),
                       
@@ -1275,14 +1317,14 @@ server <- function(input, output, session) {
 
     
     CTdata <- read.csv("councilTaxEnglandAndWales.csv", sep=",")
-    bandAtax <- CTdata$N[1] * topBandValue * bandArate
-    bandBtax <- CTdata$N[2] * topBandValue * bandBrate
-    bandCtax <- CTdata$N[3] * topBandValue * bandCrate
-    bandDtax <- CTdata$N[4] * topBandValue * bandDrate
-    bandEtax <- CTdata$N[5] * topBandValue * bandErate
-    bandFtax <- CTdata$N[6] * topBandValue * bandFrate
-    bandGtax <- CTdata$N[7] * topBandValue * bandGrate
-    bandHtax <- CTdata$N[8] * topBandValue * bandHrate
+    bandAtax <- CTdata$N[1] * topBandValue * (bandArate / 100)
+    bandBtax <- CTdata$N[2] * topBandValue * (bandBrate / 100)
+    bandCtax <- CTdata$N[3] * topBandValue * (bandCrate / 100)
+    bandDtax <- CTdata$N[4] * topBandValue * (bandDrate / 100)
+    bandEtax <- CTdata$N[5] * topBandValue * (bandErate / 100)
+    bandFtax <- CTdata$N[6] * topBandValue * (bandFrate / 100)
+    bandGtax <- CTdata$N[7] * topBandValue * (bandGrate / 100)
+    bandHtax <- CTdata$N[8] * topBandValue * (bandHrate / 100)
     
     
     
@@ -1291,7 +1333,7 @@ server <- function(input, output, session) {
     if (input$councilTaxCountry == "Wales"){
       bandIrate <- input$bandIrate
       #print("hello")
-      bandItax <- CTdata$N[9] * topBandValue  * bandIrate
+      bandItax <- CTdata$N[9] * topBandValue  * (bandIrate / 100)
       
       councilTax <- bandAtax + bandBtax + bandCtax + bandDtax + bandEtax + bandFtax + bandFtax + bandGtax + bandHtax+ bandItax
       reactive_council_values <- reactive({
@@ -1347,7 +1389,7 @@ server <- function(input, output, session) {
   
   output$councilTaxOutput <- renderText({
     councilTax <- calcCounciltax()
-    paste("Council Tax return = ", councilTax)
+    paste("Council Tax return = ", councilTax, "(",councilTax/1000000000, "billion )")
   })
   
   observeEvent(input$calculate, {
@@ -1359,7 +1401,8 @@ server <- function(input, output, session) {
   # Reactive value to keep track of button state
   values <- reactiveValues(
     divide = FALSE,
-    show_sum = FALSE
+    show_sum = FALSE,
+    language = "English"
   )
   
   observeEvent(input$toggleButton, {
@@ -1376,9 +1419,30 @@ server <- function(input, output, session) {
     if (values$show_sum) {
       updateActionButton(session, "viewButton", label = "Revert")
     } else {
-      updateActionButton(session, "viewButton", label = "Show Tax")
+      updateActionButton(session, "viewButton", label = "Show Tax Breakdown")
     }
   })
+  
+  #Langauge and translation stuff:
+  observeEvent(input$translateButton, {
+    values$language <- ifelse(values$language == "English", "Welsh", "English")
+  })
+  
+  #translate button:
+  output$translate_button <- renderText({
+    text_resources[[values$language]]$translate_button
+  })
+  
+  #Main App title:
+  output$title <- renderText({
+    text_resources[[values$language]]$title
+  })
+  
+  #Income Tax intro:
+  output$income_tax_intro <- renderText({
+    text_resources[[values$language]]$income_tax_intro
+  })
+  
 }
 
 shinyApp(ui = ui, server = server)

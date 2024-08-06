@@ -1,0 +1,11 @@
+key,english,welsh
+title,Reactive Stacked Bar Chart,Cynllun Bar Staciog Reactif
+dataset,Choose Dataset:,Dewiswch Set Data:
+divide_button,Divide by 10,Rhannu trwy 10
+show_sum_button,Show Sum,Dangos Crynodeb
+translate_button,Translate,Cyfieithu
+stacked_plot_title,Stacked Bar Chart with Plotly,Cynllun Bar Staciog gyda Plotly
+sum_plot_title,Sum of Values,Crynodeb o Werthoedd
+xaxis_title,Categories,Categori
+yaxis_title_stacked,Values,Gwerthoedd
+yaxis_title_sum,Sum,Crynodeb

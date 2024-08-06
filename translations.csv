@@ -1,0 +1,12 @@
+key,english,welsh
+title,Tax Calculater 2023/24,Cyfrifydd Treth 2023/24
+dataset,Choose Dataset:,Dewiswch Set Data:
+divide_button,Divide by 10,Rhannu trwy 10
+show_sum_button,Show Sum,Dangos Crynodeb
+translate_button,Translate,Cyfieithu
+stacked_plot_title,Stacked Bar Chart with Plotly,Cynllun Bar Staciog gyda Plotly
+sum_plot_title,Sum of Values,Crynodeb o Werthoedd
+xaxis_title,Categories,Categori
+yaxis_title_stacked,Values,Gwerthoedd
+yaxis_title_sum,Sum,Crynodeb
+income_tax_intro,Income tax is paid by employers to the gov via employee salary,Mae treth incwm yn cael ei thalu gan gyflogwyr i'r llywodraeth trwy gyflog yr weithwyr
