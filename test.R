@@ -230,9 +230,9 @@ ui <- fluidPage(
   # Tabs for different content
   tabsetPanel(
     id = "tabs",
-    tabPanel("Income Tax", value = "incomeTab", h4(textOutput("income_tax_intro")),
+    tabPanel(textOutput("income_tax"), value = "incomeTab", h4(textOutput("income_tax_intro")),
              div(style = "height: 20px;", p("")), # Empty placeholder
-             selectInput("tax_choice", "Select Income Tax System:",
+             selectInput("tax_choice", textOutput("select_income_system"),
                          choices = c("current", "scottish", "fully devolved"),
                          selected = "current"),
              div(style = "height: 30px;", p("")), # Empty placeholder
@@ -241,7 +241,7 @@ ui <- fluidPage(
                       style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
                       tabPanel("incomeTax",
                                div(class = "input-group",
-                                   tags$label("Personal Allowance:", `for` = "PA"),
+                                   tags$label(textOutput("pa_box"), `for` = "PA"),
                                    numericInput("PA", NULL, 12500)),
                                
                                
@@ -252,34 +252,34 @@ ui <- fluidPage(
                                
                                
                                div(class = "input-group",
-                                   tags$label("Personal Allowance Limit:", `for` = "PAlimit"),
+                                   tags$label(textOutput("pa_limit"), `for` = "PAlimit"),
                                    sliderInput("PAlimit", NULL, min = 0, max = 200000, value = 100000)),
                                div(class = "input-group",
-                                   tags$label("Starter Rate Threshold:", `for` = "SRthreshold"),
+                                   tags$label(textOutput("sr_threshold"), `for` = "SRthreshold"),
                                    numericInput("SRthreshold", NULL, 2000)),
                                div(class = "input-group",
-                                   tags$label(id="BRThreshold","Basic Rate Threshold:", `for` = "BRthreshold"),
+                                   tags$label(id="BRThreshold",textOutput("br_threshold"), `for` = "BRthreshold"),
                                    numericInput("BRthreshold", NULL, 0)),
                                div(class = "input-group",
-                                   tags$label("Intermediate Rate Threshold:", `for` = "IRthreshold"),
+                                   tags$label(textOutput("ir_threshold"), `for` = "IRthreshold"),
                                    numericInput("IRthreshold", NULL, 18000)),
                                div(class = "input-group",
-                                   tags$label(id="HRThreshold","Higher Rate Threshold:", `for` = "HRthreshold"),
+                                   tags$label(id="HRThreshold",textOutput("hr_threshold"), `for` = "HRthreshold"),
                                    numericInput("HRthreshold", NULL, 0)),
                                div(class = "input-group",
-                                   tags$label("Starter Rate:", `for` = "SR"),
+                                   tags$label(textOutput("sr"), `for` = "SR"),
                                    sliderInput("SR", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
                                div(class = "input-group",
-                                   tags$label(id="BR","Basic Rate:", `for` = "BR"),
+                                   tags$label(id="BR",textOutput("br"), `for` = "BR"),
                                    sliderInput("BR", NULL, min = 0, max = 1, value = 0.2, step = 0.01)),
                                div(class = "input-group",
-                                   tags$label("Intermediate Rate:", `for` = "IR"),
+                                   tags$label(textOutput("ir"), `for` = "IR"),
                                    sliderInput("IR", NULL, min = 0, max = 1, value = 0.21, step = 0.01)),
                                div(class = "input-group",
-                                   tags$label(id="HR","Higher Rate:", `for` = "HR"),
+                                   tags$label(id="HR",textOutput("hr"), `for` = "HR"),
                                    sliderInput("HR", NULL, min = 0, max = 1, value = 0.41, step = 0.01)),
                                div(class = "input-group",
-                                   tags$label(id="AR","Additional Rate:", `for` = "AR"),
+                                   tags$label(id="AR",textOutput("ar"), `for` = "AR"),
                                    sliderInput("AR", NULL, min = 0, max = 1, value = 0.46, step = 0.01))
                       )
                ),
@@ -297,13 +297,13 @@ ui <- fluidPage(
                           verbatimTextOutput("newTotalTaxOutput")
                       ),
                       div(class = "calculate-button-container",
-                          actionButton("calculate", label = "update with new filters")
+                          actionButton("calculate", label = textOutput("update_with_new_filters"))
                       ),
                       plotlyOutput("pieChart"),
                       div(class = "calculate-button-container",
                           #actionButton("calculate", label = "update with new filters")
-                          actionButton("toggleButton", "Divide by people per band"),
-                          actionButton("viewButton", "Show Tax Breakdown")
+                          actionButton("toggleButton", textOutput("divide_by_people")),
+                          actionButton("viewButton", textOutput("show_breakdown"))
                       ),
                       plotlyOutput("stackedPlot"),
                       
@@ -1185,10 +1185,11 @@ server <- function(input, output, session) {
     #piechart:
     output$pieChart <- renderPlotly({
       fruit_data <- reactive_fruit_data()
-      
+      #title <- as.character(textOutput("tax_income_dist"))
+      #title2 <- "test"
       plot_ly(fruit_data, labels = ~fruit, values = ~count, type = 'pie') %>%
         layout(
-          title = 'Tax income distribution',
+          title = text_resources[[values$language]]$income_tax_pie,
           margin = list(l = 20, r = 20, b = 10, t = 30),  # Adjust margins
           paper_bgcolor = 'lightgray',  # Background color of the plot area
           plot_bgcolor = 'white'  # Background color of the chart area
@@ -1246,7 +1247,7 @@ server <- function(input, output, session) {
           p <- p %>%
             layout(
               barmode = 'stack',
-              title = "Stacked Bar Chart with Plotly",
+              title = text_resources[[values$language]]$income_stacked_graph_title,
               xaxis = list(title = "Categories"),
               yaxis = list(title = "Values")
             )
@@ -1263,7 +1264,7 @@ server <- function(input, output, session) {
         ) %>%
           layout(
             barmode = 'group',
-            title = "Sum of Values",
+            title = text_resources[[values$language]]$income_stacked_graph_title,
             xaxis = list(title = "Categories"),
             yaxis = list(title = "Sum")
           )
@@ -1442,6 +1443,62 @@ server <- function(input, output, session) {
   output$income_tax_intro <- renderText({
     text_resources[[values$language]]$income_tax_intro
   })
+  
+  #Inouts for income tax page: pa_box
+  output$pa_box <- renderText({
+    text_resources[[values$language]]$pa_box
+  })
+  output$pa_limit <- renderText({
+    text_resources[[values$language]]$pa_limit
+  })
+  output$sr_threshold <- renderText({
+    text_resources[[values$language]]$sr_threshold
+  })
+  output$br_threshold <- renderText({
+    text_resources[[values$language]]$br_threshold
+  })
+  output$ir_threshold <- renderText({
+    text_resources[[values$language]]$ir_threshold
+  })
+  output$hr_threshold <- renderText({
+    text_resources[[values$language]]$hr_threshold
+  })
+  output$sr <- renderText({
+    text_resources[[values$language]]$sr
+  })
+  output$br <- renderText({
+    text_resources[[values$language]]$br
+  })
+  output$ir <- renderText({
+    text_resources[[values$language]]$ir
+  })
+  output$hr <- renderText({
+    text_resources[[values$language]]$hr
+  })
+  output$ar <- renderText({
+    text_resources[[values$language]]$ar
+  })
+  
+  output$select_income_system <- renderText({
+    text_resources[[values$language]]$select_income_system
+  })
+  output$divide_by_people <- renderText({
+    text_resources[[values$language]]$divide_by_people
+  })
+  output$show_breakdown <- renderText({
+    text_resources[[values$language]]$show_breakdown
+  })
+  output$update_with_new_filters <- renderText({
+    text_resources[[values$language]]$update_with_new_filters
+  })
+
+  
+  output$income_tax <- renderText({
+    text_resources[[values$language]]$income_tax
+  })
+  
+  #
+  
   
 }
 

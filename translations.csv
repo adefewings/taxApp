@@ -10,3 +10,21 @@ xaxis_title,Categories,Categori
 yaxis_title_stacked,Values,Gwerthoedd
 yaxis_title_sum,Sum,Crynodeb
 income_tax_intro,Income tax is paid by employers to the gov via employee salary,Mae treth incwm yn cael ei thalu gan gyflogwyr i'r llywodraeth trwy gyflog yr weithwyr
+pa_box,Personal Allowance:,Gwariant Bersonol:
+pa_limit,Personal Allowance Limit:, Terfyn Gwariant Bersonol:
+sr_threshold,Starter Rate Threshold:,Y Derfyn Rhydd Y Cyntaf:
+ir_threshold,Intermediate Rate Threshold:,Y Derfyn Rheswm Canol:
+br_threshold,Basic Rate Threshold:,Y Derfyn Rheswm Sylfaenol:
+hr_threshold,Higher Rate Threshold:,Y Derfyn Rheswm Uchel:
+sr,Starter Rate:,Y Rheswm Cychwyn:
+br,Basic Rate:,Rheswm Sylfaenol:
+ir,Intermediate Rate:,Rheswm Canol:
+hr,Higher Rate:,Rheswm Uchel:
+ar,Additional Rate:,Rheswm Ychwanegol:
+select_income_system,Select Income Tax System:,Dewis System Treth Incwm:
+divide_by_people,Divide by people per band,Rhannu gan bobl y band
+show_breakdown,Show Tax Breakdown,Dangos Dadansoddiad Treth
+update_with_new_filters,Update with New Filters,Diweddaru gyda'r hidlwyr newydd
+income_tax_pie,Tax Income Distribution,Dosbarthiad Incwm Treth
+income_tax,Income Tax,Treth Incwm
+income_stacked_graph_title,Income Tax Distribution per Salary Band,Dosbarthiad Treth Incwm yn ôl Bandau Cyflog
