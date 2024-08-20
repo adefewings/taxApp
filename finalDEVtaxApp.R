@@ -6,6 +6,13 @@ library(shinyjs)
 library(plotly) 
 library(ggplot2)
 
+########################
+########################
+########################
+#Code to allow translation:
+########################
+########################
+########################
 #input csv file which contains the dictionary of words for translations:
 text_data <- read.csv("translations.csv", stringsAsFactors = FALSE)
 
@@ -33,17 +40,22 @@ text_resources_func <- function(df) {
 #Function call to enable translations
 text_resources <- text_resources_func(text_data)
 
-#-------------------------------------------------------------------------------
-#UI SIDE OF APP
+########################
+########################
+########################
+#UI Function:
+########################
+########################
+########################
 ui <- fluidPage(
   useShinyjs(),  # Initialize shinyjs
   
-  #Custom css for formatting:
+  #Custom css for formatting app items:
   tags$head(
     tags$style(
       HTML("
         body {
-          background-color: #CCCCCC;
+          background-color: #FFFFFF;
         }
         .title {
           color: #333;
@@ -191,17 +203,18 @@ ui <- fluidPage(
         }
           .output-container {
           display: flex;
-          background-color: #f0f0f0; 
+          background-color: #FFFFFF; 
           padding: 10px;
           #border-radius: 5px;
           #margin-top: 10px;
           #margin-right: 120px;
           }
           .calculate-button-container{
-          background-color: #f0f0f0;
-          padding: 10px;
+          background-color: #FFFFFF;
+          padding: 5px; 
           border-radius: 3px;
           margin-top: 10px;
+          margin-bottom: 10px;
           margin-left: 0px;
           marin-right:100px;
           display: inline-block; 
@@ -214,6 +227,10 @@ ui <- fluidPage(
         label {
           font-size: 15px;
         }
+        #title {
+      font-size: 35px;
+      font-weight: bold;
+    }
       ")
     )
   ),
@@ -221,7 +238,7 @@ ui <- fluidPage(
   
   
   #Start of the main page - default is the income tax page.
-  #Title and trsnalate button on top of screen
+  #Title and translate button on top of screen
   fluidRow(
     column(10, 
            titlePanel(textOutput("title"))
@@ -231,17 +248,53 @@ ui <- fluidPage(
            actionButton("translateButton", textOutput("translate_button"))
     )
   ),
-  
-  
-  
-  # Tabs for different content
+  br(),
+ 
+  fluidRow(
+    column(3,
+           align = "left",
+           div(class = "output-container",
+               verbatimTextOutput("old_total_tax")
+           ),
+           div(class = "output-container",
+               verbatimTextOutput("updated_total_tax")
+           ),
+           div(class = "calculate-button-container",
+               actionButton("see_more_button", label = textOutput("see_more_button"))
+           ),
+      
+    ),
+    column(3,
+          plotlyOutput("old_tax_piechart",height = "260px"),
+    ),
+    column(3,
+           plotlyOutput("updated_tax_piechart",height = "260px"),
+    ),
+    column(3,
+           align = "right",
+           tags$img(src = "businessLogo.png", height = "150px", width = "auto"),
+           )
+  ),
+  #Some breaks for formatting
+  br(),
+  br(),
+  br(),
+
+  # rest of the page seperated by tabs.[ income | Local | Others ]
   tabsetPanel(
     id = "tabs",
     tabPanel(textOutput("income_tax"), value = "incomeTab", h4(textOutput("income_tax_intro")),
              div(style = "height: 20px;", p("")), # Empty placeholder
-             selectInput("tax_choice", textOutput("select_income_system"),
-                         choices = c("current", "scottish", "fully devolved"),
-                         selected = "current"),
+             #selectInput("income_tax_system_choice", textOutput("select_income_system"),
+            #             choices = c("current", "scottish", "fully devolved"),
+            #             selected = "current"),
+             radioButtons("income_tax_system_choice", textOutput("select_income_system"), 
+                          choices = c("current", "scottish", "fully devolved"), 
+                          selected = "current", 
+                          inline = FALSE,
+                          width = NULL),
+             #radioButtons("landfillButtonChoice", "Please select a Country", choices = c("Wales", "Scotland", "England"), selected = "Wales", inline = FALSE,
+             #width = NULL),
              div(style = "height: 30px;", p("")), # Empty placeholder
              fluidRow(
                column(5,
@@ -250,12 +303,6 @@ ui <- fluidPage(
                                div(class = "input-group",
                                    tags$label(textOutput("pa_box"), `for` = "PA"),
                                    numericInput("PA", NULL, 12500)),
-                               
-                               
-                               #div(class = "input-group-council",
-                               #   tags$label(id = "bandA-label","Band A limit", `for` = "bandA"),
-                               #   numericInput("bandA", NULL, 0)),
-                               
                                
                                
                                div(class = "input-group",
@@ -267,8 +314,8 @@ ui <- fluidPage(
                                                #animate = TRUE,
                                                ticks = TRUE
                                                #breaks = seq(0, 200000, by = 20000)
-                                              #labels = scales::comma(seq(0, 200000, by = 20000))
-                                              )),
+                                               #labels = scales::comma(seq(0, 200000, by = 20000))
+                                   )),
                                div(class = "input-group",
                                    tags$label(textOutput("sr_threshold"), `for` = "SRthreshold"),
                                    numericInput("SRthreshold", NULL, 2000)),
@@ -301,13 +348,10 @@ ui <- fluidPage(
                column(5,
                       style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
                       #div(style = "height: 60px;", p("")), # Empty placeholder
-                      #div(style = "height: 60px;", p("")), # Empty placeholder
                       
                       div(class = "output-container",
                           verbatimTextOutput("totalTaxOutput")
                       ),
-                      
-                      
                       div(class = "output-container",
                           verbatimTextOutput("newTotalTaxOutput")
                       ),
@@ -316,7 +360,6 @@ ui <- fluidPage(
                       ),
                       plotlyOutput("pieChart"),
                       div(class = "calculate-button-container",
-                          #actionButton("calculate", label = "update with new filters")
                           actionButton("toggleButton", label = textOutput("divide_by_people")),
                           actionButton("viewButton", label = textOutput("show_breakdown"))
                       ),
@@ -325,10 +368,9 @@ ui <- fluidPage(
                )
              )        
              
-             
     ),
     #Council Tax Tab:
-    tabPanel(textOutput("council_tax"), value = "councilTax", h4("this is a tax levied on residential domestic property"),
+    tabPanel(textOutput("local_taxes_tab_label"), value = "councilTax", h4("this is a tax levied on residential domestic property"),
              #empty gap first:
              div(style = "height: 20px;", p("")),
              #Need to have choices for Scotland, England and Wales:
@@ -339,7 +381,7 @@ ui <- fluidPage(
              div(class = "input-group-council",
                  tags$label("Top Band Value = ", `for` = "topBandValue"),
                  numericInput("topBandValue", NULL, 2000)),
-                              #Now need to include the different bands (A-H) with I only included for Wales:
+             #Now need to include the different bands (A-H) with I only included for Wales:
              div(style = "height: 30px;", p("")), # Empty placeholder
              fluidRow(
                column(4,
@@ -352,7 +394,7 @@ ui <- fluidPage(
                                div(class = "input-group-council",
                                    tags$label("% top band:", `for` = "bandArate"),
                                    sliderInput("bandArate", NULL, min = 1, max = 100, value = 5.4, step = 0.1)),
-                              
+                               
                                tags$p("Band B:", style = "font-size: 18px;font-weight: bold;"), 
                                div(class = "input-group-council",
                                    tags$label(id="bandB-label","Band B limit", `for` = "bandB"),
@@ -413,15 +455,15 @@ ui <- fluidPage(
                                tags$p("Band I:", style = "font-size: 18px;font-weight: bold;"),
                                
                                div(id="bandI-container",
-                                  div(class = "input-group-council",
-                                      tags$label("% top band:", `for` = "bandIrate"),
-                                      sliderInput("bandIrate", NULL, min = 1, max = 100, value = 80.4, step = 0.1))),
+                                   div(class = "input-group-council",
+                                       tags$label("% top band:", `for` = "bandIrate"),
+                                       sliderInput("bandIrate", NULL, min = 1, max = 100, value = 80.4, step = 0.1))),
                                
                       )
                ),
                column(5,
                       #div(style = "height: 60px;", p("")), # Empty placeholder
-                    
+                      
                       div(class = "output-container",
                           verbatimTextOutput("councilTaxOutput")
                       ),
@@ -438,208 +480,35 @@ ui <- fluidPage(
              )  
              
     ),
-    
-    tabPanel(textOutput("ndr"), value = "more info", h4("This is a tax levied on non-domestic property"),
-             div(style = "height: 20px;", p("")), # Empty placeholder
-             div(style = "ndr-selection",
-                 selectInput("ndrCountry", "Select Income Tax System:",
-                             choices = c("Wales", "Scotland", "England"),
-                             selected = "Wales")),
-             div(style = "height: 20px;", p("")), # Empty placeholder
-             fluidRow(
-               column(4,
-                      tabPanel("NDR",
-                               style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
-                               div(class = "input-group-ndr",
-                                   tags$label(id = "rateableValue-label","Proposed change for rateable values:", `for` = "rateableValueChange"),
-                                   numericInput("rateableValueChange", NULL, 0)),
-                               div(class = "input-group-ndr",
-                                   tags$label(id="stdMultiplier-label","Standard multiplier value:", `for` = "stdMult"),
-                                   numericInput("stdMult", NULL, 0)),
-                               div(class = "input-group-ndr",
-                                   tags$label(id="smallBusinessMultiplier-label","Small Business multiplier:", `for` = "smallBusMult"),
-                                   numericInput("smallBusMult", NULL, 0)),
-                               
-                      )
-               )
-             )
-             
-    ),
-    
-    tabPanel(textOutput("ltt"), value = "more info", h4("This is a tax on property transactions in Wales. Replaced Stamp Duty which is still in place in England"),
-             div(style = "height: 20px;", p("")), # Empty placeholder
-             
-             selectInput("LTTchoice", "Select Income Tax System:",
+    tabPanel(textOutput("other_taxes_tab_label"), value = "councilTax", h4("this is a tax levied on residential domestic property"),
+             #empty gap first:
+             div(style = "height: 20px;", p("")),
+             #Need to have choices for Scotland, England and Wales:
+             selectInput("councilTaxCountry", "Select Country for Council tax calculations",
                          choices = c("Wales", "Scotland", "England"),
                          selected = "Wales"),
-             div(style = "height: 20px;", p("")), # Empty placeholder
-             
-             fluidRow(
-               column(3,
-                      tabPanel("LTT",
-                               tags$p("Residential Property Tax", style = "font-size: 21px;font-weight: bold;margin-left: 70px;"),
-                               tags$p("Band 1:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band1Limit","Band 1 Limit:", `for` = "band1LimitRes"),
-                                   numericInput("band1LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate1Res"),
-                                   sliderInput("LTTrate1Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 2:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band2Limit","Band 2 Limit:", `for` = "band2LimitRes"),
-                                   numericInput("band2LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrateRes"),
-                                   sliderInput("LTTrate2Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 3:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band3Limit","Band 3 Limit:", `for` = "band3LimitRes"),
-                                   numericInput("band3LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate3Res"),
-                                   sliderInput("LTTrate3Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 4:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band4Limit","Band 4 Limit:", `for` = "band4LimitRes"),
-                                   numericInput("band4LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate4Res"),
-                                   sliderInput("LTTrate4Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 5:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band5Limit","Band 5 Limit:", `for` = "band5LimitRes"),
-                                   numericInput("band5LimitRes", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate5Res"),
-                                   sliderInput("LTTrate5Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 6:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate6Res"),
-                                   sliderInput("LTTrate6Res", NULL, min = 0, max = 1, value = 0.19, step = 0.01))
-                               
-                      )
-               ),
-               column(3,
-                      tabPanel("LTT",
-                               tags$p("Non-Residential Property Tax (Purchase)", style = "font-size: 21px;font-weight: bold;margin-left: 10px;"),
-                               tags$p("Band 1:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band1Limit","Band 1 Limit:", `for` = "band1LimitPurchase"),
-                                   numericInput("band1LimitPurchase", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate1Purchase"),
-                                   sliderInput("LTTrate1Purchase", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 2:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band2Limit","Band 2 Limit:", `for` = "band2LimitPurchase"),
-                                   numericInput("band2LimitPurchase", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTratePurchase"),
-                                   sliderInput("LTTrate2Purchase", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 3:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band3Limit","Band 3 Limit:", `for` = "band3LimitPurchase"),
-                                   numericInput("band3LimitPurchase", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate3Purchase"),
-                                   sliderInput("LTTrate3Purchase", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 4:", style = "font-size: 18px;font-weight: bold;"),
-                               
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate4Purchase"),
-                                   sliderInput("LTTrate4Purchase", NULL, min = 0, max = 1, value = 0.19, step = 0.01))
-                               
-                               
-                      )
-               ),
-                column(3,
-                      tabPanel("LTT",
-                               tags$p("Non-Residential Property Tax (Lease)", style = "font-size: 21px;font-weight: bold;margin-left: 10px;"),
-                               tags$p("Band 1:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band1Limit","Band 1 Limit:", `for` = "band1LimitLease"),
-                                   numericInput("band1LimitLease", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate1Lease"),
-                                   sliderInput("LTTrate1Lease", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 2:", style = "font-size: 18px;font-weight: bold;"),
-                               div(class = "input-group-ltt",
-                                   tags$label(id="band2Limit","Band 2 Limit:", `for` = "band2LimitLease"),
-                                   numericInput("band2LimitLease", NULL, 0)),
-                               div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrateLease"),
-                                   sliderInput("LTTrate2Lease", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                               
-                               tags$p("Band 3:", style = "font-size: 18px;font-weight: bold;"),
-                                  div(class = "input-group-ltt",
-                                   tags$label("LTT rate", `for` = "LTTrate3Lease"),
-                                   sliderInput("LTTrate3Lease", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                                                                                       
-                      )
-             )
              
              
     )
-  ),
-  tabPanel(textOutput("ldt"), value = "more info", h4("Levy paid by Landfill owners, usually pased on to those paying to use the landfill"),
-           div(style = "height: 20px;", p("")), # Empty placeholder
-           
-           selectInput("landfillChoice", "Select Income Tax System:",
-                       choices = c("Wales", "Scotland", "England"),
-                       selected = "Wales"),
-           radioButtons("landfillButtonChoice", "Please select a Country", choices = c("Wales", "Scotland", "England"), selected = "Wales", inline = FALSE,
-                        width = NULL),
-           div(style = "height: 20px;", p("")), # Empty placeholder
-           
-           fluidRow(
-             column(6,
-                    tabPanel("landfills",
-                             
-                             #tags$p("Band 1:", style = "font-size: 18px;font-weight: bold;"),
-                             
-                             div(class = "input-group-landfill",
-                                 tags$label("Lower Rate:", `for` = "lowRateLandfill"),
-                                 sliderInput("lowRateLandfill", NULL, min = 0, max = 200, value = 3.1 , step = 0.1)),
-                             
-                             
-                             div(class = "input-group-landfill",
-                                 tags$label("Standard rate", `for` = "stdRateLandfill"),
-                                 sliderInput("stdRateLandfill", NULL, min = 0, max = 200, value = 98.6, step = 0.1)),
-                             
-                    )
-             ),
-             column(4,
-                    tabPanel("pieChart",
-                             tags$p("Non-Residential Property Tax (Lease)", style = "font-size: 21px;font-weight: bold;margin-left: 5px;margin-right:10px; margin-bottom: 10px;")
-                             )
-                    )
-             
-             
-           )
+  
   )
 )
-)
 
-
+########################
+########################
+########################
+#Server Function:
+########################
+########################
+########################
 server <- function(input, output, session) {
   
-  
-  
+  #Observe function to change Income Tax values depending on the choice
   observe({
     enabled_ids <- character(0)
     disabled_ids <- character(0)
     
-    if (input$tax_choice == "current") {
+    if (input$income_tax_system_choice == "current") {
       enabled_ids <- c("BR", "HR", "AR")
       disabled_ids <- c("SR", "IR", "SRthreshold", "IRthreshold")
       updateNumericInput(session, "BRthreshold", value = 37500)
@@ -649,7 +518,7 @@ server <- function(input, output, session) {
       
       #sliderInput("AR", NULL, min = 0, max = 1, value = 0.46, step = 0.01))
       
-    } else if (input$tax_choice == "scottish" || input$tax_choice == "fully devolved") {
+    } else if (input$income_tax_system_choice == "scottish" || input$income_tax_system_choice == "fully devolved") {
       enabled_ids <- c("SR", "BR", "IR", "HR", "AR", "SRthreshold", "IRthreshold")
       disabled_ids <- character(0)
       updateNumericInput(session, "BRthreshold", value = 11000)
@@ -671,28 +540,7 @@ server <- function(input, output, session) {
     })
   })
   
-  #obersvations for council tax (only activate band I for Wales):
-  #observe({
-  # enabled_ids_council <- character(0)
-  #disabled_ids_council <- character(0)
-  #if (input$councilTaxCountry == "Wales"){
-  # enabled_ids_council <- c("bandI")
-  #  disabled_ids_council <- character(0)
-  #}else{
-  #  enabled_ids_council <- character(0)
-  #  disabled_ids_council <- c("bandI")
-  #}
-  #lapply(enabled_ids_council, function(id) {
-  #  runjs(sprintf("$('#%s').prop('disabled', false).parent().removeClass('grey-out-council');", id))
-  #})
-  
-  # Disable sliders
-  #lapply(disabled_ids_council, function(id) {
-  #  runjs(sprintf("$('#%s').prop('disabled', true).parent().addClass('grey-out-council');", id))
-  #})
-  
-  #})
-  
+  #Observations for Council Tax to enable selections if specific items are chosen.
   observe({
     if (input$councilTaxCountry == "Wales") {
       show("bandH-container")
@@ -703,19 +551,9 @@ server <- function(input, output, session) {
     }
   })
   
-  
-  #obervation to change the income tax band widths based on Scotland/Wales.
-  observe({
-    
-    if (input$tax_choice == "current"){
-      
-    }else if (input$tax_choice == "scottish" || input$tax_choice == "fully devolved"){
-      
-    }
-  })
-  #tax_choice
-  
-  #obersvations to change the council tax bands in repsonse to what country choice:
+ 
+
+  #obersvations to change the council tax bands in response to what country choice:
   observe({
     if (input$councilTaxCountry == "Wales"){
       updateNumericInput(session, "bandA", value = 44000)
@@ -747,83 +585,15 @@ server <- function(input, output, session) {
   })
   
   
-  observe({
-    if (input$LTTchoice == "Wales"){
-      updateNumericInput(session, "band1LimitRes", value = 180000)
-      updateNumericInput(session, "band2LimitRes", value = 250000)
-      updateNumericInput(session, "band3LimitRes", value = 400000)
-      updateNumericInput(session, "band4LimitRes", value = 750000)
-      updateNumericInput(session, "band5LimitRes", value = 1500000)
-      updateSliderInput(session, "LTTrate1Res", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Res", min = 0, max = 1, value = 0.035,step = 0.01)
-      updateSliderInput(session, "LTTrate3Res", min = 0, max = 1, value = 0.05,step = 0.01)
-      updateSliderInput(session, "LTTrate4Res", min = 0, max = 1, value = 0.075,step = 0.01)
-      updateSliderInput(session, "LTTrate5Res", min = 0, max = 1, value = 0.1,step = 0.01)
-      updateSliderInput(session, "LTTrate6Res", min = 0, max = 1, value = 0.12,step = 0.01)
-      updateNumericInput(session, "band1LimitPurchase", value = 225000)
-      updateNumericInput(session, "band2LimitPurchase", value = 250000)
-      updateNumericInput(session, "band3LimitPurchase", value = 1000000)
-      updateSliderInput(session, "LTTrate1Purchase", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Purchase", min = 0, max = 1, value = 0.01,step = 0.01)
-      updateSliderInput(session, "LTTrate3Purchase", min = 0, max = 1, value = 0.05,step = 0.01)
-      updateSliderInput(session, "LTTrate4Purchase", min = 0, max = 1, value = 0.06,step = 0.01)
-      updateNumericInput(session, "band1LimitLease", value = 225000)
-      updateNumericInput(session, "band2LimitLease", value = 2000000)
-      updateSliderInput(session, "LTTrate1Lease", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Lease", min = 0, max = 1, value = 0.01,step = 0.01)
-      updateSliderInput(session, "LTTrate3Lease", min = 0, max = 1, value = 0.02,step = 0.01)
-    }else if (input$LTTchoice == "England"){
-      updateNumericInput(session, "band1LimitRes", value = 200000)
-      updateNumericInput(session, "band2LimitRes", value = 260000)
-      updateNumericInput(session, "band3LimitRes", value = 500000)
-      updateNumericInput(session, "band4LimitRes", value = 900000)
-      updateNumericInput(session, "band5LimitRes", value = 1800000)
-      updateSliderInput(session, "LTTrate1Res", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Res", min = 0, max = 1, value = 0.03,step = 0.01)
-      updateSliderInput(session, "LTTrate3Res", min = 0, max = 1, value = 0.05,step = 0.01)
-      updateSliderInput(session, "LTTrate4Res", min = 0, max = 1, value = 0.08,step = 0.01)
-      updateSliderInput(session, "LTTrate5Res", min = 0, max = 1, value = 0.11,step = 0.01)
-      updateSliderInput(session, "LTTrate6Res", min = 0, max = 1, value = 0.14,step = 0.01)
-      updateNumericInput(session, "band1LimitPurchase", value = 240000)
-      updateNumericInput(session, "band2LimitPurchase", value = 280000)
-      updateNumericInput(session, "band3LimitPurchase", value = 1500000)
-      updateSliderInput(session, "LTTrate1Purchase", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Purchase", min = 0, max = 1, value = 0.02,step = 0.01)
-      updateSliderInput(session, "LTTrate3Purchase", min = 0, max = 1, value = 0.04,step = 0.01)
-      updateSliderInput(session, "LTTrate4Purchase", min = 0, max = 1, value = 0.05,step = 0.01)
-      updateNumericInput(session, "band1LimitLease", value = 200000)
-      updateNumericInput(session, "band2LimitLease", value = 2500000)
-      updateSliderInput(session, "LTTrate1Lease", min = 0, max = 1, value = 0,step = 0.01)
-      updateSliderInput(session, "LTTrate2Lease", min = 0, max = 1, value = 0.01,step = 0.01)
-      updateSliderInput(session, "LTTrate3Lease", min = 0, max = 1, value = 0.02,step = 0.01)
-      }
-  })
   
-  
-  #lowRateLandfill/std
-  
-  
-  observe({
-    if (input$landfillButtonChoice == "Wales"){
-      updateSliderInput(session, "lowRateLandfill",  NULL, min = 0, max = 200, value = 3.1 , step = 0.1)
-      updateSliderInput(session, "stdRateLandfill",  NULL, min = 0, max = 200, value = 98.6 , step = 0.1)
-    } else if (input$landfillButtonChoice == "England"){
-      updateSliderInput(session, "lowRateLandfill",  NULL, min = 0, max = 200, value = 6.1 , step = 0.1)
-      updateSliderInput(session, "stdRateLandfill",  NULL, min = 0, max = 200, value = 80 , step = 0.1)
-    }
-  })
-  
+
+  #Initialising the values for the income tax page to show previous and new amounts
   latest_value <- reactiveVal(0)
   saved_value <- reactiveVal(0)
   
-  calculateTax <- function(){
-    #-----------------------
-    
-    
-    # Observe tax choice changes and update pie chart
-    
-    #-----------------------
-    
+  
+  #Function to calculate the income tax for either scottish, current of fully deveolved scenarios:
+  calculate__income_tax <- function(){
     # Define Parameters from inputs
     PA <- input$PA
     PAlimit <- input$PAlimit
@@ -842,10 +612,7 @@ server <- function(input, output, session) {
     TIDist <- read.csv("TaxableIncomeDistribution2023.csv", sep=";")
     
     # Calculate Income by tax bracket
-    
-    if (input$tax_choice == "scottish" || input$tax_choice == "fully devolved"){
-      
-    
+    if (input$income_tax_system_choice == "scottish" || input$income_tax_system_choice == "fully devolved"){
       TIDist$PA <- NA
       TIDist$PA[TIDist$TaxableIncome <= PAlimit] <- PA
       TIDist$PA[TIDist$TaxableIncome > PAlimit] <- pmax(0, PA - 0.5 * (TIDist$TaxableIncome[TIDist$TaxableIncome > PAlimit] - PAlimit))
@@ -879,84 +646,62 @@ server <- function(input, output, session) {
       TIDist$ARtax <- AR * TIDist$ARincome
       
       starter_total <- sum((TIDist$SRtax) * TIDist$N, na.rm = TRUE)
-      
       basic_total <- sum((TIDist$BRtax) * TIDist$N, na.rm = TRUE)
       inter_total <- sum((TIDist$IRtax) * TIDist$N, na.rm = TRUE)
-      
       higher_total <- sum((TIDist$HRtax) * TIDist$N, na.rm = TRUE)
-
       additional_total <- sum((TIDist$ARtax) * TIDist$N, na.rm = TRUE)
       
-      
       # Calculate total income tax payable
-      
       TIDist$TotalTax <- (TIDist$SRtax + TIDist$BRtax + TIDist$IRtax + TIDist$HRtax + TIDist$ARtax) * TIDist$N
-      total_tax_sum <- sum(TIDist$TotalTax, na.rm = TRUE)
-      
-      
-      reactive_fruit_data <- reactive({
-        #req(input$tax_choice)  # Ensure tax_choice is available
-        
-        # Determine fruit counts based on tax choice
-        
+      total_income_tax_sum <- sum(TIDist$TotalTax, na.rm = TRUE)
+
+      #reactively update the tax values for graphs:
+      reactive_income_tax_data <- reactive({
         data.frame(
-          #fruit = c("Starter", "Basic","Intermediate","Higher", "Additional"),
-          fruit = c(text_resources[[values$language]]$starter,text_resources[[values$language]]$basic, text_resources[[values$language]]$intermediate,text_resources[[values$language]]$higher, text_resources[[values$language]]$additional),
-          
-          #count = c(TIDist$SRtax * TIDist$N, TIDist$BRtax * TIDist$N, TIDist$IRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
+          tax_type = c(text_resources[[values$language]]$starter,text_resources[[values$language]]$basic, text_resources[[values$language]]$intermediate,text_resources[[values$language]]$higher, text_resources[[values$language]]$additional),
           count = c(starter_total, basic_total,inter_total, higher_total, additional_total)
-          
         )
-        
       })
       
-      #barchart stuff:
+      #barchart data:
       num_rows <- nrow(TIDist)
       counter <- 1
       band_sum <- 0
-      
       results <-numeric(13)
       num_people <-numeric(13)
       band_people <- 0
-      
-      
-      #now we want to do a break down of the different taxes too.
       basic_list <-numeric(13)
       higher_list <- numeric(13)
       additional_list <- numeric(13)
-      
       #scotland only
       starter_list <- numeric(13)
       inter_list <- numeric(13)
-      
       basic_sum <- 0
       higher_sum <- 0
       addional_sum <- 0
-      
       starter_sum <- 0
       inter_sum <- 0
       
-      
+      #loop through tax bands to populate the variables:
       for (i in 1:num_rows){
-        
+        #all bands except the last one:
         if (TIDist$TaxableIncome[i] <= (counter * 10000)){
           band_sum <- band_sum + (TIDist$TotalTax[i])
           band_people <- band_people + (TIDist$N[i])
           basic_sum <- basic_sum + (TIDist$BRtax[i] * TIDist$N[i])
           higher_sum <- higher_sum + (TIDist$HRtax[i] * TIDist$N[i])
           addional_sum <- addional_sum + (TIDist$ARtax[i] * TIDist$N[i])
-          
           starter_sum <- starter_sum + (TIDist$SRtax[i] * TIDist$N[i])
           inter_sum <- inter_sum + (TIDist$IRtax[i] * TIDist$N[i])
           
         } else {
+          #last band calculations:
           if (counter < 13){
             results[counter] <- band_sum
             num_people[counter] <- band_people
             basic_list[counter] <- basic_sum
             higher_list[counter] <- higher_sum
             additional_list[counter] <- addional_sum
-            
             starter_list[counter] <- starter_sum
             inter_list[counter] <- inter_sum
             
@@ -967,14 +712,12 @@ server <- function(input, output, session) {
             basic_sum <- (TIDist$BRtax[i] * TIDist$N[i])
             higher_sum <- (TIDist$HRtax[i] * TIDist$N[i])
             addional_sum <- (TIDist$ARtax[i] * TIDist$N[i])
-            
+            #scotland:
             starter_sum <- (TIDist$SRtax[i] * TIDist$N[i])
             inter_sum <- (TIDist$IRtax[i] * TIDist$N[i])
-            
-            
-            
-            
+ 
           }
+          #last band save:
           else{
             band_sum <- band_sum + (TIDist$TotalTax[i])
             band_people <- band_people + (TIDist$N[i])
@@ -984,25 +727,21 @@ server <- function(input, output, session) {
             starter_sum <- starter_sum + (TIDist$SRtax[i] * TIDist$N[i])
             inter_sum <- inter_sum + (TIDist$IRtax[i] * TIDist$N[i])
             
-            
             if (i == num_rows){
               results[counter] <- band_sum
               num_people[counter] <- band_people
               basic_list[counter] <- basic_sum
               higher_list[counter] <- higher_sum
               additional_list[counter] <- addional_sum
-              
+              #Scotland Only:
               starter_list[counter] <- starter_sum
               inter_list[counter] <- inter_sum
-              
             }
           }
-          
         }
       }
-      
+      #divide by number of people per band if button Pressed:
       divisor <- if (values$divide) num_people else 1
-      
       #barchart:
       bar_data <- reactive({
         vector1 <- c(starter_list/divisor)
@@ -1010,15 +749,9 @@ server <- function(input, output, session) {
         vector3 <- c(inter_list/divisor)
         vector4 <- c(higher_list/divisor)
         vector5 <- c(additional_list/divisor)
-        labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
-        #legend_vector <- c("Starter", "Basic", "Intermediate", "Higher", "Additional")
-        legend_vector = c(text_resources[[values$language]]$starter,text_resources[[values$language]]$basic, text_resources[[values$language]]$intermediate,text_resources[[values$language]]$higher, text_resources[[values$language]]$additional)
         
-        #list(
-        #  stacked = rbind(vector1, vector2, vector3, vector4, vector5),
-        #  labels = labels,
-        #  legend_vector = legend_vector
-        #)
+        labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
+        legend_vector = c(text_resources[[values$language]]$starter,text_resources[[values$language]]$basic, text_resources[[values$language]]$intermediate,text_resources[[values$language]]$higher, text_resources[[values$language]]$additional)
         
         if (values$show_sum) {
           list(
@@ -1033,20 +766,13 @@ server <- function(input, output, session) {
             stacked = summed,
             labels = labels
           )
-          #
           
         }
       })
       
-      
-      
-      
-      
-      #latest_value(total_tax_sum)
-      #paste("Total tax return from income tax = ", total_tax_sum)
-    } else if (input$tax_choice == "current"){
-      
-      
+
+    } else if (input$income_tax_system_choice == "current"){
+      #Similar to above, but less bands to worry about.
       
       TIDist$PA <- NA
       TIDist$PA[TIDist$TaxableIncome <= PAlimit] <- PA
@@ -1079,18 +805,15 @@ server <- function(input, output, session) {
       additional_total <- sum((TIDist$ARtax) * TIDist$N, na.rm = TRUE)
       
       # Calculate total income tax payable
-      
       TIDist$TotalTax <- ( TIDist$BRtax + TIDist$HRtax + TIDist$ARtax) * TIDist$N
-      total_tax_sum <- sum(TIDist$TotalTax, na.rm = TRUE)
-      #latest_value(total_tax_sum)
-      #paste("tax return from income tax with current filters= ", total_tax_sum)
-      reactive_fruit_data <- reactive({
-        
+      total_income_tax_sum <- sum(TIDist$TotalTax, na.rm = TRUE)
+
+      #reactive tax values for pie chart:
+      reactive_income_tax_data <- reactive({
         data.frame(
-          fruit = c(text_resources[[values$language]]$basic, text_resources[[values$language]]$higher, text_resources[[values$language]]$additional),
+          tax_type = c(text_resources[[values$language]]$basic, text_resources[[values$language]]$higher, text_resources[[values$language]]$additional),
           count = c( basic_total, higher_total, additional_total)
         )
-        
       })
       
       
@@ -1098,25 +821,19 @@ server <- function(input, output, session) {
       num_rows <- nrow(TIDist)
       counter <- 1
       band_sum <- 0
-      
       results <-numeric(13)
       num_people <-numeric(13)
       band_people <- 0
-      
-      
-      #now we want to do a break down of the different taxes too.
       basic_list <-numeric(13)
       higher_list <- numeric(13)
       additional_list <- numeric(13)
-      
       basic_sum <- 0
       higher_sum <- 0
       addional_sum <- 0
       
-      
-      
+      #Loop through the number of bands thats been decided upon:
       for (i in 1:num_rows){
-        
+        #All salary bands bar the last one
         if (TIDist$TaxableIncome[i] <= (counter * 10000)){
           band_sum <- band_sum + (TIDist$TotalTax[i])
           band_people <- band_people + (TIDist$N[i])
@@ -1125,6 +842,7 @@ server <- function(input, output, session) {
           addional_sum <- addional_sum + (TIDist$ARtax[i] * TIDist$N[i])
           
         } else {
+          #last band tax calcs:
           if (counter < 13){
             results[counter] <- band_sum
             num_people[counter] <- band_people
@@ -1143,6 +861,7 @@ server <- function(input, output, session) {
             
           }
           else{
+            #Last band tax sums:
             band_sum <- band_sum + (TIDist$TotalTax[i])
             band_people <- band_people + (TIDist$N[i])
             basic_sum <- basic_sum + (TIDist$BRtax[i] * TIDist$N[i])
@@ -1161,6 +880,7 @@ server <- function(input, output, session) {
         }
       }
       
+      #if the divide by people has been pressed:
       divisor <- if (values$divide) num_people else 1
       
       #barchart:
@@ -1171,14 +891,8 @@ server <- function(input, output, session) {
         labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
         #legend_vector <- c("basic", "higher", "additional")
         legend_vector <- c(text_resources[[values$language]]$basic,text_resources[[values$language]]$higher, text_resources[[values$language]]$additional)
-
         
-        #list(
-        #  stacked = rbind(vector1, vector2, vector3),
-        #  labels = labels,
-        #  legend_vector = legend_vector
-        #)
-        
+        #data prep for barchart:
         if (values$show_sum) {
           list(
             stacked = rbind(vector1, vector2, vector3),
@@ -1192,87 +906,74 @@ server <- function(input, output, session) {
             stacked = summed,
             labels = labels
           )
-          #
-          
         }
-        
       })
-      
-  
       
     }
     
-    #piechart:
+    #piechart output:
     output$pieChart <- renderPlotly({
-      fruit_data <- reactive_fruit_data()
-      #title <- as.character(textOutput("tax_income_dist"))
-      #title2 <- "test"
-      plot_ly(fruit_data, labels = ~fruit, values = ~count, type = 'pie') %>%
+      income_tax_pie_data <- reactive_income_tax_data()
+
+      plot_ly(income_tax_pie_data, labels = ~tax_type, values = ~count, type = 'pie') %>%
         layout(
           title = text_resources[[values$language]]$income_tax_pie,
           margin = list(l = 20, r = 20, b = 10, t = 30),  # Adjust margins
-          paper_bgcolor = 'lightgray',  # Background color of the plot area
+          paper_bgcolor = 'white',  # Background color of the plot area
           plot_bgcolor = 'white'  # Background color of the chart area
           #width = 200px
         )
     })
     
-    
-    
-    # Generate Stacked Bar Chart using Plotly
+    # Generate Stacked Bar Chart
     output$stackedPlot <- renderPlotly({
       data <- bar_data()
       
       # Ensure x-axis categories are factors with the correct order
       x_categories <- factor(data$labels, levels = data$labels)
-      
-      
+
       if (values$show_sum){
-      
-          # Initialize plotly object with the base traces
-          p <- plot_ly(
-            x = x_categories,
-            y = ~data$stacked[1,],
-            type = 'bar',
-            name = ~data$legend_vector[1],
-            marker = list(color = 'rgba(255, 99, 132, 0.6)')
+        p <- plot_ly(
+          x = x_categories,
+          y = ~data$stacked[1,],
+          type = 'bar',
+          name = ~data$legend_vector[1],
+          marker = list(color = 'rgba(255, 99, 132, 0.6)')
+        ) %>%
+          add_trace(
+            y = ~data$stacked[2,],
+            name = ~data$legend_vector[2],
+            marker = list(color = 'rgba(54, 162, 235, 0.6)')
           ) %>%
+          add_trace(
+            y = ~data$stacked[3,],
+            name = ~data$legend_vector[3],
+            marker = list(color = 'rgba(75, 192, 192, 0.6)')
+          )
+        
+        #Current tax button pressed:
+        if (input$income_tax_system_choice != "current" && nrow(data$stacked) > 3) {
+          p <- p %>%
             add_trace(
-              y = ~data$stacked[2,],
-              name = ~data$legend_vector[2],
-              marker = list(color = 'rgba(54, 162, 235, 0.6)')
+              y = ~data$stacked[4,],
+              name = ~data$legend_vector[4],
+              marker = list(color = 'rgba(223, 192, 192, 0.6)')
             ) %>%
             add_trace(
-              y = ~data$stacked[3,],
-              name = ~data$legend_vector[3],
-              marker = list(color = 'rgba(75, 192, 192, 0.6)')
+              y = ~data$stacked[5,],
+              name = ~data$legend_vector[5],
+              marker = list(color = 'rgba(23, 192, 192, 0.6)')
             )
-          
-          # Conditionally add additional traces based on input$tax_choice
-          if (input$tax_choice != "current" && nrow(data$stacked) > 3) {
-            p <- p %>%
-              add_trace(
-                y = ~data$stacked[4,],
-                name = ~data$legend_vector[4],
-                marker = list(color = 'rgba(223, 192, 192, 0.6)')
-              ) %>%
-              add_trace(
-                y = ~data$stacked[5,],
-                name = ~data$legend_vector[5],
-                marker = list(color = 'rgba(23, 192, 192, 0.6)')
-              )
-          }
-          
-          # Finalize layout
-          p <- p %>%
-            layout(
-              barmode = 'stack',
-              title = text_resources[[values$language]]$income_stacked_graph_title,
-              xaxis = list(title = text_resources[[values$language]]$income_bar_x),
-              yaxis = list(title = text_resources[[values$language]]$income_bar_y)
-            )
-          
-          p
+        }
+        p <- p %>%
+          layout(
+            barmode = 'stack',
+            title = text_resources[[values$language]]$income_stacked_graph_title,
+            xaxis = list(title = text_resources[[values$language]]$income_bar_x),
+            yaxis = list(title = text_resources[[values$language]]$income_bar_y)
+          )
+        
+        p
       }else {
         # Plot summed values
         plot_ly(
@@ -1292,14 +993,62 @@ server <- function(input, output, session) {
       }
     })
     
-    total_tax_sum
+    #return total_income_tax_sum for the total_income_tax total
+    total_income_tax_sum
   }
   
   
+  #piechart:
+  output$old_tax_piechart <- renderPlotly({
+    old_tax_data <- data.frame(
+      labels = c("Income", "Council","LTT","LDT","VAT","Corporation"),
+      count = c(10,8,6,5,8,10)
+      
+    )
+    
+    plot_ly(old_tax_data, labels = ~labels, values = ~count, type = 'pie') %>%
+      layout(
+        title = list(
+          text = "Previous Tax Breakdown:",  # Set the title text
+          x = 0,                      # Align title to the left
+          xanchor = 'left'            # Set the anchor point to left
+        ),
+        #title = "",
+        margin = list(l = 0, r = 0, b = 0, t = 25),  # Adjust margins
+        paper_bgcolor = 'white',  # Background color of the plot area
+        plot_bgcolor = 'white'  # Background color of the chart area
+        #width = 200px
+      )
+  })
+  
+  #piechart:
+  output$updated_tax_piechart <- renderPlotly({
+    old_tax_data <- data.frame(
+      labels = c("Income", "Council","LTT","LDT","VAT","Corporation"),
+      count = c(12,7,6,4,2,1)
+      
+    )
+    
+    plot_ly(old_tax_data, labels = ~labels, values = ~count, type = 'pie') %>%
+      layout(
+        title = list(
+          text = "Updated Tax Breakdown:",
+          x = 0,
+          xanchor = 'left'
+        ),
+        #title = "Updated Tax Breakdown:",
+        margin = list(l = 0, r = 0, b = 0, t = 25),  # Adjust margins
+        paper_bgcolor = 'white',  # Background color of the plot area
+        plot_bgcolor = 'white'  # Background color of the chart area
+        #width = 200px
+      )
+  })
+  
+  
   output$totalTaxOutput <- renderText({
-    total_tax_sum <- calculateTax()
-    latest_value(total_tax_sum)
-    paste(text_resources[[values$language]]$total_income_title, total_tax_sum, "(", round(total_tax_sum/1000000000, digits = 2), " billion)")
+    total_income_tax_sum <- calculate__income_tax()
+    latest_value(total_income_tax_sum)
+    paste(text_resources[[values$language]]$total_income_title, total_income_tax_sum, "(", round(total_income_tax_sum/1000000000, digits = 2), " billion)")
   })
   
   output$newTotalTaxOutput <- renderText({
@@ -1310,7 +1059,7 @@ server <- function(input, output, session) {
   
   
   #Function to calculate the reactive council tax from user inputs.
-  calcCounciltax <- function(){
+  calculate_council_tax <- function(){
     
     #top band value:
     topBandValue <- input$topBandValue
@@ -1335,7 +1084,7 @@ server <- function(input, output, session) {
     bandGrate <- input$bandGrate
     bandHrate <- input$bandHrate
     
-
+    
     
     CTdata <- read.csv("councilTaxEnglandAndWales.csv", sep=",")
     bandAtax <- CTdata$N[1] * topBandValue * (bandArate / 100)
@@ -1349,8 +1098,8 @@ server <- function(input, output, session) {
     
     
     
-
-
+    
+    
     if (input$councilTaxCountry == "Wales"){
       bandIrate <- input$bandIrate
       #print("hello")
@@ -1358,10 +1107,7 @@ server <- function(input, output, session) {
       
       councilTax <- bandAtax + bandBtax + bandCtax + bandDtax + bandEtax + bandFtax + bandFtax + bandGtax + bandHtax+ bandItax
       reactive_council_values <- reactive({
-        #req(input$tax_choice)  # Ensure tax_choice is available
-        
-        # Determine fruit counts based on tax choice
-        
+
         data.frame(
           band_label = c("A", "B","C","D", "E","F","G","H","I"),
           #count = c(TIDist$SRtax * TIDist$N, TIDist$BRtax * TIDist$N, TIDist$IRtax * TIDist$N, TIDist$HRtax * TIDist$N, TIDist$ARtax * TIDist$N)
@@ -1374,9 +1120,6 @@ server <- function(input, output, session) {
       councilTax <- bandAtax + bandBtax + bandCtax + bandDtax + bandEtax + bandFtax + bandFtax + bandGtax + bandHtax
       
       reactive_council_values <- reactive({
-        #req(input$tax_choice)  # Ensure tax_choice is available
-        
-        # Determine fruit counts based on tax choice
         
         data.frame(
           band_label = c("A", "B","C","D", "E","F","G","H"),
@@ -1387,7 +1130,7 @@ server <- function(input, output, session) {
         
       })
     }
-        
+    
     #plotPychart:
     #piechart:
     output$pieChartCouncil <- renderPlotly({
@@ -1396,7 +1139,7 @@ server <- function(input, output, session) {
       plot_ly(reactive_council_values, labels = ~band_label, values = ~band, type = 'pie') %>%
         layout(
           title = 'Council Tax income distribution',
-          margin = list(l = 20, r = 20, b = 10, t = 30),  # Adjust margins
+          margin = list(l = 20, r = 20, b = 10, t = 35),  # Adjust margins
           paper_bgcolor = 'lightgray',  # Background color of the plot area
           plot_bgcolor = 'white'  # Background color of the chart area
           #width = 200px
@@ -1407,11 +1150,28 @@ server <- function(input, output, session) {
     councilTax
   }
   
+  ###############
+  ###############
+  #Outputs for UI
+  ###############
+  ###############
+  #outputs in the top menu (Previous and current tax returns):
+  output$old_total_tax <- renderText({
+    paste(text_resources[[values$language]]$old_total_tax, "= £3Billion")
+  })
+  
+  output$updated_total_tax <- renderText({
+    paste(text_resources[[values$language]]$updated_total_tax, "= £5Billion")
+  })
+  
   
   output$councilTaxOutput <- renderText({
-    councilTax <- calcCounciltax()
+    councilTax <- calculate_council_tax()
     paste("Council Tax return = ", councilTax, "(",councilTax/1000000000, "billion )")
   })
+  
+  
+  
   
   observeEvent(input$calculate, {
     # Save the current latest value when the button is clicked
@@ -1426,15 +1186,7 @@ server <- function(input, output, session) {
     language = "English"
   )
   
-  #observeEvent(input$toggleButton, {
-  #  values$divide <- !values$divide
-  #  if (values$divide) {
-  #    updateActionButton(session, "toggleButton", label = text_resources[[values$language]]$revert)
-  #  } else {
-  #    updateActionButton(session, "toggleButton", label = text_resources[[values$language]]$divide_by_people)
-  #  }
-  #})
-  
+ 
   observeEvent(input$toggleButton, {
     values$divide <- !values$divide
     updateButtonLabels()  # Update button label when toggled
@@ -1443,30 +1195,17 @@ server <- function(input, output, session) {
     values$show_sum <- !values$show_sum
     updateButtonLabels()  # Update button label when toggled
   })
-
+  
   updateButtonLabels <- function() {
     updateActionButton(session, "toggleButton", label = ifelse(values$divide, 
                                                                text_resources[[values$language]]$revert, 
                                                                text_resources[[values$language]]$divide_by_people))
     updateActionButton(session, "viewButton", label = ifelse(values$show_sum, 
-                                                               text_resources[[values$language]]$revert, 
-                                                               text_resources[[values$language]]$show_breakdown))
+                                                             text_resources[[values$language]]$revert, 
+                                                             text_resources[[values$language]]$show_breakdown))
     updateActionButton(session, "translateButton", label = text_resources[[values$language]]$translate_button)
   }
-    
-
   
-  
-  #    values$language <- ifelse(values$language == "English", "Welsh", "English")
-
-  #observeEvent(input$viewButton, {
-  #  values$show_sum <- !values$show_sum
-  #  if (values$show_sum) {
-  #    updateActionButton(session, "viewButton", label = text_resources[[values$language]]$revert)
-  #  } else {
-  #    updateActionButton(session, "viewButton", label = text_resources[[values$language]]$show_breakdown) 
-  #  }
-  #})
   
   #Langauge and translation stuff:
   observeEvent(input$translateButton, {
@@ -1474,22 +1213,24 @@ server <- function(input, output, session) {
     updateButtonLabels()
   })
   
+  ###################
+  #Translation data:#
+  ###################
   #translate button:
   output$translate_button <- renderText({
     text_resources[[values$language]]$translate_button
   })
-  
   #Main App title:
   output$title <- renderText({
     text_resources[[values$language]]$title
   })
   
-  #Income Tax intro:
+  #Income Tax Page intro:
   output$income_tax_intro <- renderText({
     text_resources[[values$language]]$income_tax_intro
   })
   
-  #Inouts for income tax page: pa_box
+  #Inputs for income tax page: pa_box
   output$pa_box <- renderText({
     text_resources[[values$language]]$pa_box
   })
@@ -1524,13 +1265,14 @@ server <- function(input, output, session) {
     text_resources[[values$language]]$ar
   })
   
+  #Select income tax type:
   output$select_income_system <- renderText({
     text_resources[[values$language]]$select_income_system
   })
+  #Buttons for income tax charts and graphs:
   output$divide_by_people <- renderText({
     text_resources[[values$language]]$divide_by_people
   })
-  
   output$divide_button <- renderText({
     text_resources[[values$language]]$divide_button
   })
@@ -1540,14 +1282,12 @@ server <- function(input, output, session) {
   output$update_with_new_filters <- renderText({
     text_resources[[values$language]]$update_with_new_filters
   })
-
+  
   
   output$income_tax <- renderText({
     text_resources[[values$language]]$income_tax
   })
   
-  
-   
   
   output$income_band_x <- renderText({
     text_resources[[values$language]]$income_band_x
@@ -1577,6 +1317,12 @@ server <- function(input, output, session) {
   output$ldt <- renderText({
     text_resources[[values$language]]$ldt
   })
+  output$local_taxes_tab_label <- renderText({
+    text_resources[[values$language]]$local_taxes_tab_label
+  })
+  output$other_taxes_tab_label <- renderText({
+    text_resources[[values$language]]$other_taxes_tab_label
+  })
   
   #Income Tax_location choice:
   output$current <- renderText({
@@ -1589,8 +1335,15 @@ server <- function(input, output, session) {
     text_resources[[values$language]]$scottish
   })
   
-  
-  
+  output$see_more_button <- renderText({
+    text_resources[[values$language]]$see_more_button
+  })
+
 }
 
+###########################################
+###########################################
+#run the app:                             #
+###########################################
+###########################################
 shinyApp(ui = ui, server = server)

@@ -1,5 +1,5 @@
 key,english,welsh
-title,Tax Calculater 2023/24,Cyfrifydd Treth 2023/24
+title,Bangor University Tax Calculator 2023/24,Cyfrifydd Treth Prifysgol Bangor 2023/24
 dataset,Choose Dataset:,Dewiswch Set Data:
 divide_button,Divide by 10,Rhannu trwy 10
 show_sum_button,Show Sum,Dangos Crynodeb
@@ -28,3 +28,27 @@ update_with_new_filters,Update with New Filters,Diweddaru gyda'r hidlwyr newydd
 income_tax_pie,Tax Income Distribution,Dosbarthiad Incwm Treth
 income_tax,Income Tax,Treth Incwm
 income_stacked_graph_title,Income Tax Distribution per Salary Band,Dosbarthiad Treth Incwm yn ôl Bandau Cyflog
+revert,revert,adfer
+income_bar_x,Salary Band,Band Cyflog
+income_bar_y,Tax Return,Adroddiad Treth
+total_income_title,Total Income Tax Return =,Cyfanswm adroddiad treth incwm
+previous_income_title,Previous Income Tax Return =,Adroddiad treth incwm blaenorol =
+starter,Starter,Cychwyn
+basic,Basic,Sylfaenol
+intermediate,Intermediate,Canol
+higher,Higher,Uchel
+additional,Additional,Ychwanegol
+current,Current,Cyfredol
+scottish,Scottish,Sgotiad
+fully_devolved,Fully Devolved,Wedi'i Ddatganoli'n Llwyr
+council_tax,Council Tax,Treth Gyngor
+ndr,Non Domestic Rates,FFyrdd i'r Cyngor
+ltt,Land Transactional Tax,Treth Trawsnewid Tir
+ldt,Landfill Disposals tax,Treth Gwaredwyr Tirlenwi
+dataset1,Dataset 1,Gwybodaeth 1
+dataset2,Dataset 2,Gwybodaeth 2
+see_more_button,See more Info,Gweld myw o Gwybodaeth
+old_total_tax,Previous Total Tax Return,Dychwelyd Treth Gyfan Blaenorol
+updated_total_tax,Updated Total Tax Return,Dychwelyd Treth Gyfan Diweddarwyd
+local_taxes_tab_label,Local Taxes,Trethi lleol
+other_taxes_tab_label,Other Taxes,Trethi Eraill
