@@ -10,18 +10,18 @@ sum_plot_title,Sum of Values,Crynodeb o Werthoedd
 xaxis_title,Categories,Categori
 yaxis_title_stacked,Values,Gwerthoedd
 yaxis_title_sum,Sum,Crynodeb
-income_tax_intro,Income tax is paid by employers to the gov via employee salary,Mae treth incwm yn cael ei thalu gan gyflogwyr i'r llywodraeth trwy gyflog yr weithwyr
+income_tax_intro,Income tax is paid by employers to the gov via employee salary. Some information about the block grant,Mae treth incwm yn cael ei thalu gan gyflogwyr i'r llywodraeth trwy gyflog yr weithwyr. Rhai gwybodaeth am y grant bloc.
 pa_box,Personal Allowance:,Gwariant Bersonol:
-pa_limit,Personal Allowance Limit:, Terfyn Gwariant Bersonol:
+pa_limit,Limit:,Terfyn:
 sr_threshold,Starter Rate Threshold:,Y Derfyn Rhydd Y Cyntaf:
 ir_threshold,Intermediate Rate Threshold:,Y Derfyn Rheswm Canol:
 br_threshold,Basic Rate Threshold:,Y Derfyn Rheswm Sylfaenol:
 hr_threshold,Higher Rate Threshold:,Y Derfyn Rheswm Uchel:
-sr,Starter Rate:,Y Rheswm Cychwyn:
-br,Basic Rate:,Rheswm Sylfaenol:
-ir,Intermediate Rate:,Rheswm Canol:
-hr,Higher Rate:,Rheswm Uchel:
-ar,Additional Rate:,Rheswm Ychwanegol:
+sr,Rate:,Cyfradd:
+br,Rate:,Cyfradd:
+ir,Rate:,Cyfradd:
+hr,Rate:,Cyfradd:
+ar,Rate:,Cyfradd:
 select_income_system,Select Income Tax System:,Dewis System Treth Incwm:
 divide_by_people,Divide by people per band,Rhannu gan bobl y band
 show_breakdown,Show Tax Breakdown,Dangos Dadansoddiad Treth
@@ -32,7 +32,8 @@ income_stacked_graph_title,Income Tax Distribution per Salary Band,Dosbarthiad T
 revert,revert,adfer
 income_bar_x,Salary Band,Band Cyflog
 income_bar_y,Tax Return,Adroddiad Treth
-total_income_title,Total Income Tax Return =,Cyfanswm adroddiad treth incwm
+total_income_title_1,Total Income Tax Return with,Cyfanswm y Dreth Incwm gyda'r 
+total_income_title_2,current filters =,hidlwyr cyfredol =
 previous_income_title,Previous Income Tax Return =,Adroddiad treth incwm blaenorol =
 starter,Starter,Cychwyn
 basic,Basic,Sylfaenol
@@ -70,3 +71,9 @@ income_tax_devolved,Income Tax dev,Treth Incwm dev
 block_grant,Block Grant,Grant Bloc
 tot_welsh_taxes,Total Welsh Taxes,Cyfanswm trethi Cymru
 welsh_budget,Total Gov Budget,Cyllideb Llywodraeth Cymru
+rate,Rate:,Cyfradd:
+ndr_input,NDR tax return (£million) =,Ffurflen dreth ANP (£miliwn) =
+tourism_input,Tourism Levy (£million) =,Levy Twristiaeth (£	miliwn) =
+block_grant_input,Block Grant (£millions) =,Grant Bloc (£miliynau) =
+council_tax_title,Council Tax:,Treth Gyngor:
+other_taxes_title,Other Taxes available with chosen system (all values in £millions):,Trethi eraill sydd ar gael gyda'r system ddewisol (pob gwerth yn £miliynau):
