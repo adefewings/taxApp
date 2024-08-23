@@ -116,7 +116,7 @@ ui <- fluidPage(
          margin-bottom: 2px;
         }
         .input-group-council label {
-        width: 150px;
+        width: 200px;
         margin-right: 5px; 
       
         }
@@ -232,7 +232,8 @@ ui <- fluidPage(
         #title {
       font-size: 35px;
       font-weight: bold;
-    }
+        }
+      
       ")
     )
   ),
@@ -242,52 +243,67 @@ ui <- fluidPage(
   #Start of the main page - default is the income tax page.
   #Title and translate button on top of screen
   fluidRow(
-    column(10, 
+    column(4,
+           align = "left",
+           tags$img(src = "businessLogo.png", height = "150px", width = "auto"),
+           
+           ),
+    column(8,
+           align = "right",
+           tags$div(style = "background-color: #C50031; height: 30px; width: 100%; margin: 10px 0; padding: 0;"),
+           tags$div(style = "background-color: #F6BC0A; height: 30px; width: 90%; margin: 10px 0; padding: 0;"),
+           #tags$div(style = "background-color: #C50031; height: 20px; width: 80%; margin: 10px 0; padding: 0;"),
+           actionButton("contact_us_button", label = textOutput("contact_us_button")),
+           actionButton("translateButton", textOutput("translate_button"))
+           
+           ),
+    
+    
+  ),
+  
+  fluidRow(
+    column(7, 
            titlePanel(textOutput("title"))
     ),
-    column(2, 
-           align = "right",
-           actionButton("translateButton", textOutput("translate_button"))
-    )
+    
+    
   ),
   br(),
  
   fluidRow(
-      column(3,
-             align = "left",
-             div(class = "output-container",
-                 verbatimTextOutput("old_total_tax")
-             ),
-             div(class = "output-container",
-                 verbatimTextOutput("updated_total_tax")
-             ),
-             div(class = "calculate-button-container",
-                 actionButton("see_more_button", label = textOutput("see_more_button"))
-             ),
+    column(6,
+           align = "left",
+           
+           br(),
+           #br(),
+          tags$div(style = "font-size: 16px;",textOutput("main_app_intro"))
+           
+    ),
+      column(width = 3,
+             align = "right",
+             #div(class = "output-container",
+            #     verbatimTextOutput("old_total_tax")
+            # ),
+             plotlyOutput("old_tax_piechart",height = "240px"),
+             
         
       ),
-      column(3,
-            plotlyOutput("old_tax_piechart",height = "260px"),
-      ),
-      column(3,
-             plotlyOutput("updated_tax_piechart",height = "260px"),
-      ),
-      column(3,
+      
+      column(width = 3,
              align = "right",
-             tags$img(src = "businessLogo.png", height = "150px", width = "auto"),
-             )
+             #div(class = "output-container",
+            #     verbatimTextOutput("updated_total_tax")
+            # ),
+             plotlyOutput("updated_tax_piechart",height = "240px"),
+      )
+      
     ),
     #Some breaks for formatting
-    br(),
-    br(),
-    br(),
+    
   
     
     fluidRow(
-        column(5,
-               
-        ),
-        column(7,
+        column(6,
         # rest of the page seperated by tabs.[ income | Local | Others ]
         tabsetPanel(
           id = "tabs",
@@ -350,7 +366,7 @@ ui <- fluidPage(
                                          sliderInput("AR", NULL, min = 0, max = 1, value = 0.46, step = 0.01))
                             )
                      ),
-                     column(4,
+                     column(6,
                             style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
                             #div(style = "height: 60px;", p("")), # Empty placeholder
                             
@@ -375,21 +391,42 @@ ui <- fluidPage(
                    
           ),
           #Council Tax Tab:
-          tabPanel(textOutput("local_taxes_tab_label"), value = "councilTax", h4("this is a tax levied on residential domestic property"),
+          tabPanel(textOutput("local_taxes_tab_label"), value = "councilTax", h4(textOutput("local_taxes_tab_intro")),
                    #empty gap first:
                    div(style = "height: 20px;", p("")),
+                   radioButtons("councilTaxCountry", textOutput("local_tax_system_selection"), 
+                                choices = c("current", "scottish", "fully devolved"), 
+                                selected = "current", 
+                                inline = FALSE,
+                                width = "400px"),
+                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                   
+                   #Start with NDR:
+                   div(class = "input-group-council",
+                       tags$label("NDR tax return (£million) = ", `for` = "ndrTotal"),
+                       numericInput("ndrTotal", NULL, 1000)),
+                   br(),
+                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                   div(class = "input-group-council",
+                       tags$label("NDR tax return (£million) = ", `for` = "tourism_levy_total"),
+                       numericInput("tourism_levy_total", NULL, 0)),
+                   br(),
+                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                   br(),
                    #Need to have choices for Scotland, England and Wales:
-                   selectInput("councilTaxCountry", "Select Country for Council tax calculations",
-                               choices = c("Wales", "Scotland", "England"),
-                               selected = "Wales"),
-                   #numericInput("top band council tax amount:", 0, 2000),
+                   #selectInput("councilTaxCountry", "Select Country for Council tax calculations",
+                  #             choices = c("Wales", "Scotland", "England"),
+                   #            selected = "Wales"),
+                   
+                  
+                  #numericInput("top band council tax amount:", 0, 2000),
                    div(class = "input-group-council",
                        tags$label("Top Band Value = ", `for` = "topBandValue"),
                        numericInput("topBandValue", NULL, 2000)),
                    #Now need to include the different bands (A-H) with I only included for Wales:
                    div(style = "height: 30px;", p("")), # Empty placeholder
                    fluidRow(
-                     column(3,
+                     column(6,
                             style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
                             tabPanel("councilTax",
                                      tags$p("Band A:", style = "font-size: 18px;font-weight: bold;"),
@@ -466,7 +503,7 @@ ui <- fluidPage(
                                      
                             )
                      ),
-                     column(3,
+                     column(5,
                             #div(style = "height: 60px;", p("")), # Empty placeholder
                             
                             div(class = "output-container",
@@ -497,7 +534,16 @@ ui <- fluidPage(
         )
     
       )
-        )
+        ),
+      column(6,
+             #style = "text-align: center;",
+             br(),
+             br(),
+             div(style = "display: flex; justify-content: center;",
+                 tableOutput("tax_table")
+             )
+             
+      )
   )
 )
 
@@ -600,7 +646,7 @@ server <- function(input, output, session) {
   
   
   #Function to calculate the income tax for either scottish, current of fully deveolved scenarios:
-  calculate__income_tax <- function(){
+  calculate_income_tax <- function(){
     # Define Parameters from inputs
     PA <- input$PA
     PAlimit <- input$PAlimit
@@ -1021,39 +1067,18 @@ server <- function(input, output, session) {
           xanchor = 'left'            # Set the anchor point to left
         ),
         #title = "",
-        margin = list(l = 0, r = 0, b = 0, t = 25),  # Adjust margins
+        margin = list(l = 0, r = 10, b = 0, t = 25),  # Adjust margins
         paper_bgcolor = 'white',  # Background color of the plot area
         plot_bgcolor = 'white'  # Background color of the chart area
         #width = 200px
       )
   })
   
-  #piechart:
-  output$updated_tax_piechart <- renderPlotly({
-    old_tax_data <- data.frame(
-      labels = c("Income", "Council","LTT","LDT","VAT","Corporation"),
-      count = c(12,7,6,4,2,1)
-      
-    )
-    
-    plot_ly(old_tax_data, labels = ~labels, values = ~count, type = 'pie') %>%
-      layout(
-        title = list(
-          text = "Updated Tax Breakdown:",
-          x = 0,
-          xanchor = 'left'
-        ),
-        #title = "Updated Tax Breakdown:",
-        margin = list(l = 0, r = 0, b = 0, t = 25),  # Adjust margins
-        paper_bgcolor = 'white',  # Background color of the plot area
-        plot_bgcolor = 'white'  # Background color of the chart area
-        #width = 200px
-      )
-  })
+
   
   
   output$totalTaxOutput <- renderText({
-    total_income_tax_sum <- calculate__income_tax()
+    total_income_tax_sum <- calculate_income_tax()
     latest_value(total_income_tax_sum)
     paste(text_resources[[values$language]]$total_income_title, total_income_tax_sum, "(", round(total_income_tax_sum/1000000000, digits = 2), " billion)")
   })
@@ -1176,6 +1201,7 @@ server <- function(input, output, session) {
     councilTax <- calculate_council_tax()
     paste("Council Tax return = ", councilTax, "(",councilTax/1000000000, "billion )")
   })
+ 
   
   
   
@@ -1190,10 +1216,50 @@ server <- function(input, output, session) {
   values <- reactiveValues(
     divide = FALSE,
     show_sum = FALSE,
-    language = "English"
+    language = "English",
+    total_income_tax = NULL,
+    total_council_tax = NULL
   )
   
- 
+  observe({
+    # Assuming calculate_income_tax and calculate_council_tax functions are called
+    values$total_income_tax <- calculate_income_tax()
+    values$total_council_tax <- calculate_council_tax()
+  })
+  
+  output$updated_tax_piechart <- renderPlotly({
+    # Ensure totals are available
+    if (is.null(values$total_income_tax) || is.null(values$total_council_tax)) {
+      return(NULL)
+    }
+    
+    #ndr data:
+    total_ndr_tax <- (input$ndrTotal) * 1000000
+    tourism_levy_tax <- (input$tourism_levy_total) * 1000000
+    
+    # Data for pie chart
+    pie_data <- data.frame(
+      category = c("Income Tax", "Council Tax","NDR Tax","Tourism Levy"),
+      amount = c(values$total_income_tax, values$total_council_tax,total_ndr_tax,tourism_levy_tax)
+    )
+    
+    plot_ly(pie_data, labels = ~category, values = ~amount, type = 'pie') %>%
+      layout(
+        title = list(
+          text = "Updated Tax Breakdown:",
+          x = 0,
+          xanchor = 'left'
+        ),
+        #title = "Updated Tax Breakdown:",
+        margin = list(l = 0, r = 0, b = 0, t = 25),  # Adjust margins
+        paper_bgcolor = 'white',  # Background color of the plot area
+        plot_bgcolor = 'white'  # Background color of the chart area
+        #width = 200px
+      )
+  })
+  
+  
+  
   observeEvent(input$toggleButton, {
     values$divide <- !values$divide
     updateButtonLabels()  # Update button label when toggled
@@ -1220,6 +1286,73 @@ server <- function(input, output, session) {
     updateButtonLabels()
   })
   
+  ###################
+  #Table data       #
+  ###################
+  #backup for table stuff:
+    # Define data values and row names
+  static_data <- reactive({    
+    tax <- c(
+      text_resources[[values$language]]$devolved_taxes,
+      text_resources[[values$language]]$income_tax_devolved,
+      text_resources[[values$language]]$council_tax,
+      text_resources[[values$language]]$ndr,
+      text_resources[[values$language]]$property_tax,
+      text_resources[[values$language]]$ltt,
+      text_resources[[values$language]]$ldt,
+      text_resources[[values$language]]$tourism_levy,
+      NA,
+      text_resources[[values$language]]$non_devolved_taxes,
+      text_resources[[values$language]]$income_tax,
+      text_resources[[values$language]]$ni,
+      text_resources[[values$language]]$vat,
+      text_resources[[values$language]]$corporation_tax,
+      text_resources[[values$language]]$duties,
+      text_resources[[values$language]]$env_levy,
+      text_resources[[values$language]]$other,
+      NA,
+    
+      text_resources[[values$language]]$block_grant,
+      text_resources[[values$language]]$tot_welsh_taxes,
+      text_resources[[values$language]]$welsh_budget
+    )
+    
+    c_estimates <- c(NA, 10, 20, 30, 4, 50, 60, 70, NA, NA, 0, 10, 20, 40, 60, 80, 40,NA,NA,NA,NA)
+    
+    c_estimate_sum <- c(
+      NA, NA, NA, NA, NA, NA, NA, NA,  # Values for devolved taxes
+      sum(c(10, 20, 30, 4, 50, 60, 70)),  # Total devolved taxes
+      NA, NA, NA, NA, NA, NA, NA, NA,  # Values for non-devolved taxes
+      sum(c(0, 10, 20, 40, 60, 80, 40)),
+      19000,NA,NA
+      # Total non-devolved taxes
+    )
+    blank_col <- c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA)
+    
+    # Create a data frame
+    data_frame <- data.frame(
+      Tax = tax,
+      `Current Estimates` = c_estimates,
+      est_tot= c_estimate_sum,
+      blank_col = blank_col,
+      updated_new = c_estimates,
+      upd_tot = c_estimate_sum,
+      stringsAsFactors = FALSE  # Ensure strings are not converted to factors
+      
+    )
+    
+  })
+  
+  
+    output$tax_table <- renderTable({
+      combined_data <- static_data()
+      # Convert NA values to empty strings for better display
+      combined_data[is.na(combined_data)] <- ""
+      combined_data
+    }, rownames = FALSE)  # Do not display row names
+  
+    
+
   ###################
   #Translation data:#
   ###################
@@ -1345,7 +1478,18 @@ server <- function(input, output, session) {
   output$see_more_button <- renderText({
     text_resources[[values$language]]$see_more_button
   })
-
+  output$contact_us_button <- renderText({
+    text_resources[[values$language]]$contact_us_button
+  })
+  output$main_app_intro <- renderText({
+    text_resources[[values$language]]$main_app_intro
+  })
+  output$local_taxes_tab_intro <- renderText({
+    text_resources[[values$language]]$local_taxes_tab_intro
+  })
+  output$local_tax_system_selection <- renderText({
+    text_resources[[values$language]]$local_tax_system_selection
+  })
 }
 
 ###########################################

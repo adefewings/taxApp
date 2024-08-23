@@ -1,5 +1,6 @@
 key,english,welsh
-title,Bangor University Tax Calculator 2023/24,Cyfrifydd Treth Prifysgol Bangor 2023/24
+title,Tax Calculator 2023/24,Cyfrifydd Treth 2023/24
+main_app_intro,Hello and Welcome to Bangor University's Tax return App. You are able to view the previous years tax return breakdown as well as apply certain tax filters to see a potential breakdown for the next tax years return. MORE INTRO INFO ADDED HERE.,Croeso i Ap Ffurflen Dreth Prifysgol Bangor. Yma gallwch weld dadansoddiad eich ffurflen dreth y flwyddyn flaenorol yn ogystal â chymhwyso hidlwyr treth penodol i weld dadansoddiad posibl ar gyfer ffurflen dreth y flwyddyn nesaf. MWY O WYBODAETH RHAGARWEINIOL YMA.
 dataset,Choose Dataset:,Dewiswch Set Data:
 divide_button,Divide by 10,Rhannu trwy 10
 show_sum_button,Show Sum,Dangos Crynodeb
@@ -52,3 +53,20 @@ old_total_tax,Previous Total Tax Return,Dychwelyd Treth Gyfan Blaenorol
 updated_total_tax,Updated Total Tax Return,Dychwelyd Treth Gyfan Diweddarwyd
 local_taxes_tab_label,Local Taxes,Trethi lleol
 other_taxes_tab_label,Other Taxes,Trethi Eraill
+contact_us_button,Contact the Business School,Cysylltwch â'r Ysgol Fusnes
+local_taxes_tab_intro,"Local taxes incluide Non Domestic Rates (NDR) tax, Council Tax and  proposed tourism Levy.","Trethi lleol yn cynnwys treth Rates Non-Domestic (NDR), Treth y Cyngor, a'r treth dwristiaeth a gynhelir."
+local_tax_system_selection,Select system for local tax filters and calculations,Dewiswch system ar gyfer hidlwyr a chyfrifon treth leol
+devolved_taxes,Devolved Taxes,Trethi Datganoledig
+property_tax,Property Tax,Treth Eiddo
+tourism_levy,Tourism Levy,Levy Twristiaeth
+non_devolved_taxes,Non Devolved Taxes,Trethi Heb eu Datganoli
+ni,National Insurance,Yswiriant Gwladol
+vat,VAT,TAW
+corporation_tax,Corporation Tax,Treth Gorfforaeth
+duties,"Duties - fuel, tobacco, alcohol","Tollau - t	anwydd, tybaco, alcohol"
+env_levy,Environmental Levy,Levy amgylcheddol
+other,Other,Eraill
+income_tax_devolved,Income Tax dev,Treth Incwm dev
+block_grant,Block Grant,Grant Bloc
+tot_welsh_taxes,Total Welsh Taxes,Cyfanswm trethi Cymru
+welsh_budget,Total Gov Budget,Cyllideb Llywodraeth Cymru
