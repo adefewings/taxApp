@@ -335,13 +335,13 @@ ui <- fluidPage(
   fluidRow(
     column(4,
            align = "left",
-           tags$img(src = "businessLogo.png", height = "150px", width = "auto"),
+           tags$img(src = "businessLogo.png", height = "100px", width = "auto"),
            
            ),
     column(8,
            align = "right",
-           tags$div(style = "background-color: #C50031; height: 30px; width: 100%; margin: 10px 0; padding: 0;"),
-           tags$div(style = "background-color: #F6BC0A; height: 30px; width: 90%; margin: 10px 0; padding: 0;"),
+           tags$div(style = "background-color: #C50031; height: 20px; width: 100%; margin: 10px 0; padding: 0;"),
+           tags$div(style = "background-color: #F6BC0A; height: 20px; width: 90%; margin: 10px 0; padding: 0;"),
            #tags$div(style = "background-color: #C50031; height: 20px; width: 80%; margin: 10px 0; padding: 0;"),
            actionButton("contact_us_button", label = textOutput("contact_us_button")),
            actionButton("translateButton", textOutput("translate_button"))
@@ -374,7 +374,7 @@ ui <- fluidPage(
              #div(class = "output-container",
             #     verbatimTextOutput("old_total_tax")
             # ),
-             plotlyOutput("old_tax_piechart",height = "240px"),
+             plotlyOutput("old_tax_piechart",height = "280px"),
              
         
       ),
@@ -384,7 +384,7 @@ ui <- fluidPage(
              #div(class = "output-container",
             #     verbatimTextOutput("updated_total_tax")
             # ),
-             plotlyOutput("updated_tax_piechart",height = "240px"),
+             plotlyOutput("updated_tax_piechart",height = "280px"),
       )
       
     ),
@@ -408,7 +408,7 @@ ui <- fluidPage(
                    #Start with NDR:
                    div(class = "input-group-block custom-numeric-input",
                        tags$label(textOutput("block_grant_input"), `for` = "block_grant_total"),
-                       numericInput("block_grant_total", NULL, 19000)),
+                       numericInput("block_grant_total", NULL, 19000, step = 100)),
                    
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                     
@@ -433,19 +433,19 @@ ui <- fluidPage(
                      column(5,
                             div(class = "input-group-thresholds custom-numeric-input",
                                   tags$label(textOutput("pa_box"), `for` = "PA"),
-                                  numericInput("PA", NULL, 12500)),
+                                  numericInput("PA", NULL, 12500, step = 100)),
                             div(class = "input-group-thresholds custom-numeric-input",
                                 tags$label(textOutput("sr_threshold"), `for` = "SRthreshold"),
-                                numericInput("SRthreshold", NULL, 2000)),
+                                numericInput("SRthreshold", NULL, 2000, step = 100)),
                             div(class = "input-group-thresholds custom-numeric-input",
                                 tags$label(id="BRThreshold",textOutput("br_threshold"), `for` = "BRthreshold"),
-                                numericInput("BRthreshold", NULL, 0)),
+                                numericInput("BRthreshold", NULL, 0, step = 100)),
                             div(class = "input-group-thresholds custom-numeric-input",
                                 tags$label(textOutput("ir_threshold"), `for` = "IRthreshold"),
-                                numericInput("IRthreshold", NULL, 18000)),
+                                numericInput("IRthreshold", NULL, 18000, step = 100)),
                             div(class = "input-group-thresholds custom-numeric-input",
                                 tags$label(id="HRThreshold",textOutput("hr_threshold"), `for` = "HRthreshold"),
-                                numericInput("HRthreshold", NULL, 0)),
+                                numericInput("HRthreshold", NULL, 0, step = 100)),
                             
                             ),
                      column(6,
@@ -456,7 +456,8 @@ ui <- fluidPage(
                                        max = 200000, 
                                        value = 100000,
                                        #animate = TRUE,
-                                       ticks = TRUE
+                                       ticks = TRUE,
+                                       step = 100
                                        #breaks = seq(0, 200000, by = 20000)
                                        #labels = scales::comma(seq(0, 200000, by = 20000))
                               )),
@@ -656,48 +657,48 @@ ui <- fluidPage(
                    
                    #Start with NDR:
                    div(class = "input-group-council",
-                       tags$label("Property Tax (£Millions) = ", `for` = "property_tax_input"),
-                       numericInput("property_tax", NULL, 1000)),
+                       tags$label("Property Tax = ", `for` = "property_tax_input"),
+                       numericInput("property_tax_input", NULL, 0)),
                    #div(style = "height: 2px;", p("")),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                    div(class = "input-group-council",
-                       tags$label("Land Transational tax = ", `for` = "ltt_input"),
-                       numericInput("ltt_input", NULL, 0)),
+                       tags$label("Land Transactional tax = ", `for` = "ltt_input"),
+                       numericInput("ltt_input", NULL, 271)),
                    #br(),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                    div(class = "input-group-council",
                        tags$label("Landfill Disposals tax = ", `for` = "ldt_input"),
-                       numericInput("ldt_input", NULL, 0)),
+                       numericInput("ldt_input", NULL, 27)),
                    #br(),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                    div(class = "input-group-council",
                        tags$label("National Insurance = ", `for` = "ni_input"),
-                       numericInput("ni_input", NULL, 0)),
+                       numericInput("ni_input", NULL, 6111)),
                    #br(),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                    div(class = "input-group-council",
                        tags$label("VAT = ", `for` = "vat_input"),
-                       numericInput("vat_input", NULL, 0)),
+                       numericInput("vat_input", NULL, 9157)),
                    #br(),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                    div(class = "input-group-council",
-                       tags$label("Land Transational tax = ", `for` = "ltt_input"),
-                       numericInput("ltt_input", NULL, 0)),
+                       tags$label("Corporation tax = ", `for` = "corporation_input"),
+                       numericInput("corporation_input", NULL, 2698)),
                    #br(),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                    div(class = "input-group-council",
                        tags$label("Duties (fuel,alcohol etc) = ", `for` = "duties_input"),
-                       numericInput("duties_input", NULL, 0)),
+                       numericInput("duties_input", NULL, 2500)),
                    #br(),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                    div(class = "input-group-council",
                        tags$label("Environmental Levy = ", `for` = "env_levy_input"),
-                       numericInput("env_levy_input", NULL, 0)),
+                       numericInput("env_levy_input", NULL, 1300)),
                    #br(),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                    div(class = "input-group-council",
                        tags$label("Other = ", `for` = "other"),
-                       numericInput("other", NULL, 0)),
+                       numericInput("other", NULL, 2500)),
                    #br(),
                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
         )
@@ -1231,7 +1232,7 @@ server <- function(input, output, session) {
     plot_ly(old_tax_data, labels = ~labels, values = ~count, type = 'pie') %>%
       layout(
         title = list(
-          text = "Previous Tax Breakdown:"  # Set the title text
+          text = text_resources[[values$language]]$previous_tax_piechart  # Set the title text
           #x = 10,                      # Align title to the left
           #xanchor = 'left'            # Set the anchor point to left
         ),
@@ -1405,23 +1406,29 @@ server <- function(input, output, session) {
     #ndr data:
     total_ndr_tax <- (input$ndrTotal) * 1000000
     tourism_levy_tax <- (input$tourism_levy_total) * 1000000
+    property_tax <- (input$property_tax_input) * 1000000
+    ltt_tax <- (input$ltt_input) * 1000000
+    ldt_tax <- (input$ldt_input) * 1000000
+    ni_tax <- (input$ni_input) * 1000000
+    vat_tax <- (input$vat_input) * 1000000
+    
     
     # Data for pie chart
     pie_data <- data.frame(
-      category = c("Income", "Council","NDR","Tourism"),
-      amount = c(values$total_income_tax, values$total_council_tax,total_ndr_tax,tourism_levy_tax)
+      category = c("Income", "Council","NDR","Tourism","Property","LTT","LDT","NI","VAT"),
+      amount = c(values$total_income_tax, values$total_council_tax,total_ndr_tax,tourism_levy_tax, property_tax, ltt_tax, ldt_tax, ni_tax, vat_tax)
     )
     
     plot_ly(pie_data, labels = ~category, values = ~amount, type = 'pie') %>%
       layout(
         title = list(
-          text = "Updated Tax Breakdown:"
+          text = text_resources[[values$language]]$updated_tax_piechart
           #x = 0,
           #xanchor = 'left'
         ),
         #title = "Updated Tax Breakdown:",
         margin = list(l = 0, r = 0, b = 0, t = 25),  # Adjust margins
-        paper_bgcolor = 'white',  # Background color of the plot area
+        paper_bgcolor = 'white',  # Background color of the plot area 
         plot_bgcolor = 'white'  # Background color of the chart area
         #width = 200px
       )
@@ -1488,6 +1495,9 @@ server <- function(input, output, session) {
     
     c_estimates <- c(NA, 3322, 2716, 1100, 0, 271, 27, 0, NA, NA, 5315, 6111, 9157, 2698, 2500, 1300, 2500,NA,NA,NA,NA)
     
+    updated_estimates <- c(NA, 3322, round((values$total_council_tax)/1000000), input$ndrTotal, 0, input$ltt_input, input$ldt_input, 0, NA, NA, round((values$total_income_tax)/1000000), 6111, 9157, 2698, 2500, 1300, 2500,NA,NA,NA,NA)
+
+    
     c_estimate_sum <- c(
       NA, NA, NA, NA, NA, NA, NA, NA,  # Values for devolved taxes
       sum(c(3322, 2716, 1100, 0, 271, 27, 0)),  # Total devolved taxes
@@ -1504,7 +1514,7 @@ server <- function(input, output, session) {
       `Current Estimates` = c_estimates,
       est_tot= c_estimate_sum,
       blank_col = blank_col,
-      updated_new = c_estimates,
+      updated_new = updated_estimates,
       upd_tot = c_estimate_sum,
       stringsAsFactors = FALSE  # Ensure strings are not converted to factors
       

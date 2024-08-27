@@ -77,3 +77,5 @@ tourism_input,Tourism Levy (£million) =,Levy Twristiaeth (£	miliwn) =
 block_grant_input,Block Grant (£millions) =,Grant Bloc (£miliynau) =
 council_tax_title,Council Tax:,Treth Gyngor:
 other_taxes_title,Other Taxes available with chosen system (all values in £millions):,Trethi eraill sydd ar gael gyda'r system ddewisol (pob gwerth yn £miliynau):
+previous_tax_piechart,Previous Tax Year Breakdown:,Manylion Blynyddoedd Treth Blaenorol:
+updated_tax_piechart,Updated Tax Year breakdown:,Manylion Blynyddoedd Treth Diweddarwyd:
