@@ -1,5 +1,6 @@
 key,english,welsh
-title,Tax Calculator 2023/24,Cyfrifydd Treth 2023/24
+title,Welsh Tax Calculator 2024/25,Cyfrifydd Treth Cymru 2024/25
+piechart_title,Welsh Government and Local Authorities' Combined Budgets,Cyfun gyllideb Llywodraeth Cymru a'r Awdurdodau Lleol
 main_app_intro,Hello and Welcome to Bangor University's Tax return App. You are able to view the previous years tax return breakdown as well as apply certain tax filters to see a potential breakdown for the next tax years return. MORE INTRO INFO ADDED HERE.,Croeso i Ap Ffurflen Dreth Prifysgol Bangor. Yma gallwch weld dadansoddiad eich ffurflen dreth y flwyddyn flaenorol yn ogystal â chymhwyso hidlwyr treth penodol i weld dadansoddiad posibl ar gyfer ffurflen dreth y flwyddyn nesaf. MWY O WYBODAETH RHAGARWEINIOL YMA.
 dataset,Choose Dataset:,Dewiswch Set Data:
 divide_button,Divide by 10,Rhannu trwy 10
@@ -12,7 +13,7 @@ yaxis_title_stacked,Values,Gwerthoedd
 yaxis_title_sum,Sum,Crynodeb
 income_tax_intro,Income tax is paid by employers to the gov via employee salary. Some information about the block grant,Mae treth incwm yn cael ei thalu gan gyflogwyr i'r llywodraeth trwy gyflog yr weithwyr. Rhai gwybodaeth am y grant bloc.
 pa_box,Personal Allowance:,Gwariant Bersonol:
-pa_limit,Limit:,Terfyn:
+pa_limit,PA Limit:,Terfyn GB:
 sr_threshold,Starter Rate Threshold:,Y Derfyn Rhydd Y Cyntaf:
 ir_threshold,Intermediate Rate Threshold:,Y Derfyn Rheswm Canol:
 br_threshold,Basic Rate Threshold:,Y Derfyn Rheswm Sylfaenol:
@@ -77,5 +78,5 @@ tourism_input,Tourism Levy (£million) =,Levy Twristiaeth (£	miliwn) =
 block_grant_input,Block Grant (£millions) =,Grant Bloc (£miliynau) =
 council_tax_title,Council Tax:,Treth Gyngor:
 other_taxes_title,Other Taxes available with chosen system (all values in £millions):,Trethi eraill sydd ar gael gyda'r system ddewisol (pob gwerth yn £miliynau):
-previous_tax_piechart,Previous Tax Year Breakdown:,Manylion Blynyddoedd Treth Blaenorol:
-updated_tax_piechart,Updated Tax Year breakdown:,Manylion Blynyddoedd Treth Diweddarwyd:
+previous_tax_piechart,Current Estimates:,Amcangyfrifon cyfredol:
+updated_tax_piechart,Estimates with you changes implemented:,Amcangyfrifon gyda'ch newidiadau wedi'u gweithredu:

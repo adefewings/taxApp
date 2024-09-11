@@ -1,4 +1,11 @@
-#Bangor Business school tax app
+#################################
+#Bangor Business school tax app #
+#################################
+#Last edited: 27/08/24          #
+#Edited by: Ollie Barbaresi     #
+#eResearch                      #
+#################################
+
 
 #import libraries:
 library(shiny)
@@ -6,13 +13,13 @@ library(shinyjs)
 library(plotly) 
 library(ggplot2)
 
-########################
-########################
-########################
-#Code to allow translation:
-########################
-########################
-########################
+#############################
+#############################
+#############################
+#Code to allow translation: #
+#############################
+#############################
+#############################
 #input csv file which contains the dictionary of words for translations:
 text_data <- read.csv("translations.csv", stringsAsFactors = FALSE)
 
@@ -43,7 +50,7 @@ text_resources <- text_resources_func(text_data)
 ########################
 ########################
 ########################
-#UI Function:
+#UI Function:          #
 ########################
 ########################
 ########################
@@ -51,6 +58,7 @@ ui <- fluidPage(
   useShinyjs(),  # Initialize shinyjs
   
   #Custom css for formatting app items:
+  #These include the inputs, backgrounds and some formatting
   tags$head(
     tags$style(
       HTML("
@@ -319,6 +327,10 @@ ui <- fluidPage(
       font-size: 35px;
       font-weight: bold;
         }
+        #piechart_title {
+        font-size: 25px;
+        font-weight: bold;
+        }
         #council_tax_title {
         font-size: 16px;
         font-weight: bold;
@@ -328,6 +340,7 @@ ui <- fluidPage(
     )
   ),
   #end of CSS
+  
   
   
   #Start of the main page - default is the income tax page.
@@ -340,14 +353,14 @@ ui <- fluidPage(
            ),
     column(8,
            align = "right",
+           #The formatted rectangles for the top of the screen:
            tags$div(style = "background-color: #C50031; height: 20px; width: 100%; margin: 10px 0; padding: 0;"),
            tags$div(style = "background-color: #F6BC0A; height: 20px; width: 90%; margin: 10px 0; padding: 0;"),
            #tags$div(style = "background-color: #C50031; height: 20px; width: 80%; margin: 10px 0; padding: 0;"),
            actionButton("contact_us_button", label = textOutput("contact_us_button")),
            actionButton("translateButton", textOutput("translate_button"))
-           
+
            ),
-    
     
   ),
   
@@ -358,363 +371,344 @@ ui <- fluidPage(
     
     
   ),
-  br(),
+  #br(),
  
   fluidRow(
-    column(6,
+    column(5,
+           #Main app intro/instructions are going in this section
            align = "left",
            
-           br(),
-           #br(),
-          tags$div(style = "font-size: 16px;",textOutput("main_app_intro"))
-           
-    ),
-      column(width = 3,
-             align = "right",
-             #div(class = "output-container",
-            #     verbatimTextOutput("old_total_tax")
-            # ),
-             plotlyOutput("old_tax_piechart",height = "280px"),
-             
-        
-      ),
-      
-      column(width = 3,
-             align = "right",
-             #div(class = "output-container",
-            #     verbatimTextOutput("updated_total_tax")
-            # ),
-             plotlyOutput("updated_tax_piechart",height = "280px"),
-      )
-      
-    ),
-    #Some breaks for formatting
-    
-  
-    
-    fluidRow(
-      
-      
-        column(6,
-               
-               div(style = "height: 21px;", p("")), # Empty placeholder
-               
-        # rest of the page seperated by tabs.[ income | Local | Others ]
-        tabsetPanel(
-          id = "tabs",
-          tabPanel(textOutput("income_tax"), value = "incomeTab", h4(textOutput("income_tax_intro")),
-                   div(style = "height: 20px;", p("")), # Empty placeholder
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   #Start with NDR:
-                   div(class = "input-group-block custom-numeric-input",
-                       tags$label(textOutput("block_grant_input"), `for` = "block_grant_total"),
-                       numericInput("block_grant_total", NULL, 19000, step = 100)),
-                   
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                    
-                   fluidRow(column(5,
-                       radioButtons("income_tax_system_choice", textOutput("select_income_system"), 
-                                    choices = c("current", "scottish", "fully devolved"), 
-                                    selected = "current", 
-                                    inline = FALSE,
-                                    width = NULL)
-                   ),
-                   column(6,
-                          div(style = "height: 20px;", p("")),
-                       div(class = "output1-container",
-                           verbatimTextOutput("totalTaxOutput")
-                       )
-                   )
-                   ),
-                   
-                   div(style = "height: 30px;", p("")), # Empty placeholder
-                   
-                   fluidRow(#input-group-thresholds
-                     column(5,
-                            div(class = "input-group-thresholds custom-numeric-input",
-                                  tags$label(textOutput("pa_box"), `for` = "PA"),
-                                  numericInput("PA", NULL, 12500, step = 100)),
-                            div(class = "input-group-thresholds custom-numeric-input",
-                                tags$label(textOutput("sr_threshold"), `for` = "SRthreshold"),
-                                numericInput("SRthreshold", NULL, 2000, step = 100)),
-                            div(class = "input-group-thresholds custom-numeric-input",
-                                tags$label(id="BRThreshold",textOutput("br_threshold"), `for` = "BRthreshold"),
-                                numericInput("BRthreshold", NULL, 0, step = 100)),
-                            div(class = "input-group-thresholds custom-numeric-input",
-                                tags$label(textOutput("ir_threshold"), `for` = "IRthreshold"),
-                                numericInput("IRthreshold", NULL, 18000, step = 100)),
-                            div(class = "input-group-thresholds custom-numeric-input",
-                                tags$label(id="HRThreshold",textOutput("hr_threshold"), `for` = "HRthreshold"),
-                                numericInput("HRthreshold", NULL, 0, step = 100)),
-                            
-                            ),
-                     column(6,
-                            div(class = "input-group-slider custom-numeric-input",
-                           tags$label(textOutput("pa_limit"), `for` = "PAlimit"),
-                           sliderInput("PAlimit", NULL, 
-                                       min = 0, 
-                                       max = 200000, 
-                                       value = 100000,
-                                       #animate = TRUE,
-                                       ticks = TRUE,
-                                       step = 100
-                                       #breaks = seq(0, 200000, by = 20000)
-                                       #labels = scales::comma(seq(0, 200000, by = 20000))
-                              )),
-                           div(class = "input-group-slider custom-numeric-input",
-                               tags$label(textOutput("sr"), `for` = "SR"),
-                               sliderInput("SR", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
-                           div(class = "input-group-slider custom-numeric-input",
-                               tags$label(id="BR",textOutput("br"), `for` = "BR"),
-                               sliderInput("BR", NULL, min = 0, max = 1, value = 0.2, step = 0.01)),
-                           div(class = "input-group-slider custom-numeric-input",
-                               tags$label(textOutput("ir"), `for` = "IR"),
-                               sliderInput("IR", NULL, min = 0, max = 1, value = 0.21, step = 0.01)),
-                           div(class = "input-group-slider custom-numeric-input",
-                               tags$label(id="HR",textOutput("hr"), `for` = "HR"),
-                               sliderInput("HR", NULL, min = 0, max = 1, value = 0.41, step = 0.01)),
-                           div(class = "input-group-slider custom-numeric-input",
-                               tags$label(id="AR",textOutput("ar"), `for` = "AR"),
-                               sliderInput("AR", NULL, min = 0, max = 1, value = 0.46, step = 0.01))
-                            )
-                       
-                       
-                   ),
-                   fluidRow(
+          
+          tags$div(style = "font-size: 16px;",textOutput("main_app_intro")),
+          div(style = "height: 30px;", p("")),
+          tabsetPanel(
+            id = "tabs",
+            ###################################
+            #income taxes tab                 #  
+            ###################################
+            tabPanel(textOutput("income_tax"), value = "incomeTab"),
+            tags$div(style = "font-size: 16px;",textOutput("income_tax_intro"),
+                     div(style = "height: 20px;", p("")), # Empty placeholder
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     ##Start with NDR:
+                     #div(class = "input-group-block custom-numeric-input",
+                      #   tags$label(textOutput("block_grant_input"), `for` = "block_grant_total"),
+                       #  numericInput("block_grant_total", NULL, 19000, step = 100)),
                      
+                    # tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                      
-                     column(10,
-                            
-                            #style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
-                            div(style = "height: 60px;", p("")), # Empty placeholder
-                            br(),
-                            
-                             actionButton("calculate", label = textOutput("update_with_new_filters"))
-                            ),
-                            plotlyOutput("pieChart"),
-                            div(class = "calculate-button-container",
-                                actionButton("toggleButton", label = textOutput("divide_by_people")),
-                                actionButton("viewButton", label = textOutput("show_breakdown"))
-                            ),
-                            plotlyOutput("stackedPlot"),
-                     #div(class = "output-container",
-                    #     verbatimTextOutput("newTotalTaxOutput")
-                    # ),
-                     #iv(class = "calculate-button-container",
-                         
-                            
-                     #)
-                   )        
-                   
-          ),
-          #Council Tax Tab:
-          tabPanel(textOutput("local_taxes_tab_label"), value = "councilTax", h4(textOutput("local_taxes_tab_intro")),
-                   #empty gap first:
-                   div(style = "height: 20px;", p("")),
-                   radioButtons("councilTaxCountry", textOutput("local_tax_system_selection"), 
-                                choices = c("current", "scottish", "fully devolved"), 
-                                selected = "current", 
-                                inline = FALSE,
-                                width = "400px"),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   
-                   #Start with NDR:
-                   div(class = "input-group-council",
-                       tags$label(textOutput("ndr_input"), `for` = "ndrTotal"),
-                       numericInput("ndrTotal", NULL, 1000)),
-                   br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label(textOutput("tourism_input"), `for` = "tourism_levy_total"),
-                       numericInput("tourism_levy_total", NULL, 0)),
-                   br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   #br(),
-                   titlePanel(textOutput("council_tax_title")),
-                   #Need to have choices for Scotland, England and Wales:
-                   #selectInput("councilTaxCountry", "Select Country for Council tax calculations",
-                  #             choices = c("Wales", "Scotland", "England"),
-                   #            selected = "Wales"),
-                   
-                  
-                  
-                  #numericInput("top band council tax amount:", 0, 2000),
-                  
-                  fluidRow(
-                    column(5,
-                       div(class = "input-group-council",
-                           tags$label("Top Band Value = ", `for` = "topBandValue"),
-                           numericInput("topBandValue", NULL, 2000)),
-                        ),
-                    column(6,
-                           div(class = "output-container",
-                               verbatimTextOutput("councilTaxOutput")
-                           )
-                           )
-                  ),
-                   #Now need to include the different bands (A-H) with I only included for Wales:
-                   #div(style = "height: 5px;", p("")), # Empty placeholder
-                  
-                   fluidRow(
-                     column(5,
-                            #style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
-                            tabPanel("councilTax",
-                                     #little extra gap for alignment
-                                     div(style = "height: 2px;", p("")), 
-                                     div(class = "input-group-council",
-                                         tags$label(id = "bandA-label","Band A limit =", `for` = "bandA"),
-                                         numericInput("bandA", NULL, 0)),
-                                   
-                                     div(class = "input-group-council",
-                                         tags$label(id="bandB-label","Band B limit =", `for` = "bandB"),
-                                         numericInput("bandB", NULL, 0)),
-                                    
-                                     div(class = "input-group-council",
-                                         tags$label(id="bandC-council","Band C limit =", `for` = "bandC"),
-                                         numericInput("bandC", NULL, 0)),
-                                    
-                                     div(class = "input-group-council",
-                                         tags$label(id="bandD-label","Band D limit =", `for` = "bandD"),
-                                         numericInput("bandD", NULL, 0)),
-                                    
-                                     div(class = "input-group-council",
-                                         tags$label(id = "bandE-label", "Band E limit =",`for` = "bandE"),
-                                         numericInput("bandE", NULL, 0)),
-                                     
-                                     div(class = "input-group-council",
-                                         tags$label(id="bandF-label","Band F limit =", `for` = "bandF"),
-                                         numericInput("bandF", NULL, 223000)),
-                                     
-                                     div(class = "input-group-council",
-                                         tags$label(id="bandG-label","Band G limit =", `for` = "bandH"),
-                                         numericInput("bandG", NULL, 324000)),
-                                     
-                                     div(id = "bandH-container",
-                                         div(class = "input-group-council",
-                                             tags$label("Band H limit", `for` = "bandH"),
-                                             numericInput("bandH", NULL, 424000))),
-                                    
-                                     
-                            )
+                     fluidRow(column(5,
+                                     radioButtons("income_tax_system_choice", textOutput("select_income_system"), 
+                                                  choices = c("Current Settlement", "Scottish Model", "Full Devolution"), 
+                                                  selected = "Current Settlement", 
+                                                  inline = FALSE,
+                                                  width = NULL)
                      ),
                      column(6,
-                            #div(style = "height: 60px;", p("")), # Empty placeholder
-                            div(class = "council-slider",
-                                tags$label("% top band:", `for` = "bandArate"),
-                                sliderInput("bandArate", NULL, min = 1, max = 100, value = 5.4, step = 0.1)),
-
-                            div(class = "council-slider",
-                                tags$label("% top band:", `for` = "bandBrate"),
-                                sliderInput("bandBrate", NULL, min = 1, max = 100, value = 10.1, step = 0.1)),
-
-                            div(class = "council-slider",
-                                tags$label("% top band:", `for` = "bandCrate"),
-                                sliderInput("bandCrate", NULL, min = 1, max = 100, value = 20.4, step = 0.1)),
-
-                            div(class = "council-slider",
-                                tags$label("% top band:", `for` = "bandDrate"),
-                                sliderInput("bandDrate", NULL, min = 1, max = 100, value = 30.0, step = 0.1)),
-
-                            div(class = "council-slider",
-                                tags$label("% top band:", `for` = "bandErate"),
-                                sliderInput("bandErate", NULL, min = 1, max = 100, value = 50.4, step = 0.1)),
-
-                            div(class = "council-slider",
-                                tags$label("% top band:", `for` = "bandFrate"),
-                                sliderInput("bandFrate", NULL, min = 1, max = 100, value = 60.7, step = 0.1)),
-                            
-                            div(class = "council-slider",
-                                tags$label("% top band:", `for` = "bandGrate"),
-                                sliderInput("bandGrate", NULL, min = 1, max = 100, value = 75.4, step = 0.1)),
-
-                            div(class = "council-slider",
-                                tags$label("% top band:", `for` = "bandHrate"),
-                                sliderInput("bandHrate", NULL, min = 1, max = 100, value = 80.4, step = 0.1)),
-                            
-                            div(id="bandI-container",
-                                div(class = "council-slider",
-                                    tags$label("% top band:", `for` = "bandIrate"),
-                                    sliderInput("bandIrate", NULL, min = 1, max = 100, value = 80.4, step = 0.1))),
-
+                            div(style = "height: 20px;", p("")),
+                            div(class = "output1-container",
+                                verbatimTextOutput("totalTaxOutput")
+                            )
                      )
-                   ),
-                  plotlyOutput("pieChartCouncil"),
-                   
-          ),
-          tabPanel(textOutput("other_taxes_tab_label"), value = "councilTax", h4("Info regarding other taxes detailed here"),
-                   #empty gap first:
-                   #div(style = "height: 20px;", p("")),
-                   div(style = "height: 20px;", p("")),
-                   radioButtons("otherTaxCountry", "Other taxes system", 
-                                choices = c("current", "scottish", "fully devolved"), 
-                                selected = "current", 
-                                inline = FALSE,
-                                width = "400px"),
-                   div(style = "height: 20px;", p("")),
-                   tags$div(style = "font-size: 17px;",textOutput("other_taxes_title")),
-                   
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   
-                   #Start with NDR:
-                   div(class = "input-group-council",
-                       tags$label("Property Tax = ", `for` = "property_tax_input"),
-                       numericInput("property_tax_input", NULL, 0)),
-                   #div(style = "height: 2px;", p("")),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label("Land Transactional tax = ", `for` = "ltt_input"),
-                       numericInput("ltt_input", NULL, 271)),
-                   #br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label("Landfill Disposals tax = ", `for` = "ldt_input"),
-                       numericInput("ldt_input", NULL, 27)),
-                   #br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label("National Insurance = ", `for` = "ni_input"),
-                       numericInput("ni_input", NULL, 6111)),
-                   #br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label("VAT = ", `for` = "vat_input"),
-                       numericInput("vat_input", NULL, 9157)),
-                   #br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label("Corporation tax = ", `for` = "corporation_input"),
-                       numericInput("corporation_input", NULL, 2698)),
-                   #br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label("Duties (fuel,alcohol etc) = ", `for` = "duties_input"),
-                       numericInput("duties_input", NULL, 2500)),
-                   #br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label("Environmental Levy = ", `for` = "env_levy_input"),
-                       numericInput("env_levy_input", NULL, 1300)),
-                   #br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                   div(class = "input-group-council",
-                       tags$label("Other = ", `for` = "other"),
-                       numericInput("other", NULL, 2500)),
-                   #br(),
-                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-        )
+                     ),
+                     
+                     div(style = "height: 30px;", p("")), # Empty placeholder
+                     
+                     fluidRow(#input-group-thresholds
+                       column(6,
+                              div(class = "input-group-thresholds custom-numeric-input",
+                                  tags$label(textOutput("pa_box"), `for` = "PA"),
+                                  numericInput("PA", NULL, 12570, step = 100)),
+                              div(class = "input-group-thresholds custom-numeric-input",
+                                  tags$label(textOutput("sr_threshold"), `for` = "SRthreshold"),
+                                  numericInput("SRthreshold", NULL, 2000, step = 100)),
+                              div(class = "input-group-thresholds custom-numeric-input",
+                                  tags$label(id="BRThreshold",textOutput("br_threshold"), `for` = "BRthreshold"),
+                                  numericInput("BRthreshold", NULL, 0, step = 100)),
+                              div(class = "input-group-thresholds custom-numeric-input",
+                                  tags$label(textOutput("ir_threshold"), `for` = "IRthreshold"),
+                                  numericInput("IRthreshold", NULL, 18000, step = 100)),
+                              div(class = "input-group-thresholds custom-numeric-input",
+                                  tags$label(id="HRThreshold",textOutput("hr_threshold"), `for` = "HRthreshold"),
+                                  numericInput("HRthreshold", NULL, 0, step = 100)),
+                              
+                       ),
+                       column(6,
+                              div(class = "input-group-slider custom-numeric-input",
+                                  tags$label(textOutput("pa_limit"), `for` = "PAlimit"),
+                                  sliderInput("PAlimit", NULL, 
+                                              min = 0, 
+                                              max = 200000, 
+                                              value = 100000,
+                                              #animate = TRUE,
+                                              ticks = TRUE,
+                                              step = 100
+                                              #breaks = seq(0, 200000, by = 20000)
+                                              #labels = scales::comma(seq(0, 200000, by = 20000))
+                                  )),
+                              div(class = "input-group-slider custom-numeric-input",
+                                  tags$label(textOutput("sr"), `for` = "SR"),
+                                  sliderInput("SR", NULL, min = 0, max = 1, value = 0.19, step = 0.01)),
+                              div(class = "input-group-slider custom-numeric-input",
+                                  tags$label(id="BR",textOutput("br"), `for` = "BR"),
+                                  sliderInput("BR", NULL, min = 0, max = 1, value = 0.2, step = 0.01)),
+                              div(class = "input-group-slider custom-numeric-input",
+                                  tags$label(textOutput("ir"), `for` = "IR"),
+                                  sliderInput("IR", NULL, min = 0, max = 1, value = 0.21, step = 0.01)),
+                              div(class = "input-group-slider custom-numeric-input",
+                                  tags$label(id="HR",textOutput("hr"), `for` = "HR"),
+                                  sliderInput("HR", NULL, min = 0, max = 1, value = 0.41, step = 0.01)),
+                              div(class = "input-group-slider custom-numeric-input",
+                                  tags$label(id="AR",textOutput("ar"), `for` = "AR"),
+                                  sliderInput("AR", NULL, min = 0, max = 1, value = 0.46, step = 0.01))
+                       )
+                       
+                       
+                     ),
+                     fluidRow(
+                       column(10,
+                              
+                              #style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
+                              div(style = "height: 60px;", p("")), # Empty placeholder
+                              br(),
+                              
+                              actionButton("calculate", label = textOutput("update_with_new_filters"))
+                       ),
+                       plotlyOutput("pieChart"),
+                       div(class = "calculate-button-container",
+                           actionButton("toggleButton", label = textOutput("divide_by_people")),
+                           actionButton("viewButton", label = textOutput("show_breakdown"))
+                       ),
+                       plotlyOutput("stackedPlot"),
+                       #button and output to temp update the tax:
+                       #div(class = "output-container",
+                       #     verbatimTextOutput("newTotalTaxOutput")
+                       # ),
+                       #div(class = "calculate-button-container",
+                       #)
+                     )        
+                     
+            ),
+            ###################################
+            #Local taxes tab                  #  
+            ###################################
+            tabPanel(textOutput("local_taxes_tab_label"), value = "councilTax", h4(textOutput("local_taxes_tab_intro")),
+                     #empty gap first:
+                     div(style = "height: 20px;", p("")),
+                     radioButtons("councilTaxCountry", textOutput("local_tax_system_selection"), 
+                                  choices = c("current", "scottish", "fully devolved"), 
+                                  selected = "current", 
+                                  inline = FALSE,
+                                  width = "400px"),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     
+                     #Start with NDR:
+                     div(class = "input-group-council",
+                         tags$label(textOutput("ndr_input"), `for` = "ndrTotal"),
+                         numericInput("ndrTotal", NULL, 1000)),
+                     br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label(textOutput("tourism_input"), `for` = "tourism_levy_total"),
+                         numericInput("tourism_levy_total", NULL, 0)),
+                     br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     titlePanel(textOutput("council_tax_title")),
+                     
+                     fluidRow(
+                       column(5,
+                              div(class = "input-group-council",
+                                  tags$label("Top Band = ", `for` = "topBandValue"),
+                                  numericInput("topBandValue", NULL, 2000)),
+                       ),
+                       column(6,
+                              div(class = "output-container",
+                                  verbatimTextOutput("councilTaxOutput")
+                              )
+                       )
+                     ),
+                     
+                     fluidRow(
+                       column(5,
+                              #border for the fluid row/column
+                              #style = "border: 2px solid #007bff; padding: 10px; margin: 5px; border-radius: 5px;",
+                              tabPanel("councilTax",
+                                       #little extra gap for alignment
+                                       div(style = "height: 2px;", p("")), 
+                                       div(class = "input-group-council",
+                                           tags$label(id = "bandA-label","Band A limit =", `for` = "bandA"),
+                                           numericInput("bandA", NULL, 0)),
+                                       
+                                       div(class = "input-group-council",
+                                           tags$label(id="bandB-label","Band B limit =", `for` = "bandB"),
+                                           numericInput("bandB", NULL, 0)),
+                                       
+                                       div(class = "input-group-council",
+                                           tags$label(id="bandC-council","Band C limit =", `for` = "bandC"),
+                                           numericInput("bandC", NULL, 0)),
+                                       
+                                       div(class = "input-group-council",
+                                           tags$label(id="bandD-label","Band D limit =", `for` = "bandD"),
+                                           numericInput("bandD", NULL, 0)),
+                                       
+                                       div(class = "input-group-council",
+                                           tags$label(id = "bandE-label", "Band E limit =",`for` = "bandE"),
+                                           numericInput("bandE", NULL, 0)),
+                                       
+                                       div(class = "input-group-council",
+                                           tags$label(id="bandF-label","Band F limit =", `for` = "bandF"),
+                                           numericInput("bandF", NULL, 223000)),
+                                       
+                                       div(class = "input-group-council",
+                                           tags$label(id="bandG-label","Band G limit =", `for` = "bandH"),
+                                           numericInput("bandG", NULL, 324000)),
+                                       
+                                       div(id = "bandH-container",
+                                           div(class = "input-group-council",
+                                               tags$label("Band H limit", `for` = "bandH"),
+                                               numericInput("bandH", NULL, 424000))),
+                                       
+                              )
+                       ),
+                       column(6,
+                              #div(style = "height: 60px;", p("")), # Empty placeholder
+                              div(class = "council-slider",
+                                  tags$label("% top band:", `for` = "bandArate"),
+                                  sliderInput("bandArate", NULL, min = 1, max = 100, value = 5.4, step = 0.1)),
+                              
+                              div(class = "council-slider",
+                                  tags$label("% top band:", `for` = "bandBrate"),
+                                  sliderInput("bandBrate", NULL, min = 1, max = 100, value = 10.1, step = 0.1)),
+                              
+                              div(class = "council-slider",
+                                  tags$label("% top band:", `for` = "bandCrate"),
+                                  sliderInput("bandCrate", NULL, min = 1, max = 100, value = 20.4, step = 0.1)),
+                              
+                              div(class = "council-slider",
+                                  tags$label("% top band:", `for` = "bandDrate"),
+                                  sliderInput("bandDrate", NULL, min = 1, max = 100, value = 30.0, step = 0.1)),
+                              
+                              div(class = "council-slider",
+                                  tags$label("% top band:", `for` = "bandErate"),
+                                  sliderInput("bandErate", NULL, min = 1, max = 100, value = 50.4, step = 0.1)),
+                              
+                              div(class = "council-slider",
+                                  tags$label("% top band:", `for` = "bandFrate"),
+                                  sliderInput("bandFrate", NULL, min = 1, max = 100, value = 60.7, step = 0.1)),
+                              
+                              div(class = "council-slider",
+                                  tags$label("% top band:", `for` = "bandGrate"),
+                                  sliderInput("bandGrate", NULL, min = 1, max = 100, value = 75.4, step = 0.1)),
+                              
+                              div(class = "council-slider",
+                                  tags$label("% top band:", `for` = "bandHrate"),
+                                  sliderInput("bandHrate", NULL, min = 1, max = 100, value = 80.4, step = 0.1)),
+                              
+                              div(id="bandI-container",
+                                  div(class = "council-slider",
+                                      tags$label("% top band:", `for` = "bandIrate"),
+                                      sliderInput("bandIrate", NULL, min = 1, max = 100, value = 80.4, step = 0.1))),
+                       )
+                     ),
+                     #pie chart for the council tax, unformatted at present
+                     plotlyOutput("pieChartCouncil"),
+                     
+            ),
+            ###################################
+            #Other taxes tab                  #  
+            ###################################
+            tabPanel(textOutput("other_taxes_tab_label"), value = "councilTax", h4("Info regarding other taxes detailed here"),
+                     #empty gap first:
+                     #div(style = "height: 20px;", p("")),
+                     div(style = "height: 20px;", p("")),
+                     radioButtons("otherTaxCountry", "Other taxes system", 
+                                  choices = c("current", "scottish", "fully devolved"), 
+                                  selected = "current", 
+                                  inline = FALSE,
+                                  width = "400px"),
+                     div(style = "height: 20px;", p("")),
+                     tags$div(style = "font-size: 17px;",textOutput("other_taxes_title")),
+                     
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     
+                     #Start with NDR:
+                     div(class = "input-group-council",
+                         tags$label("Property Tax = ", `for` = "property_tax_input"),
+                         numericInput("property_tax_input", NULL, 0)),
+                     #div(style = "height: 2px;", p("")),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label("Land Transactional tax = ", `for` = "ltt_input"),
+                         numericInput("ltt_input", NULL, 271)),
+                     #br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label("Landfill Disposals tax = ", `for` = "ldt_input"),
+                         numericInput("ldt_input", NULL, 27)),
+                     #br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label("National Insurance = ", `for` = "ni_input"),
+                         numericInput("ni_input", NULL, 6111)),
+                     #br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label("VAT = ", `for` = "vat_input"),
+                         numericInput("vat_input", NULL, 9157)),
+                     #br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label("Corporation tax = ", `for` = "corporation_input"),
+                         numericInput("corporation_input", NULL, 2698)),
+                     #br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label("Duties (fuel,alcohol etc) = ", `for` = "duties_input"),
+                         numericInput("duties_input", NULL, 2500)),
+                     #br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label("Environmental Levy = ", `for` = "env_levy_input"),
+                         numericInput("env_levy_input", NULL, 1300)),
+                     #br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                     div(class = "input-group-council",
+                         tags$label("Other = ", `for` = "other"),
+                         numericInput("other", NULL, 2500)),
+                     #br(),
+                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+            )
+            
+          )
+          
+           
+    ),
+    column(7,
+      fluidRow(
+        #titlePanel(textOutput("piechart_title"))
+        tags$div(style = "font-size: 18px;",textOutput("piechart_title"))
+      ),    
+      #Old and updated pie charts for the top right section of the screen:
+      fluidRow(
+      column(width = 6,
+             align = "right",
+             plotlyOutput("old_tax_piechart"),
+      ),
+      column(width = 6,
+             align = "right",
+             plotlyOutput("updated_tax_piechart"),
+      )
+      ),
+      fluidRow(
+        div(style = "height: 21px;", p("")),
+      div(style = "display: flex; justify-content: center;",
+          tableOutput("tax_table")
+      )
+      )
+    )
+    ),
+
     
-      )
-        ),
-      column(6,
-             #style = "text-align: center;",
-             br(),
-             br(),
-             div(style = "display: flex; justify-content: center;",
-                 tableOutput("tax_table")
-             )
-             
-      )
-  )
 )
 
 ########################
@@ -731,7 +725,7 @@ server <- function(input, output, session) {
     enabled_ids <- character(0)
     disabled_ids <- character(0)
     
-    if (input$income_tax_system_choice == "current") {
+    if (input$income_tax_system_choice == "Current Settlement") {
       enabled_ids <- c("BR", "HR", "AR")
       disabled_ids <- c("SR", "IR", "SRthreshold", "IRthreshold")
       updateNumericInput(session, "BRthreshold", value = 37500)
@@ -741,7 +735,7 @@ server <- function(input, output, session) {
       
       #sliderInput("AR", NULL, min = 0, max = 1, value = 0.46, step = 0.01))
       
-    } else if (input$income_tax_system_choice == "scottish" || input$income_tax_system_choice == "fully devolved") {
+    } else if (input$income_tax_system_choice == "Scottish Model" || input$income_tax_system_choice == "Full Devolution") {
       enabled_ids <- c("SR", "BR", "IR", "HR", "AR", "SRthreshold", "IRthreshold")
       disabled_ids <- character(0)
       updateNumericInput(session, "BRthreshold", value = 11000)
@@ -835,7 +829,7 @@ server <- function(input, output, session) {
     TIDist <- read.csv("TaxableIncomeDistribution2023.csv", sep=";")
     
     # Calculate Income by tax bracket
-    if (input$income_tax_system_choice == "scottish" || input$income_tax_system_choice == "fully devolved"){
+    if (input$income_tax_system_choice == "Scottish Model" || input$income_tax_system_choice == "Full Devolution"){
       TIDist$PA <- NA
       TIDist$PA[TIDist$TaxableIncome <= PAlimit] <- PA
       TIDist$PA[TIDist$TaxableIncome > PAlimit] <- pmax(0, PA - 0.5 * (TIDist$TaxableIncome[TIDist$TaxableIncome > PAlimit] - PAlimit))
@@ -994,7 +988,7 @@ server <- function(input, output, session) {
       })
       
 
-    } else if (input$income_tax_system_choice == "current"){
+    } else if (input$income_tax_system_choice == "Current Settlement"){
       #Similar to above, but less bands to worry about.
       
       TIDist$PA <- NA
@@ -1175,7 +1169,7 @@ server <- function(input, output, session) {
           )
         
         #Current tax button pressed:
-        if (input$income_tax_system_choice != "current" && nrow(data$stacked) > 3) {
+        if (input$income_tax_system_choice != "Current Settlement" && nrow(data$stacked) > 3) {
           p <- p %>%
             add_trace(
               y = ~data$stacked[4,],
@@ -1228,21 +1222,33 @@ server <- function(input, output, session) {
       count = c(3322,2716,1100,271,27,6111,9157,2698,2500,1300,2500)
       
     )
+    # Calculate total sum
+    total_count <- sum(old_tax_data$count)
     
-    plot_ly(old_tax_data, labels = ~labels, values = ~count, type = 'pie') %>%
+    # Add percentage column calculated manually
+    old_tax_data$percentage <- round((old_tax_data$count / total_count) * 100, 2)
+    
+    plot_ly(old_tax_data, values = ~count, type = 'pie',
+            textinfo = 'percent', 
+            hoverinfo = 'percent',
+            texttemplate = ~paste0(labels, ": ", percentage, "%"),
+            automargin = TRUE) %>%
       layout(
         title = list(
-          text = text_resources[[values$language]]$previous_tax_piechart  # Set the title text
+          text = text_resources[[values$language]]$previous_tax_piechart,  # Set the title text
+          font = list(size = 15)
           #x = 10,                      # Align title to the left
           #xanchor = 'left'            # Set the anchor point to left
         ),
         #title = "",
-        margin = list(l = 0, r = 10, b = 0, t = 25),  # Adjust margins
+        margin = list(l = 0, r = 10, b = 20, t = 40),  # Adjust margins
         paper_bgcolor = 'white',  # Background color of the plot area
-        plot_bgcolor = 'white'  # Background color of the chart area
+        plot_bgcolor = 'white',  # Background color of the chart area
+        showlegend = FALSE
         #width = 200px
       )
-  })
+      
+    })
   
 
   
@@ -1419,17 +1425,26 @@ server <- function(input, output, session) {
       amount = c(values$total_income_tax, values$total_council_tax,total_ndr_tax,tourism_levy_tax, property_tax, ltt_tax, ldt_tax, ni_tax, vat_tax)
     )
     
-    plot_ly(pie_data, labels = ~category, values = ~amount, type = 'pie') %>%
+    updated_total_count <- sum(pie_data$amount)
+    pie_data$percentage <- round((pie_data$amount / updated_total_count) * 100, 2)
+    
+    plot_ly(pie_data, values = ~amount, type = 'pie',
+            textinfo = 'text', 
+            hoverinfo = 'text',
+            text = ~paste0(category, ": ", percentage, "%"),
+            automargin = TRUE) %>%
       layout(
         title = list(
-          text = text_resources[[values$language]]$updated_tax_piechart
+          text = text_resources[[values$language]]$updated_tax_piechart,
+          font = list(size = 15)
           #x = 0,
           #xanchor = 'left'
         ),
         #title = "Updated Tax Breakdown:",
-        margin = list(l = 0, r = 0, b = 0, t = 25),  # Adjust margins
+        margin = list(l = 0, r = 0, b = 20, t = 40),  # Adjust margins
         paper_bgcolor = 'white',  # Background color of the plot area 
-        plot_bgcolor = 'white'  # Background color of the chart area
+        plot_bgcolor = 'white',  # Background color of the chart area
+        showlegend = FALSE
         #width = 200px
       )
   })
@@ -1687,6 +1702,9 @@ server <- function(input, output, session) {
   })
   output$other_taxes_title <- renderText({
     text_resources[[values$language]]$other_taxes_title
+  })
+  output$piechart_title <- renderText({
+    text_resources[[values$language]]$piechart_title
   })
 }
 
