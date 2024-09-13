@@ -163,6 +163,145 @@ ui <- fluidPage(
         
         
         
+        
+        
+        .pa_input_left {
+          display: flex;
+          align-items: center;
+          margin-top:10px;
+          margin-bottom: 30px; /* Space between input groups */
+         
+        }
+        .pa_input_left label {
+          flex: 0 0 130px; /* Fixed width for labels */
+          margin-right: 5px; /* Space between label and input */
+          font-size: 14px;
+          font-weight: normal;
+        }
+        .pa_input_left input {
+          width: 100%; /* Ensures the input is as wide as its container */
+          max-width: 65px; /* Optional: Set a maximum width for the input */
+          padding: 2px; /* Padding inside the input box */
+          font-size: 14px; /* Font size for the input text */
+          box-sizing: border-box; /* Ensures padding is included in the total width */
+        }
+        
+       .pa_input_right {
+          display: flex;
+          align-items: center;
+          margin-top:10px;
+          margin-bottom: 30px; /* Space between input groups */
+         
+        }
+        .pa_input_right label {
+          flex: 0 0 75px; /* Fixed width for labels */
+          margin-right: 5px; /* Space between label and input */
+          font-size: 14px;
+          font-weight: normal;
+        }
+        .pa_input_right input {
+          width: 100%; /* Ensures the input is as wide as its container */
+          max-width: 80px; /* Optional: Set a maximum width for the input */
+          padding: 2px; /* Padding inside the input box */
+          font-size: 14px; /* Font size for the input text */
+          box-sizing: border-box; /* Ensures padding is included in the total width */
+        }
+        
+        .rates_input_left {
+          display: flex;
+          align-items: center;
+          margin-top:13px;
+          margin-bottom: 30px; /* Space between input groups */
+          margin-right:0px;
+         
+        }
+        .rates_input_left label {
+          flex: 0 0 115px; /* Fixed width for labels */
+          margin-right: 3px; /* Space between label and input */
+          font-size: 14px;
+          font-weight: normal;
+          
+        }
+        .rates_input_left input {
+          width: 100%; /* Ensures the input is as wide as its container */
+          max-width: 65px; /* Optional: Set a maximum width for the input */
+          padding: 0px; /* Padding inside the input box */
+          margin-top:8px;
+          line-height: 14px;
+          font-size: 14px; /* Font size for the input text */
+          box-sizing: border-box; /* Ensures padding is included in the total width */
+          margin-right: 0px;
+          height: 25px;
+        }
+       
+        .rates_input_middle {
+          display: flex;
+          align-items: center;
+          margin-top:10px;
+          margin-bottom: 30px; /* Space between input groups */
+          margin-left: 0px;
+         
+        }
+        .rates_input_middle label {
+          flex: 0 0 25px; /* Fixed width for labels */
+          margin-right: 5px; /* Space between label and input */
+          font-size: 14px;
+          font-weight: normal;
+          margin-left: 0px;
+        }
+        .rates_input_middle input {
+          width: 100%; /* Ensures the input is as wide as its container */
+          max-width: 65px; /* Optional: Set a maximum width for the input */
+          padding: 2px; /* Padding inside the input box */
+          font-size: 14px; /* Font size for the input text */
+          box-sizing: border-box; /* Ensures padding is included in the total width */
+        }
+       .rates_input_right_slider {
+          display: flex;
+          align-items: center;
+          margin-bottom: 5px; /* Space between input groups */
+        }
+        .rates_input_right_slider label {
+          flex: 0 0 90px; /* Fixed width for the label (adjust as needed) */
+          margin-right: 5px; /* Space between label and slider */
+          font-size: 14px; /* Font size for the label */
+          font-weight: normal;
+        }
+        .rates_input_right_slider slider {
+              flex: 1; /* Takes up the remaining space */
+    /* Optional: Styling the slider */
+    -webkit-appearance: none; /* Remove default styling */
+    height: 8px; /* Height of the slider track */
+    background: #ddd; /* Background color of the track */
+    border-radius: 4px; /* Rounded corners */
+    outline: none; /* Remove outline on focus */
+        }
+        .rates_input_right_slider .shiny-input-container {
+          flex-grow: 0.2; /* Let inputs take the remaining space */
+          font-size: 14px;
+        }
+        .rates_input_right_slider.custom-numeric-input .shiny-input-container input {
+          font-size: 14px; /* Adjust font size for the numeric input field */
+        }
+        
+        .grey-text-box {
+        background-color: #f0f0f0; /* Light grey background */
+        padding: 2px; /* Add some padding */
+        border: 1px solid #d3d3d3; /* Optional: Light grey border */
+        border-radius: 5px; /* Optional: Rounded corners */
+        color: #333; /* Optional: Text color */
+        font-size: 13px;
+        width: 90px;
+      }
+       
+        
+      
+        
+        
+        
+        
+        
+        
        .input-group-thresholds {
           display: flex;
           align-items: center;
@@ -411,9 +550,101 @@ ui <- fluidPage(
                             )
                      )
                      ),
+                    #adding the new requested rows and columns for the inputs:
+                    numericInput("num_rows", "Number of bands", value = 3, min = 3, max = 10),
+                    fluidRow(
+                      column(5,
+                             div(class = "pa_input_left",
+                                 tags$label("Personal Allowance:", `for` = "PAnew"),
+                                 numericInput("PAnew", NULL, 12500, step = 100)),
+                      ),
+                      
+                      column(3,
+                             div(style = "height: 20px;", p(""))
+                             ),
+                      
+                      column(4,
+                             div(class = "pa_input_right",
+                                 tags$label("PA Limit:", `for` = "pa_limit"),
+                                 numericInput("pa_limit", NULL, 100000, step = 100)),
+                             
+                      ),
+                    ),
+                    
+                    
+                    fluidRow(
+                      column(4,
+                             div(class = "rates_input_left",
+                                 tags$label("Rate 1 Threshold:", `for` = "rate_1_t"),
+                                 numericInput("rate_1_t", NULL, 50270, step = 100)),
+
+                      ),
+                             
+                      column(2,
+                             div(style = "height: 12px;", p("")),
+                             div(class = "grey-text-box", 
+                                 textOutput("uk_rate_text_1")
+                             )
+                             ), 
+                      
+                      column(6,
+                             div(class = "rates_input_right_slider custom-numeric-input",
+                                 tags$label("Welsh rate:", `for` = "welsh_rate_1"),
+                                 sliderInput("welsh_rate_1", NULL, min = 0, max = 100, value = 20, step = 1)),)
+                             
+                      ),
+                    fluidRow(
+                      column(4,
+                             div(class = "rates_input_left",
+                                 tags$label("Rate 2 Threshold:", `for` = "rate_2_t"),
+                                 numericInput("rate_2_t", NULL, 100270, step = 100)),
+                             
+                      ),
+                      
+                      column(2,
+                             div(style = "height: 12px;", p("")),
+                             div(class = "grey-text-box", 
+                                 textOutput("uk_rate_text_2")
+                             )
+                      ), 
+                      
+                      column(6,
+                             div(class = "rates_input_right_slider custom-numeric-input",
+                                 tags$label("Welsh rate:", `for` = "welsh_rate_2"),
+                                 sliderInput("welsh_rate_2", NULL, min = 0, max = 100, value = 30, step = 1)),)
+                      
+                    ),
+                    fluidRow(
+                      column(4,
+                             div(class = "rates_input_left",
+                                 tags$label("Rate 3 Threshold:", `for` = "rate_3_t"),
+                                 numericInput("rate_3_t", NULL, 100270, step = 100)),
+                             
+                      ),
+                      
+                      column(2,
+                             div(style = "height: 12px;", p("")),
+                             div(class = "grey-text-box", 
+                                 textOutput("uk_rate_text_3")
+                             )
+                      ), 
+                      
+                      column(6,
+                             div(class = "rates_input_right_slider custom-numeric-input",
+                                 tags$label("Welsh rate:", `for` = "welsh_rate_3"),
+                                 sliderInput("welsh_rate_3", NULL, min = 0, max = 100, value = 35, step = 1)),)
+                      
+                    ),
+                    
+                    uiOutput("dynamic_rows"),
+                    
+                    div(class = "output1-container",
+                        verbatimTextOutput("new_income_tax")
+                    ),
                      
                      div(style = "height: 30px;", p("")), # Empty placeholder
-                     
+                    tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
+                    
                      fluidRow(#input-group-thresholds
                        column(6,
                               div(class = "input-group-thresholds custom-numeric-input",
@@ -1546,6 +1777,176 @@ server <- function(input, output, session) {
     }, rownames = FALSE)  # Do not display row names
   
     
+    
+  ######################################
+  #Observe income Tax model selection: #
+  ######################################
+    
+    observe({
+      if (input$income_tax_system_choice %in% c("Scottish Model", "Full Devolution")) {
+        shinyjs::enable("num_rows")
+      } else {
+        shinyjs::disable("num_rows")
+      }
+    })
+    
+  #Observe event to ensure that if current settlement is selcted, the other rows go back:
+  observeEvent(input$income_tax_system_choice, {
+    if (input$income_tax_system_choice == "Current Settlement"){
+      updateNumericInput(session, "num_rows", value = 3)
+    }
+  })
+  
+  
+  ###################################################################
+  #Observe model selection to toggle the Uk rate to 10/20/30% or 0% #
+  ###################################################################
+  uk_rate_text_1 <- reactive({
+    if (input$income_tax_system_choice %in% c("Scottish Model", "Full Devolution")){
+      "UK Rate: 0%"
+    } else {
+      "UK Rate: 10%"
+    }
+  })
+  uk_rate_text_2 <- reactive({
+    if (input$income_tax_system_choice %in% c("Scottish Model", "Full Devolution")){
+      "UK Rate: 0%"
+    } else {
+      "UK Rate: 30%"
+    }
+  })
+  uk_rate_text_3 <- reactive({
+    if (input$income_tax_system_choice %in% c("Scottish Model", "Full Devolution")){
+      "UK Rate: 0%"
+    } else {
+      "UK Rate: 35%"
+    }
+  })
+  
+  output$uk_rate_text_1 <- renderText({ uk_rate_text_1() })
+  output$uk_rate_text_2 <- renderText({ uk_rate_text_2() })
+  output$uk_rate_text_3 <- renderText({ uk_rate_text_3() })
+  
+  #####################################
+  #Dynamic Rows for income tax input: #
+  #####################################
+  
+    output$dynamic_rows <- renderUI({
+      num_rows <- input$num_rows
+      
+      # Create an empty list to store dynamic rows
+      rows <- list()
+      
+      # Only generate additional rows if num_rows is greater than 3
+      if (num_rows > 3) {
+        # Loop to create dynamic rows starting from the 4th row
+        for (i in 4:num_rows) {
+          rows[[i - 3]] <- fluidRow(
+            column(4,
+                   div(class = "rates_input_left",
+                       tags$label(paste("Rate", i, "Threshold:"), `for` = paste0("rate_", i, "_t")),
+                       numericInput(paste0("rate_", i, "_t"), NULL, 120000, step = 100))
+            ),
+            column(2,
+                   div(style = "height: 12px;", p("")),
+                   div(class = "grey-text-box", 
+                       "UK Rate: 0%"
+                   )
+            ),
+            column(6,
+                   div(class = "rates_input_right_slider custom-numeric-input",
+                       tags$label(paste("Welsh rate", i, ":"), `for` = paste0("welsh_rate_", i)),
+                       sliderInput(paste0("welsh_rate_", i), NULL, min = 0, max = 100, value = 20, step = 1))
+            )
+          )
+        }
+      }
+      
+      # Return the list of dynamic rows
+      do.call(tagList, rows)
+    })
+  
+  
+  ###############################
+  #New Income Tax calculations: #
+  ###############################
+  
+  calculate_income_tax_new <- function(){
+    PA <- input$PAnew
+    PAlimit <- input$PAlimit
+    
+    #need to know how many bands there are to be able to calulcate the income tax:
+    #thresholds <- c(37500, 112500)   # Define thresholds for all bands
+    #rates <- c(0.2, 0.4, 0.45)
+    num_rows <- input$num_rows
+    
+    thresholds <- numeric(num_rows -1)
+    rates <- numeric(num_rows)
+    
+    
+    
+    for (i in 1:num_rows){
+      rate_name <- paste0("welsh_rate_",i)
+      rates[i] <- input[[rate_name]]
+      if (i == num_rows){
+        break
+      }else{
+        threshold_name <- paste0("rate_",i,"_t")
+        thresholds[i] <- input[[threshold_name]]
+      }
+    }
+    
+    #thresholds <- c(37500, 112500)   # Define thresholds for all bands
+    #rates <- c(0.2, 0.4, 0.45)
+    
+    # Import taxable income distribution
+    TIDist_new <- read.csv("TaxableIncomeDistribution2023.csv", sep=";")
+    
+    # Calculate Personal Allowance
+    TIDist_new$PA <- ifelse(TIDist_new$TaxableIncome <= PAlimit, PA, pmax(0, PA - 0.5 * (TIDist_new$TaxableIncome - PAlimit)))
+    
+    # Calculate Total Taxable Income after allowance
+    TIDist_new$totTaxableInc <- pmax(TIDist_new$TaxableIncome - TIDist_new$PA, 0)
+    
+    # Initialize variables for tax calculations
+    TIDist_new$r1_income <- pmin(TIDist_new$totTaxableInc, thresholds[1]) # First band
+    TIDist_new$r1_tax <- rates[1] * TIDist_new$r1_income
+    remaining_income <- TIDist_new$totTaxableInc - TIDist_new$r1_income
+    
+    # Loop through the remaining bands
+    for (i in 2:length(thresholds)) {
+      # Calculate the income for the current band
+      band_income <- pmin(remaining_income, thresholds[i])  # Income within the current threshold
+      TIDist_new[[paste0("r", i, "_income")]] <- band_income                       # Assign to dynamic column name
+      TIDist_new[[paste0("r", i, "_tax")]] <- rates[i] * band_income               # Calculate tax for current band
+      remaining_income <- remaining_income - band_income                       # Update remaining income
+    }
+    
+    # Calculate tax for income above the highest threshold
+    TIDist_new[[paste0("r", length(thresholds) + 1, "_income")]] <- pmax(remaining_income, 0)
+    TIDist_new[[paste0("r", length(thresholds) + 1, "_tax")]] <- rates[length(rates)] * TIDist_new[[paste0("r", length(thresholds) + 1, "_income")]]
+    
+    # Calculate total tax payable
+    TIDist_new$TotalTax <- rowSums(TIDist_new[grep("_tax$", names(TIDist_new))], na.rm = TRUE) * TIDist_new$N
+    total_income_tax_new <- sum(TIDist_new$TotalTax, na.rm = TRUE)
+    
+    total_income_tax_new
+
+  }
+  
+  boop <- function(){
+    test <- 10
+    test
+  }
+  
+  #get this new value to the main program:
+  output$new_income_tax <- renderText({
+    new_total_income <- calculate_income_tax_new()
+    #paste(text_resources[[values$language]]$total_income_title_1, "\n", text_resources[[values$language]]$total_income_title_2, round(total_income_tax_sum/1000000000, digits = 2), " billion")
+    paste("new value = ", new_total_income)  
+    })
+  
+  
 
   ###################
   #Translation data:#
