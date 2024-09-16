@@ -576,7 +576,7 @@ ui <- fluidPage(
                       column(4,
                              div(class = "rates_input_left",
                                  tags$label("Rate 1 Threshold:", `for` = "rate_1_t"),
-                                 numericInput("rate_1_t", NULL, 50270, step = 100)),
+                                 numericInput("rate_1_t", NULL, 37500, step = 100)),
 
                       ),
                              
@@ -597,7 +597,7 @@ ui <- fluidPage(
                       column(4,
                              div(class = "rates_input_left",
                                  tags$label("Rate 2 Threshold:", `for` = "rate_2_t"),
-                                 numericInput("rate_2_t", NULL, 100270, step = 100)),
+                                 numericInput("rate_2_t", NULL, 112500, step = 100)),
                              
                       ),
                       
@@ -641,6 +641,9 @@ ui <- fluidPage(
                     div(class = "output1-container",
                         verbatimTextOutput("new_income_tax")
                     ),
+                    
+                    plotlyOutput("income_tax_piechart"),
+                    plotlyOutput("stacked_plot_income_tax"),
                      
                      div(style = "height: 30px;", p("")), # Empty placeholder
                     tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
@@ -1121,6 +1124,8 @@ server <- function(input, output, session) {
       basic_list <-numeric(13)
       higher_list <- numeric(13)
       additional_list <- numeric(13)
+      
+      
       #scotland only
       starter_list <- numeric(13)
       inter_list <- numeric(13)
@@ -1887,7 +1892,7 @@ server <- function(input, output, session) {
     
     for (i in 1:num_rows){
       rate_name <- paste0("welsh_rate_",i)
-      rates[i] <- input[[rate_name]]
+      rates[i] <- input[[rate_name]] / 100
       if (i == num_rows){
         break
       }else{
@@ -1930,14 +1935,264 @@ server <- function(input, output, session) {
     TIDist_new$TotalTax <- rowSums(TIDist_new[grep("_tax$", names(TIDist_new))], na.rm = TRUE) * TIDist_new$N
     total_income_tax_new <- sum(TIDist_new$TotalTax, na.rm = TRUE)
     
+    #Vector containing breakdown of the tax types for piechart:
+    tax_columns <- grep("_tax$", names(TIDist_new), value = TRUE)  # Find column names ending with '_tax'
+    tax_totals <- colSums(TIDist_new[tax_columns] * TIDist_new$N, na.rm = TRUE)    # Calculate column sums for each tax type
+
+    
+    
+    #data for the piechart
+    reactive_income_tax_data_new <- reactive({
+      data.frame(
+        tax_type = tax_columns,
+        count = tax_totals
+      )
+    })
+    
+    
+    output$income_tax_piechart <- renderPlotly({
+      income_tax_pie_data <- reactive_income_tax_data_new()
+      
+      plot_ly(income_tax_pie_data, labels = ~tax_type, values = ~count, type = 'pie') %>%
+        layout(
+          title = text_resources[[values$language]]$income_tax_pie,
+          margin = list(l = 20, r = 20, b = 10, t = 30),  # Adjust margins
+          paper_bgcolor = 'white',  # Background color of the plot area
+          plot_bgcolor = 'white'  # Background color of the chart area
+          #width = 200px
+        )
+    })
+    
+    #######################################
+    #Bar chart stuff:                     #
+    #######################################
+
+    num_rows_in_data <- nrow(TIDist_new)
+    counter <- 1
+    band_sum <- 0
+    results <-numeric(13)
+    num_people <-numeric(13)
+    band_people <- 0
+    
+    total_rates <- num_rows
+    rates_list <- vector("list", total_rates)  # Create a list with num_rows slots
+    sum_list <- vector("list",total_rates)
+    
+    
+    # Populate each sublist with numeric(13)
+    for (i in 1:total_rates) {
+      rates_list[[i]] <- numeric(13)
+      sum_list[[i]] <- 0
+    }
+    
+    #loop through tax bands to populate the variables:
+    for (i in 1:num_rows_in_data){
+      #all bands except the last one:
+      if (TIDist_new$TaxableIncome[i] <= (counter * 10000)){
+        band_sum <- band_sum + (TIDist_new$TotalTax[i])
+        band_people <- band_people + (TIDist_new$N[i])
+        
+        for (j in 1:total_rates){
+          tax_type <- paste0("r",j,"_tax")
+          sum_list[[j]] <- sum_list[[j]] + (TIDist_new[[tax_type]][i] * TIDist_new$N[i])
+ 
+        }
+        
+        
+      } else {
+        #last band calculations:
+        if (counter < 13){
+          results[counter] <- band_sum
+          num_people[counter] <- band_people
+          
+          for (j in 1:total_rates){
+            
+            rates_list[[j]][counter] <- sum_list[[j]]
+          }
+          
+          
+          counter <- counter + 1
+          
+          band_sum <- TIDist_new$TotalTax[i]
+          band_people <- TIDist_new$N[i]
+          
+          for (j in 1:total_rates){
+            tax_type <- paste0("r",j,"_tax")
+            sum_list[[j]] <- (TIDist_new[[tax_type]][i] * TIDist_new$N[i])
+          }
+          
+        }
+        #last band save:
+        else{
+          band_sum <- band_sum + (TIDist_new$TotalTax[i])
+          band_people <- band_people + (TIDist_new$N[i])
+          
+          for (j in 1:total_rates){
+            tax_type <- paste0("r",j,"_tax")
+            sum_list[[j]] <- sum_list[[j]] + (TIDist_new[[tax_type]][i] * TIDist_new$N[i])
+          }
+          
+          
+          if (i == num_rows_in_data){
+            results[counter] <- band_sum
+            num_people[counter] <- band_people
+            
+            for (j in 1:total_rates){
+              rates_list[[j]][counter] <- sum_list[[j]]
+            }
+            
+          }
+        }
+      }
+    }
+    print(rates_list)
+
+    
+    #divide by number of people per band if button Pressed:
+    divisor <- if (values$divide) num_people else 1
+    #barchart:
+    bar_data <- reactive({
+      
+      
+      #new list to hold the divided by people:
+      rates_divided_list <- vector("list", total_rates)
+      for (i in 1:total_rates) {
+        rates_divided_list[[i]] <- numeric(13)
+      }
+      
+      #now to work out the new values:
+      for (j in 1:total_rates){
+        rates_divided_list[[j]] = c(rates_list[[j]]/divisor)
+        
+      }
+      #print(rates)
+      
+      #vector1 <- c(starter_list/divisor)
+      #vector2 <- c(basic_list/divisor)
+      #vector3 <- c(inter_list/divisor)
+      #vector4 <- c(higher_list/divisor)
+      #vector5 <- c(additional_list/divisor)
+      
+      labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
+      #legend_vector = c(text_resources[[values$language]]$starter,text_resources[[values$language]]$basic, text_resources[[values$language]]$intermediate,text_resources[[values$language]]$higher, text_resources[[values$language]]$additional)
+      
+      if (values$show_sum) {
+        list(
+          #stacked = rbind(vector1, vector2, vector3,vector4, vector5),
+          
+          stacked = do.call(rbind,rates_divided_list),
+          labels = labels,
+          legend_vector = tax_columns
+        )
+      } else {
+        # Calculate sum of vectors
+        #summed <- vector1 + vector2 + vector3 + vector4 + vector5
+        summed <- Reduce(`+`,rates_divided_list)
+        #print(summed)
+        list(
+          #stacked = summed,
+          stacked = summed,
+          labels = labels
+        )
+        
+      }
+    })
+    
+    
+    # Generate Stacked Bar Chart
+    output$stacked_plot_income_tax <- renderPlotly({
+      data <- bar_data()
+      
+      # Ensure x-axis categories are factors with the correct order
+      x_categories <- factor(data$labels, levels = data$labels)
+      
+      if (values$show_sum){
+        
+        colors <- c('rgba(255, 99, 132, 0.6)',  # First color
+                    'rgba(54, 162, 235, 0.6)',  # Second color
+                    'rgba(75, 192, 192, 0.6)',  # Third color
+                    'rgba(223, 192, 192, 0.6)', # Fourth color
+                    'rgba(23, 192, 192, 0.6)',  # Fifth color
+                    'rgba(192, 192, 75, 0.6)')  # Add more colors if necessary
+        p <- plot_ly(
+          x = x_categories,
+          y = ~data$stacked[1,],
+         type = 'bar',
+          name = ~data$legend_vector[1],
+          marker = list(color = 'rgba(255, 99, 132, 0.6)')
+        ) 
+        total_rates <- input$num_rows
+        for (i in 2:total_rates){
+          p <- p %>%
+            add_trace(
+              y = data$stacked[i,],
+              name = data$legend_vector[i],
+              marker = list(color = colors[i])
+            )
+        }
+       
+        
+       # p <- p %>%
+        #  add_trace(
+         #   y = data$stacked[3,],
+          #  name = data$legend_vector[3],
+           # marker = list(color = 'rgba(23, 192, 192, 0.6)')
+          #)
+        
+        
+        
+        
+        #for (i in 2:total_rates) {
+        #  color <- switch(i,
+         #                 'rgba(54, 162, 235, 0.6)',  # Color for the second trace
+          #                'rgba(75, 192, 192, 0.6)',  # Color for the third trace
+           #               'rgba(223, 192, 192, 0.6)', # Color for the fourth trace
+            #              'rgba(23, 192, 192, 0.6)',  # Color for the fifth trace
+             #             'rgba(192, 192, 75, 0.6)')  # Color for additional traces if needed
+          
+          #p <- p %>%
+           # add_trace(
+            #  y = ~data$stacked[i,],
+             # name = ~data$legend_vector[i],
+            #  marker = list(color = color)
+            #)
+        
+        #}
+        
+
+        p <- p %>%
+          layout(
+            barmode = 'stack',
+            title = text_resources[[values$language]]$income_stacked_graph_title,
+            xaxis = list(title = text_resources[[values$language]]$income_bar_x),
+            yaxis = list(title = text_resources[[values$language]]$income_bar_y)
+          )
+        
+        p
+      }else {
+        # Plot summed values
+        plot_ly(
+          x = x_categories,
+          y = ~data$stacked,
+          type = 'bar',
+          name = 'Sum',
+          marker = list(color = 'rgba(255, 99, 132, 0.6)')
+        ) %>%
+          layout(
+            barmode = 'group',
+            title = text_resources[[values$language]]$income_stacked_graph_title,
+            xaxis = list(title = text_resources[[values$language]]$income_bar_x),
+            yaxis = list(title = text_resources[[values$language]]$income_bar_y)
+          )
+        
+      }
+    })
+        
+    
     total_income_tax_new
 
   }
   
-  boop <- function(){
-    test <- 10
-    test
-  }
   
   #get this new value to the main program:
   output$new_income_tax <- renderText({
