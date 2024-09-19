@@ -58,10 +58,10 @@ other_taxes_tab_label,Other Taxes,Trethi Eraill
 contact_us_button,Contact the Business School,Cysylltwch â'r Ysgol Fusnes
 local_taxes_tab_intro,"Local taxes incluide Non Domestic Rates (NDR) tax, Council Tax and  proposed tourism Levy.","Trethi lleol yn cynnwys treth Rates Non-Domestic (NDR), Treth y Cyngor, a'r treth dwristiaeth a gynhelir."
 local_tax_system_selection,Select system for local tax filters and calculations,Dewiswch system ar gyfer hidlwyr a chyfrifon treth leol
-devolved_taxes,Devolved Taxes,Trethi Datganoledig
+devolved_taxes,Devolved Taxes (A),Trethi Datganoledig (A)
 property_tax,Property Tax,Treth Eiddo
 tourism_levy,Tourism Levy,Levy Twristiaeth
-non_devolved_taxes,Non Devolved Taxes,Trethi Heb eu Datganoli
+non_devolved_taxes,Non Devolved Taxes (B),Trethi Heb eu Datganoli (B)
 ni,National Insurance,Yswiriant Gwladol
 vat,VAT,TAW
 corporation_tax,Corporation Tax,Treth Gorfforaeth
@@ -69,9 +69,9 @@ duties,"Duties - fuel, tobacco, alcohol","Tollau - t	anwydd, tybaco, alcohol"
 env_levy,Environmental Levy,Levy amgylcheddol
 other,Other,Eraill
 income_tax_devolved,Income Tax dev,Treth Incwm dev
-block_grant,Block Grant,Grant Bloc
-tot_welsh_taxes,Total Welsh Taxes,Cyfanswm trethi Cymru
-welsh_budget,Total Gov Budget,Cyllideb Llywodraeth Cymru
+block_grant,Block Grant (C),Grant Bloc (C)
+tot_welsh_taxes,Total Welsh Taxes (A+B),Cyfanswm trethi Cymru (A+B)
+welsh_budget,Total Gov Budget (A+C),Cyllideb Llywodraeth Cymru (A+C)
 rate,Rate:,Cyfradd:
 ndr_input,NDR tax return (£million) =,Ffurflen dreth ANP (£miliwn) =
 tourism_input,Tourism Levy (£million) =,Levy Twristiaeth (£	miliwn) =
