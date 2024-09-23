@@ -15,8 +15,11 @@ server <- function(input, output, session) {
     
     
     
+    
+    
     if (input$income_tax_system_choice == "Current Settlement") {
-        disabled_ids <- c("pa_new", "pa_limit", "rate_3_t")
+      
+        disabled_ids <- c("pa_new", "pa_limit")
       
       #updateNumericInput(session, "BRthreshold", value = 37500)
       #updateSliderInput(session, "HR", min = 0, max = 1, value = 0.40,step = 0.01)
@@ -26,15 +29,15 @@ server <- function(input, output, session) {
       
     } else if (input$income_tax_system_choice == "Scottish Model"){
       
-        enabled_ids <- c("rate_3_t" )
+        #enabled_ids <- c("rate_3_t" )
         disabled_ids <- c("pa_new", "pa_limit")
       
       #updateNumericInput(session, "BRthreshold", value = 11000)
       #updateSliderInput(session, "BR", min = 0, max = 1, value = 0.2,step = 0.01)
      
     } else if (input$income_tax_system_choice == "Full Devolution"){
-      enabled_ids <- c("pa_new", "pa_limit","rate_3_t" )
-      disabled_ids <- character(0)
+      enabled_ids <- c("pa_new", "pa_limit" )
+      #disabled_ids <- c(final_threshold)
     }
 
     # Enable sliders
@@ -629,6 +632,11 @@ server <- function(input, output, session) {
   observeEvent(input$income_tax_system_choice, {
     if (input$income_tax_system_choice == "Current Settlement"){
       updateNumericInput(session, "num_rows", value = 3)
+      updateNumericInput(session,"rate_1_t",value = 37500)
+      updateNumericInput(session,"rate_2_t",value = 112500)
+      updateNumericInput(session,"welsh_rate_1",value = 10)
+      updateNumericInput(session,"welsh_rate_2",value = 10)
+      updateNumericInput(session,"welsh_rate_3",value = 10)
     }
   })
   
@@ -673,34 +681,61 @@ server <- function(input, output, session) {
     rows <- list()
     
     # Only generate additional rows if num_rows is greater than 3
-    if (num_rows > 3) {
+    if (num_rows > 1) {
       # Loop to create dynamic rows starting from the 4th row
-      for (i in 4:num_rows) {
-        rows[[i - 3]] <- fluidRow(
+      for (i in 2:num_rows) {
+        # Create a column for the threshold part, depending on the condition
+        threshold_column <- if (i == num_rows) {
+          column(3, 
+                 tags$div(style = "font-size: 14px;", paste0("Rate ", i, ":")),
+                 div(style = "height: 1px;", p("")),
+                 tags$div(style = "font-size: 14px;", "Threshold: unlimited"))
+        } else {
           column(3,
-                 tags$div(style = "font-size: 14px;",paste0("Rate ",i,":")),
+                 tags$div(style = "font-size: 14px;", paste0("Rate ", i, ":")),
                  div(class = "rates_input_left",
                      tags$label("Threshold: £", `for` = paste0("rate_", i, "_t")),
                      numericInput(paste0("rate_", i, "_t"), NULL, 120000, step = 100))
-          ),
+          )
+        }
+        
+        uk_rate_column <- if (i == 2 && input$income_tax_system_choice == "Current Settlement"){
+          uk_rate = 30
+        }else if ((i == 3 && input$income_tax_system_choice == "Current Settlement")){
+          uk_rate = 35
+        }else{
+          uk_rate = 0
+        }
+        
+        
+        
+        
+        # Add this to the rows list, along with the other columns
+        rows[[i - 1]] <- fluidRow(
+          threshold_column,  # Use the threshold_column variable
+          
           column(6,
                  fluidRow(
                    column(3,
                           div(style = "height: 12px;", p("")),
                           div(class = "grey-text-box", 
-                              "UK: 0%"
-                          )
+                              paste0("UK: ",uk_rate,"%"))
                    ),
                    column(9,
                           div(class = "rates_input_right_slider custom-numeric-input",
                               tags$label(paste("Welsh:"), `for` = paste0("welsh_rate_", i)),
                               sliderInput(paste0("welsh_rate_", i), NULL, min = 0, max = 100, value = 20, step = 1))
                    )
-                   
-                 )),
-          
+                 )
+          )
         )
       }
+      
+    
+      #final row:
+      
+      
+      
     }
     
     # Return the list of dynamic rows
@@ -722,7 +757,19 @@ server <- function(input, output, session) {
     
     for (i in 1:num_rows){
       rate_name <- paste0("welsh_rate_",i)
-      rates[i] <- input[[rate_name]] / 100
+      if (input$income_tax_system_choice == "Current Settlement" && i == 1){
+        rates[i] <- (input[[rate_name]] + 10)/ 100 
+      }else if (input$income_tax_system_choice == "Current Settlement" && i == 2){
+        rates[i] <- (input[[rate_name]] + 30)/ 100
+      }else if (input$income_tax_system_choice == "Current Settlement" && i == 3){
+        rates[i] <- (input[[rate_name]] + 35)/ 100
+      }else{
+        rates[i] <- (input[[rate_name]])/ 100
+      }
+      
+      
+      
+      
       if (i == num_rows){
         break
       }else{

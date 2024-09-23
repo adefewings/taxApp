@@ -138,61 +138,8 @@ ui <- fluidPage(
                                  
                                  ),
                                ),
-                               fluidRow(
-                                 column(3,
-                                        tags$div(style = "font-size: 14px;","Rate 2:"),
-                                        div(class = "rates_input_left",
-                                            tags$label("Threshold: £", `for` = "rate_2_t"),
-                                            numericInput("rate_2_t", NULL, 112500, step = 100)),
-                                        
-                                 ),
-                                 
-                                 column(6,
-                                        fluidRow(
-                                          column(3,
-                                                 div(style = "height: 18px;", p("")),
-                                                 div(class = "grey-text-box", 
-                                                     textOutput("uk_rate_text_2")
-                                                 )
-                                          ), 
-                                          
-                                          column(9,
-                                                 div(class = "rates_input_right_slider custom-numeric-input",
-                                                     tags$label("Welsh:", `for` = "welsh_rate_2"),
-                                                     sliderInput("welsh_rate_2", NULL, min = 0, max = 100, value = 30, step = 1)),)
-                                        )),
-                                 
-                                 
-                               ),
-                               fluidRow(
-                                 column(3,
-                                        tags$div(style = "font-size: 14px;","Rate 3:"),
-                                        div(class = "rates_input_left",
-                                            tags$label("Threshold: £", `for` = "rate_3_t"),
-                                            numericInput("rate_3_t", NULL,0, step = 100)),
-                                        
-                                 ),
-                                 
-                                 
-                                 column(6,
-                                        fluidRow(
-                                          column(3,
-                                                 div(style = "height: 18px;", p("")),
-                                                 div(class = "grey-text-box", 
-                                                     textOutput("uk_rate_text_3")
-                                                 )
-                                          ), 
-                                          
-                                          column(9,
-                                                 div(class = "rates_input_right_slider custom-numeric-input",
-                                                     tags$label("Welsh:", `for` = "welsh_rate_3"),
-                                                     sliderInput("welsh_rate_3", NULL, min = 0, max = 100, value = 35, step = 1)),)
-                                        )
-                                        ),
-                                 
-                                 
-                               ),
-                               
+                              
+
                                uiOutput("dynamic_rows"),
                                tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                                
@@ -224,13 +171,7 @@ ui <- fluidPage(
                                 
                                 ),
                               
-                      
-                               
-                                 
-             
-                               
-                               
-                               
+        
                                
                       
              
