@@ -3,7 +3,8 @@ library(shinyjs)
 library(plotly) 
 library(ggplot2)
 library(shinyWidgets)
-
+library(scales)
+library(DT)
 
 #input csv file which contains the dictionary of words for translations:
 text_data <- read.csv("translations.csv", stringsAsFactors = FALSE)

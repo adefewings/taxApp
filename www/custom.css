@@ -120,6 +120,7 @@
           padding: 2px; /* Padding inside the input box */
           font-size: 14px; /* Font size for the input text */
           box-sizing: border-box; /* Ensures padding is included in the total width */
+          height: 28px;
         }
         
        .pa_input_right {
@@ -137,8 +138,10 @@
         }
         .pa_input_right input {
           width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 80px; /* Optional: Set a maximum width for the input */
-          padding: 2px; /* Padding inside the input box */
+          max-width: 70px; /* Optional: Set a maximum width for the input */
+          padding: 0px; /* Padding inside the input box */
+          line-height: 14px;
+          height: 28px;
           font-size: 14px; /* Font size for the input text */
           box-sizing: border-box; /* Ensures padding is included in the total width */
         }
@@ -146,21 +149,20 @@
         .rates_input_left {
           display: flex;
           align-items: center;
-          margin-top:13px;
-          margin-bottom: 30px; /* Space between input groups */
+          margin-top:0px;
+          margin-bottom: 25px; /* Space between input groups */
           margin-right:0px;
          
         }
         .rates_input_left label {
-          flex: 0 0 115px; /* Fixed width for labels */
-          margin-right: 3px; /* Space between label and input */
+          flex: 0 0 80px; /* Fixed width for labels */
+          margin-right: 1px; /* Space between label and input */
           font-size: 14px;
           font-weight: normal;
           
         }
         .rates_input_left input {
-          width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 65px; /* Optional: Set a maximum width for the input */
+          width: 65px; /* Optional: Set a maximum width for the input */
           padding: 0px; /* Padding inside the input box */
           margin-top:8px;
           line-height: 14px;
@@ -174,7 +176,7 @@
           display: flex;
           align-items: center;
           margin-top:10px;
-          margin-bottom: 30px; /* Space between input groups */
+          margin-bottom: 25px; /* Space between input groups */
           margin-left: 0px;
          
         }
@@ -195,11 +197,14 @@
        .rates_input_right_slider {
           display: flex;
           align-items: center;
-          margin-bottom: 5px; /* Space between input groups */
+          margin-bottom: 0px; /* Space between input groups */
+          margin-top: 7px;
+          margin-left:2px;
         }
         .rates_input_right_slider label {
-          flex: 0 0 90px; /* Fixed width for the label (adjust as needed) */
-          margin-right: 5px; /* Space between label and slider */
+          flex: 0 0 50px; /* Fixed width for the label (adjust as needed) */
+          margin-right: 2px; /* Space between label and slider */
+          margin-left:6px;
           font-size: 14px; /* Font size for the label */
           font-weight: normal;
         }
@@ -227,25 +232,36 @@
         border-radius: 5px; /* Optional: Rounded corners */
         color: #333; /* Optional: Text color */
         font-size: 13px;
-        width: 90px;
+        width: 58px;
         }
-      .local_taxes-text-box {
+      .local_taxes_text_box {
         margin-top:3px;
         margin-bottom: 20px;
-        width: 300px;
+        width: 220px;
         font-size:14px;
       }
       
       .custom-toggle .bootstrap-switch-container {
       line-height: 15px; /* Match this to the height of the switch to center text */
     }
+    
+    
     .local_taxes-toggle .bootstrap-switch {
       width: 50px; /* Adjust the width of the entire toggle switch */
       height: 24px; /* Adjust height of the toggle */
+      margin-bottom:1px;
     }
     .local_taxes-toggle .bootstrap-switch-handle-on,
     .custom-toggle .bootstrap-switch-handle-off {
       font-size: 14px; /* Smaller font for ON/OFF text */
+      line-height: 0px;
+      padding-bottom: 15px;
+    }
+    .local_taxes-toggle .bootstrap-switch-handle-off,
+    .custom-toggle .bootstrap-switch-handle-on {
+      font-size: 14px; /* Smaller font for ON/OFF text */
+      line-height: 0px;
+      padding-bottom: 15px;
     }
        
     .local_taxes_numeric {
@@ -305,8 +321,8 @@
         .ltt_input_left {
           display: flex;
           align-items: center;
-          margin-top:5px;
-          margin-bottom: 5px; /* Space between input groups */
+          margin-top:0px;
+          margin-bottom: 0px; /* Space between input groups */
           margin-right:0px;
          
         }
@@ -330,34 +346,37 @@
         }
         
         
-        .ltt_input_middle {
+      .ltt_input_middle {
           display: flex;
           align-items: center;
-          margin-top:5px;
-          margin-bottom: 5px; /* Space between input groups */
-          margin-right:0px;
-         
+          margin-top: 0px;
+          margin-bottom: 0px; /* Space between input groups */
+          margin-right: 0px;
         }
+        
         .ltt_input_middle label {
           flex: 0 0 90px; /* Fixed width for labels */
           margin-right: 3px; /* Space between label and input */
           font-size: 14px;
           font-weight: normal;
-          
         }
+        
         .ltt_input_middle input {
-          width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 65px; /* Optional: Set a maximum width for the input */
+          width: 45px;
           padding: 0px; /* Padding inside the input box */
-          margin-top:8px;
           line-height: 14px;
           font-size: 14px; /* Font size for the input text */
           box-sizing: border-box; /* Ensures padding is included in the total width */
-          margin-right: 0px;
           height: 25px;
+          margin-right: 1px; /* Small space between input and "%" symbol */
+          margin-top:8px;
         }
         
-        
+        .ltt_input_middle span {
+          margin-left: 0px; /* Remove margin-left to position it close to the input */
+          margin-right:25px;
+          font-size: 14px; /* Match font size with input text */
+        }
         
         
         
@@ -535,15 +554,15 @@
         }
       
       /* local taxes CSS: */
-       .switch-label {
+       .switch-label .bootstrap-switch{
       display: inline-block;
-      width: 200px; /* Adjust width as needed */
+      width: 100px; /* Adjust width as needed */
       margin-bottom: 10px; /* Add space between toggles */
     }
     .switch-label .switch {
       display: flex;
       align-items: center;
-      width: 100%;
+      width: 100px;
     }
     .switch-label .switch input {
       width: auto;
@@ -552,9 +571,16 @@
       width: 50px; /* Adjust width of the switch part if needed */
       height: 24px; /* Adjust height if needed */
     }
+    .switch-label .switch .label {
+      width: 100px;
+    }
     .switch-label .switch .label-text {
       margin-left: 10px; /* Space between switch and label text */
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    #num_rows {
+      width: 50px;
+      font-size: 15px;
     }
