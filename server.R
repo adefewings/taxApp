@@ -168,12 +168,15 @@ server <- function(input, output, session) {
     ni_tax <- 1000 * 1000000
     vat_tax <- 10000 * 1000000
     
+    #function call for incomeTax:
+    income_tax_totals <- calculate_income_tax_new()
+    total_income_tax = income_tax_totals$non_devolved_total + income_tax_totals$devolved_total
     
     # Data for pie chart
     pie_data <- data.frame(
       category = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
       #amount = c(values$total_income_tax, values$total_council_tax,total_ndr_tax,tourism_levy_tax, property_tax, ltt_tax, ldt_tax, ni_tax, vat_tax)
-      amount= c(app_parameters_list$current_blockgrant,calculate_income_tax_new()/1000000,calculate_council_tax_new()/1000000,calculate_ndr_tax_new()/1000000,(calculate_property_new()/1000000),round(calculate_ldt_tax_new()/1000000),calculate_ltt_tax_new()/1000000,round(calculate_tourism_tax_new()/1000000))
+      amount= c(app_parameters_list$current_blockgrant,total_income_tax/1000000,calculate_council_tax_new()/1000000,calculate_ndr_tax_new()/1000000,(calculate_property_new()/1000000),round(calculate_ldt_tax_new()/1000000),calculate_ltt_tax_new()/1000000,round(calculate_tourism_tax_new()/1000000))
       )
     
     #
@@ -400,7 +403,8 @@ server <- function(input, output, session) {
     
     # Return a list or dataframe of all the calculated taxes
     taxes <- list(
-      income_tax = total_income_tax_new,
+      income_tax_devolved = total_income_tax_new$devolved_total,
+      income_tax_non_devolved = total_income_tax_new$non_devolved_total,
       ndr_tax = total_ndr,
       property_tax = property_tax_updated,
       council_tax = council_tax_updated,
@@ -456,7 +460,7 @@ server <- function(input, output, session) {
     
     c_estimates <- c(NA, app_parameters_list$current_income_tax_dev, app_parameters_list$current_council, app_parameters_list$current_ndr, app_parameters_list$current_property, app_parameters_list$current_ltt, app_parameters_list$current_ldt, app_parameters_list$current_tourism, NA, NA, app_parameters_list$current_income_tax_nondev, app_parameters_list$current_ni, app_parameters_list$current_vat, app_parameters_list$current_corporation, app_parameters_list$current_duties, app_parameters_list$current_env_levy, app_parameters_list$current_other,NA,NA,NA,NA)
     
-    updated_estimates <- c(NA, 9999, round((updated_taxes$council_tax)/1000000), round((updated_taxes$ndr_tax)/1000000), round((updated_taxes$property_tax)/1000000), round(updated_taxes$ltt_tax)/1000000, round((updated_taxes$ldt_tax)/1000000), round((updated_taxes$tourism_tax)/1000000), NA, NA, round((updated_taxes$income_tax)/1000000), app_parameters_list$current_ni, app_parameters_list$current_vat, app_parameters_list$current_corporation, app_parameters_list$current_duties, app_parameters_list$current_env_levy, app_parameters_list$current_other,NA,NA,NA,NA)
+    updated_estimates <- c(NA, round((updated_taxes$income_tax_devolved)/1000000), round((updated_taxes$council_tax)/1000000), round((updated_taxes$ndr_tax)/1000000), round((updated_taxes$property_tax)/1000000), round(updated_taxes$ltt_tax)/1000000, round((updated_taxes$ldt_tax)/1000000), round((updated_taxes$tourism_tax)/1000000), NA, NA, round((updated_taxes$income_tax_non_devolved)/1000000), app_parameters_list$current_ni, app_parameters_list$current_vat, app_parameters_list$current_corporation, app_parameters_list$current_duties, app_parameters_list$current_env_levy, app_parameters_list$current_other,NA,NA,NA,NA)
     
     
     c_estimate_sum <- c(
@@ -695,7 +699,7 @@ server <- function(input, output, session) {
                  tags$div(style = "font-size: 14px;", paste0("Rate ", i, ":")),
                  div(class = "rates_input_left",
                      tags$label("Threshold: £", `for` = paste0("rate_", i, "_t")),
-                     numericInput(paste0("rate_", i, "_t"), NULL, 120000, step = 100))
+                     numericInput(paste0("rate_", i, "_t"), NULL, 112500, step = 100))
           )
         }
         
@@ -770,6 +774,7 @@ server <- function(input, output, session) {
       
       
       
+      
       if (i == num_rows){
         break
       }else{
@@ -777,6 +782,9 @@ server <- function(input, output, session) {
         thresholds[i] <- input[[threshold_name]]
       }
     }
+    #print()
+    print(thresholds)
+    print(rates)
 
     
     # Import taxable income distribution
@@ -788,12 +796,22 @@ server <- function(input, output, session) {
     # Calculate Total Taxable Income after allowance
     TIDist_new$totTaxableInc <- pmax(TIDist_new$TaxableIncome - TIDist_new$PA, 0)
     
+    if (num_rows == 1){
+      #this is a flat rate on all income past the PA (taxable_income)
+      TIDist_new$r1_income <- pmin(TIDist_new$totTaxableInc) # First band
+      TIDist_new$r1_tax <- rates[1] * TIDist_new$r1_income
+   
+    }else{
+  
+    
     # Initialize variables for tax calculations
     TIDist_new$r1_income <- pmin(TIDist_new$totTaxableInc, thresholds[1]) # First band
     TIDist_new$r1_tax <- rates[1] * TIDist_new$r1_income
     remaining_income <- TIDist_new$totTaxableInc - TIDist_new$r1_income
     
     # Loop through the remaining bands
+    
+    if (num_rows > 2){
     for (i in 2:length(thresholds)) {
       # Calculate the income for the current band
       band_income <- pmin(remaining_income, thresholds[i])  # Income within the current threshold
@@ -801,19 +819,51 @@ server <- function(input, output, session) {
       TIDist_new[[paste0("r", i, "_tax")]] <- rates[i] * band_income               # Calculate tax for current band
       remaining_income <- remaining_income - band_income                       # Update remaining income
     }
-    
+    }
     # Calculate tax for income above the highest threshold
     TIDist_new[[paste0("r", length(thresholds) + 1, "_income")]] <- pmax(remaining_income, 0)
     TIDist_new[[paste0("r", length(thresholds) + 1, "_tax")]] <- rates[length(rates)] * TIDist_new[[paste0("r", length(thresholds) + 1, "_income")]]
+   
+    }
     
+     
     # Calculate total tax payable
     TIDist_new$TotalTax <- rowSums(TIDist_new[grep("_tax$", names(TIDist_new))], na.rm = TRUE) * TIDist_new$N
     total_income_tax_new <- sum(TIDist_new$TotalTax, na.rm = TRUE)
     
+    
+    
+    
+    
     #Vector containing breakdown of the tax types for piechart:
     tax_columns <- grep("_tax$", names(TIDist_new), value = TRUE)  # Find column names ending with '_tax'
     tax_totals <- colSums(TIDist_new[tax_columns] * TIDist_new$N, na.rm = TRUE)    # Calculate column sums for each tax type
+    #print(tax_columns)
+    print(tax_totals[1])
+    #print(tax_totals[2])
     
+    #logic to calculate proportion of income tax which is devolved and not-devolved:
+    
+    #non_devolved_total <- 0
+    if (input$income_tax_system_choice == "Current Settlement"){
+      print(tax_totals[1])
+      print(tax_totals[2])
+      print(tax_totals[3])
+      print(rates[1])
+      print(rates[2])
+      print(rates[3])
+      non_devolved_total <- ((0.1/rates[1]) * unname(tax_totals[1])) + ((0.3/rates[2]) * unname(tax_totals[2])) + ((0.35/rates[3]) * unname(tax_totals[3]))
+      devolved_total <- total_income_tax_new - non_devolved_total
+    }else{
+      non_devolved_total <- 0
+      devolved_total <- total_income_tax_new
+    }
+    print("values:")
+    print(total_income_tax_new)
+    print("boop")
+    #print( 1 * sum(TIDist_new$r1_tax))
+    print(non_devolved_total)
+    print(devolved_total)
     
     #data for the piechart
     reactive_income_tax_data_new <- reactive({
@@ -1021,17 +1071,18 @@ server <- function(input, output, session) {
       }
     })
     
-    total_income_tax_new
+    #total_income_tax_new
+    return(list(non_devolved_total = non_devolved_total, devolved_total = devolved_total))
     
   }
   
   
   #get this new value to the main program:
-  output$new_income_tax <- renderText({
-    new_total_income <- calculate_income_tax_new()
+  #output$new_income_tax <- renderText({
+   # new_total_income <- calculate_income_tax_new()
     #paste(text_resources[[values$language]]$total_income_title_1, "\n", text_resources[[values$language]]$total_income_title_2, round(total_income_tax_sum/1000000000, digits = 2), " billion")
-    paste("new value = ", new_total_income)  
-  })
+  #  paste("new value = ", new_total_income)  
+  #})
   
   
   
