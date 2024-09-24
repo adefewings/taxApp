@@ -19,7 +19,7 @@ server <- function(input, output, session) {
     
     if (input$income_tax_system_choice == "Current Settlement") {
       
-        disabled_ids <- c("pa_new", "pa_limit")
+      disabled_ids <- c("pa_new", "pa_limit")
       
       #updateNumericInput(session, "BRthreshold", value = 37500)
       #updateSliderInput(session, "HR", min = 0, max = 1, value = 0.40,step = 0.01)
@@ -29,17 +29,17 @@ server <- function(input, output, session) {
       
     } else if (input$income_tax_system_choice == "Scottish Model"){
       
-        #enabled_ids <- c("rate_3_t" )
-        disabled_ids <- c("pa_new", "pa_limit")
+      #enabled_ids <- c("rate_3_t" )
+      disabled_ids <- c("pa_new", "pa_limit")
       
       #updateNumericInput(session, "BRthreshold", value = 11000)
       #updateSliderInput(session, "BR", min = 0, max = 1, value = 0.2,step = 0.01)
-     
+      
     } else if (input$income_tax_system_choice == "Full Devolution"){
       enabled_ids <- c("pa_new", "pa_limit" )
       #disabled_ids <- c(final_threshold)
     }
-
+    
     # Enable sliders
     lapply(enabled_ids, function(id) {
       runjs(sprintf("$('#%s').prop('disabled', false).parent().removeClass('grey-out');", id))
@@ -73,39 +73,39 @@ server <- function(input, output, session) {
   
   #piechart:
   output$old_tax_piechart <- renderPlotly({
-  old_tax_data <- data.frame(
-    #labels = c("Income", "Council", "NDR", "LTT", "LDT", "NI", "VAT", "Corporation", "Duties", "Env Levy", "Other"),
-    labels = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
-    
-    count = c(app_parameters_list$current_blockgrant,app_parameters_list$current_income_tax_dev + app_parameters_list$current_income_tax_nondev,app_parameters_list$current_council,app_parameters_list$current_ndr,app_parameters_list$current_property,app_parameters_list$current_ldt,app_parameters_list$current_ltt,app_parameters_list$current_tourism)
-    
-    #count = c(3322, 2716, 1100, 271, 27, 6111, 9157, 2698, 2500, 1300, 2500)
-  )
-  
-  # Calculate total sum
-  total_count <- sum(old_tax_data$count)
-  
-  # Add percentage column calculated manually
-  old_tax_data$percentage <- round((old_tax_data$count / total_count) * 100, 2)
-  
-  # Modify plot_ly to hide labels for segments < 5%
-  plot_ly(old_tax_data, values = ~count, type = 'pie',
-          text = ~paste0(labels, ": ", percentage, "%"),
-          textinfo = 'percent',
-          hoverinfo = 'text',  # Show hoverinfo for all segments
-          texttemplate = ~ifelse(percentage >= 5, paste0(labels, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
-          automargin = TRUE) %>%
-    layout(
-      title = list(
-        text = text_resources[[values$language]]$previous_tax_piechart,  # Set the title text
-        font = list(size = 15)
-      ),
-      margin = list(l = 0, r = 10, b = 20, t = 40),  # Adjust margins
-      paper_bgcolor = 'white',  # Background color of the plot area
-      plot_bgcolor = 'white',  # Background color of the chart area 
-      showlegend = FALSE
+    old_tax_data <- data.frame(
+      #labels = c("Income", "Council", "NDR", "LTT", "LDT", "NI", "VAT", "Corporation", "Duties", "Env Levy", "Other"),
+      labels = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
+      
+      count = c(app_parameters_list$current_blockgrant,app_parameters_list$current_income_tax_dev + app_parameters_list$current_income_tax_nondev,app_parameters_list$current_council,app_parameters_list$current_ndr,app_parameters_list$current_property,app_parameters_list$current_ldt,app_parameters_list$current_ltt,app_parameters_list$current_tourism)
+      
+      #count = c(3322, 2716, 1100, 271, 27, 6111, 9157, 2698, 2500, 1300, 2500)
     )
-})
+    
+    # Calculate total sum
+    total_count <- sum(old_tax_data$count)
+    
+    # Add percentage column calculated manually
+    old_tax_data$percentage <- round((old_tax_data$count / total_count) * 100, 2)
+    
+    # Modify plot_ly to hide labels for segments < 5%
+    plot_ly(old_tax_data, values = ~count, type = 'pie',
+            text = ~paste0(labels, ": ", percentage, "%"),
+            textinfo = 'percent',
+            hoverinfo = 'text',  # Show hoverinfo for all segments
+            texttemplate = ~ifelse(percentage >= 5, paste0(labels, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
+            automargin = TRUE) %>%
+      layout(
+        title = list(
+          text = text_resources[[values$language]]$previous_tax_piechart,  # Set the title text
+          font = list(size = 15)
+        ),
+        margin = list(l = 0, r = 10, b = 20, t = 40),  # Adjust margins
+        paper_bgcolor = 'white',  # Background color of the plot area
+        plot_bgcolor = 'white',  # Background color of the chart area 
+        showlegend = FALSE
+      )
+  })
   
   
   
@@ -177,7 +177,7 @@ server <- function(input, output, session) {
       category = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
       #amount = c(values$total_income_tax, values$total_council_tax,total_ndr_tax,tourism_levy_tax, property_tax, ltt_tax, ldt_tax, ni_tax, vat_tax)
       amount= c(app_parameters_list$current_blockgrant,total_income_tax/1000000,calculate_council_tax_new()/1000000,calculate_ndr_tax_new()/1000000,(calculate_property_new()/1000000),round(calculate_ldt_tax_new()/1000000),calculate_ltt_tax_new()/1000000,round(calculate_tourism_tax_new()/1000000))
-      )
+    )
     
     #
     #labels = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
@@ -192,7 +192,7 @@ server <- function(input, output, session) {
             hoverinfo = 'text',
             text = ~paste0(category, ": ", percentage, "%"),
             texttemplate = ~ifelse(percentage >= 5, paste0(category, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
-
+            
             
             
             #textinfo = 'percent',
@@ -255,7 +255,7 @@ server <- function(input, output, session) {
     
     if (input$ndr_toggle){
       
-      ndr_value <- 1000000000
+      ndr_value <- 1969500000
       
       multiplier <- input$ndr_muliplier
       small_business_relief <- input$small_business_relief
@@ -281,7 +281,7 @@ server <- function(input, output, session) {
     }else{
       ndr_value <- 0
     }
-   
+    
     return(ndr_value)
     
   }
@@ -308,7 +308,7 @@ server <- function(input, output, session) {
   #calculate council tax dynamically
   calculate_council_tax_new <- function(){
     if (input$council_toggle){
-      council_tax <- 10000000000
+      council_tax <- round(10000000000/3.11)
       
       #band d rate:
       av_band_d_rate <- input$av_band_d_rate
@@ -374,7 +374,7 @@ server <- function(input, output, session) {
   }
   
   calculate_ltt_tax_new <- function(){
-    ltt_tax <- 27100000
+    ltt_tax <- 17100000
     
     ltt_tax <- ltt_tax * input$ltt_higher_rate7
     
@@ -384,7 +384,7 @@ server <- function(input, output, session) {
   
   
   calculate_ldt_tax_new <- function(){
-    ldt_tax <- 270000
+    ldt_tax <- 260000
     ldt_tax <- ldt_tax * input$ldt_std_rate
     
   }
@@ -480,7 +480,7 @@ server <- function(input, output, session) {
       app_parameters_list$current_blockgrant,sum(updated_estimates[2:8]) + sum(updated_estimates[11:17]),sum(updated_estimates[2:8]) + app_parameters_list$current_blockgrant
       # Total non-devolved taxes
     )
-
+    
     # Create a data frame
     data_frame <- data.frame(
       Millions = tax,
@@ -707,7 +707,7 @@ server <- function(input, output, session) {
           uk_rate = 10
         }else if (i == 2 && input$income_tax_system_choice == "Current Settlement"){
           uk_rate = 30
-          }else if ((i == 3 && input$income_tax_system_choice == "Current Settlement")){
+        }else if ((i == 3 && input$income_tax_system_choice == "Current Settlement")){
           uk_rate = 35
         }else{
           uk_rate = 0
@@ -737,7 +737,7 @@ server <- function(input, output, session) {
         )
       }
       
-    
+      
       #final row:
       
       
@@ -787,7 +787,7 @@ server <- function(input, output, session) {
     #print()
     #print(thresholds)
     #print(rates)
-
+    
     
     # Import taxable income distribution
     TIDist_new <- read.csv("TaxableIncomeDistribution2023.csv", sep=";")
@@ -802,33 +802,33 @@ server <- function(input, output, session) {
       #this is a flat rate on all income past the PA (taxable_income)
       TIDist_new$r1_income <- pmin(TIDist_new$totTaxableInc) # First band
       TIDist_new$r1_tax <- rates[1] * TIDist_new$r1_income
-   
+      
     }else{
-  
-    
-    # Initialize variables for tax calculations
-    TIDist_new$r1_income <- pmin(TIDist_new$totTaxableInc, thresholds[1]) # First band
-    TIDist_new$r1_tax <- rates[1] * TIDist_new$r1_income
-    remaining_income <- TIDist_new$totTaxableInc - TIDist_new$r1_income
-    
-    # Loop through the remaining bands
-    
-    if (num_rows > 2){
-    for (i in 2:length(thresholds)) {
-      # Calculate the income for the current band
-      band_income <- pmin(remaining_income, thresholds[i])  # Income within the current threshold
-      TIDist_new[[paste0("r", i, "_income")]] <- band_income                       # Assign to dynamic column name
-      TIDist_new[[paste0("r", i, "_tax")]] <- rates[i] * band_income               # Calculate tax for current band
-      remaining_income <- remaining_income - band_income                       # Update remaining income
+      
+      
+      # Initialize variables for tax calculations
+      TIDist_new$r1_income <- pmin(TIDist_new$totTaxableInc, thresholds[1]) # First band
+      TIDist_new$r1_tax <- rates[1] * TIDist_new$r1_income
+      remaining_income <- TIDist_new$totTaxableInc - TIDist_new$r1_income
+      
+      # Loop through the remaining bands
+      
+      if (num_rows > 2){
+        for (i in 2:length(thresholds)) {
+          # Calculate the income for the current band
+          band_income <- pmin(remaining_income, thresholds[i])  # Income within the current threshold
+          TIDist_new[[paste0("r", i, "_income")]] <- band_income                       # Assign to dynamic column name
+          TIDist_new[[paste0("r", i, "_tax")]] <- rates[i] * band_income               # Calculate tax for current band
+          remaining_income <- remaining_income - band_income                       # Update remaining income
+        }
+      }
+      # Calculate tax for income above the highest threshold
+      TIDist_new[[paste0("r", length(thresholds) + 1, "_income")]] <- pmax(remaining_income, 0)
+      TIDist_new[[paste0("r", length(thresholds) + 1, "_tax")]] <- rates[length(rates)] * TIDist_new[[paste0("r", length(thresholds) + 1, "_income")]]
+      
     }
-    }
-    # Calculate tax for income above the highest threshold
-    TIDist_new[[paste0("r", length(thresholds) + 1, "_income")]] <- pmax(remaining_income, 0)
-    TIDist_new[[paste0("r", length(thresholds) + 1, "_tax")]] <- rates[length(rates)] * TIDist_new[[paste0("r", length(thresholds) + 1, "_income")]]
-   
-    }
     
-     
+    
     # Calculate total tax payable
     TIDist_new$TotalTax <- rowSums(TIDist_new[grep("_tax$", names(TIDist_new))], na.rm = TRUE) * TIDist_new$N
     total_income_tax_new <- sum(TIDist_new$TotalTax, na.rm = TRUE)
@@ -988,7 +988,7 @@ server <- function(input, output, session) {
         rates_divided_list[[j]] = c(rates_list[[j]]/divisor)
         
       }
-     
+      
       
       labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
       #legend_vector = c(text_resources[[values$language]]$starter,text_resources[[values$language]]$basic, text_resources[[values$language]]$intermediate,text_resources[[values$language]]$higher, text_resources[[values$language]]$additional)
@@ -1044,7 +1044,7 @@ server <- function(input, output, session) {
               marker = list(color = colors[i])
             )
         }
-
+        
         p <- p %>%
           layout(
             barmode = 'stack',
@@ -1081,8 +1081,8 @@ server <- function(input, output, session) {
   
   #get this new value to the main program:
   #output$new_income_tax <- renderText({
-   # new_total_income <- calculate_income_tax_new()
-    #paste(text_resources[[values$language]]$total_income_title_1, "\n", text_resources[[values$language]]$total_income_title_2, round(total_income_tax_sum/1000000000, digits = 2), " billion")
+  # new_total_income <- calculate_income_tax_new()
+  #paste(text_resources[[values$language]]$total_income_title_1, "\n", text_resources[[values$language]]$total_income_title_2, round(total_income_tax_sum/1000000000, digits = 2), " billion")
   #  paste("new value = ", new_total_income)  
   #})
   

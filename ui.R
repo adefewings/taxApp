@@ -114,6 +114,12 @@ ui <- fluidPage(
                               
 
                                uiOutput("dynamic_rows"),
+                      
+                              fluidRow(
+                                column(6, 
+                                       uiOutput("arrowOutput")  # Output to display dynamic icon
+                                )
+                              ),
                                tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                                
                               fluidRow(
