@@ -110,34 +110,7 @@ ui <- fluidPage(
                                ),
                                
                                
-                               fluidRow(
-                                 
-                                 column(3,
-                                        tags$div(style = "font-size: 14px;","Rate 1:"),
-                                        div(class = "rates_input_left",
-                                            tags$label("Threshold: £", `for` = "rate_1_t"),
-                                            numericInput("rate_1_t", NULL, 37500, step = 100)),
-                                        
-                                 ),
-                                 column(6,
-                                 fluidRow(
-                                   column(3,
-                                        div(style = "height: 18px;", p("")),
-                                        div(class = "grey-text-box", 
-                                            textOutput("uk_rate_text_1")
-                                        )
-                                 ), 
-                                 
-                                 column(9,
-                                        #div(style = "height: 0.0px;", p("")),
-                                        div(class = "rates_input_right_slider custom-numeric-input",
-                                            tags$label("Welsh:", `for` = "welsh_rate_1"),
-                                            sliderInput("welsh_rate_1", NULL, min = 0, max = 100, value = 20, step = 1)),)
-      
-                                 ),
-                                 
-                                 ),
-                               ),
+                              
                               
 
                                uiOutput("dynamic_rows"),

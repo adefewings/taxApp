@@ -685,9 +685,9 @@ server <- function(input, output, session) {
     rows <- list()
     
     # Only generate additional rows if num_rows is greater than 3
-    if (num_rows > 1) {
+    if (num_rows > 0) {
       # Loop to create dynamic rows starting from the 4th row
-      for (i in 2:num_rows) {
+      for (i in 1:num_rows) {
         # Create a column for the threshold part, depending on the condition
         threshold_column <- if (i == num_rows) {
           column(3, 
@@ -699,13 +699,15 @@ server <- function(input, output, session) {
                  tags$div(style = "font-size: 14px;", paste0("Rate ", i, ":")),
                  div(class = "rates_input_left",
                      tags$label("Threshold: £", `for` = paste0("rate_", i, "_t")),
-                     numericInput(paste0("rate_", i, "_t"), NULL, 112500, step = 100))
+                     numericInput(paste0("rate_", i, "_t"), NULL, 37500, step = 100))
           )
         }
         
-        uk_rate_column <- if (i == 2 && input$income_tax_system_choice == "Current Settlement"){
+        uk_rate_column <- if (i == 1 && input$income_tax_system_choice == "Current Settlement"){
+          uk_rate = 10
+        }else if (i == 2 && input$income_tax_system_choice == "Current Settlement"){
           uk_rate = 30
-        }else if ((i == 3 && input$income_tax_system_choice == "Current Settlement")){
+          }else if ((i == 3 && input$income_tax_system_choice == "Current Settlement")){
           uk_rate = 35
         }else{
           uk_rate = 0
@@ -715,7 +717,7 @@ server <- function(input, output, session) {
         
         
         # Add this to the rows list, along with the other columns
-        rows[[i - 1]] <- fluidRow(
+        rows[[i - 0]] <- fluidRow(
           threshold_column,  # Use the threshold_column variable
           
           column(6,
@@ -783,8 +785,8 @@ server <- function(input, output, session) {
       }
     }
     #print()
-    print(thresholds)
-    print(rates)
+    #print(thresholds)
+    #print(rates)
 
     
     # Import taxable income distribution
@@ -839,31 +841,31 @@ server <- function(input, output, session) {
     tax_columns <- grep("_tax$", names(TIDist_new), value = TRUE)  # Find column names ending with '_tax'
     tax_totals <- colSums(TIDist_new[tax_columns] * TIDist_new$N, na.rm = TRUE)    # Calculate column sums for each tax type
     #print(tax_columns)
-    print(tax_totals[1])
+    #print(tax_totals[1])
     #print(tax_totals[2])
     
     #logic to calculate proportion of income tax which is devolved and not-devolved:
     
     #non_devolved_total <- 0
     if (input$income_tax_system_choice == "Current Settlement"){
-      print(tax_totals[1])
-      print(tax_totals[2])
-      print(tax_totals[3])
-      print(rates[1])
-      print(rates[2])
-      print(rates[3])
+      #print(tax_totals[1])
+      #print(tax_totals[2])
+      #print(tax_totals[3])
+      #print(rates[1])
+      #print(rates[2])
+      #print(rates[3])
       non_devolved_total <- ((0.1/rates[1]) * unname(tax_totals[1])) + ((0.3/rates[2]) * unname(tax_totals[2])) + ((0.35/rates[3]) * unname(tax_totals[3]))
       devolved_total <- total_income_tax_new - non_devolved_total
     }else{
       non_devolved_total <- 0
       devolved_total <- total_income_tax_new
     }
-    print("values:")
-    print(total_income_tax_new)
-    print("boop")
+    #print("values:")
+    #print(total_income_tax_new)
+    #print("boop")
     #print( 1 * sum(TIDist_new$r1_tax))
-    print(non_devolved_total)
-    print(devolved_total)
+    #print(non_devolved_total)
+    #print(devolved_total)
     
     #data for the piechart
     reactive_income_tax_data_new <- reactive({
