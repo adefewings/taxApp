@@ -93,7 +93,7 @@ server <- function(input, output, session) {
           text = ~paste0(labels, ": ", percentage, "%"),
           textinfo = 'percent',
           hoverinfo = 'text',  # Show hoverinfo for all segments
-          texttemplate = ~ifelse(percentage >= 3, paste0(labels, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
+          texttemplate = ~ifelse(percentage >= 5, paste0(labels, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
           automargin = TRUE) %>%
     layout(
       title = list(
@@ -191,7 +191,7 @@ server <- function(input, output, session) {
             textinfo = 'text', 
             hoverinfo = 'text',
             text = ~paste0(category, ": ", percentage, "%"),
-            texttemplate = ~ifelse(percentage >= 3, paste0(category, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
+            texttemplate = ~ifelse(percentage >= 5, paste0(category, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
 
             
             
