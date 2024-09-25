@@ -6,6 +6,7 @@
 ########################
 ########################
 ui <- fluidPage(
+  title = "Welsh Tax Calculator 2024/25",
   useShinyjs(),  # Initialize shinyjs
   
   #Custom css for formatting app items:
