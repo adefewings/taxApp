@@ -989,12 +989,12 @@ server <- function(input, output, session) {
     
     
     #data for the piechart
-    #reactive_income_tax_data_new <- reactive({
-    #  data.frame(
-    #    tax_type = tax_columns,
-    #    count = tax_totals
-    # )
-    #})
+    reactive_income_tax_data_new <- reactive({
+      data.frame(
+        tax_type = tax_columns,
+        count = tax_totals
+     )
+    })
     
     
     output$income_tax_piechart <- renderPlotly({
