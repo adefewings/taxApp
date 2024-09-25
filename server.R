@@ -7,6 +7,8 @@
 ########################
 server <- function(input, output, session) {
   
+  income_tax_data <- read.csv("TaxableIncomeDistribution2023.csv", sep=";")
+  
   #Observe function to change Income Tax values depending on the choice
   observe({
     enabled_ids <- character(0)
@@ -142,7 +144,8 @@ server <- function(input, output, session) {
     language = "English",
     total_income_tax = NULL,
     total_council_tax = NULL,
-    new_total_income_tax = 0
+    new_total_income_tax = 0,
+    income_tax_difference_list = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     
   )
   
@@ -255,7 +258,7 @@ server <- function(input, output, session) {
     
     if (input$ndr_toggle){
       
-      ndr_value <- 1969500000
+      ndr_value <- 1000000000
       
       multiplier <- input$ndr_muliplier
       small_business_relief <- input$small_business_relief
@@ -681,6 +684,7 @@ server <- function(input, output, session) {
   output$dynamic_rows <- renderUI({
     num_rows <- input$num_rows
     
+    
     # Create an empty list to store dynamic rows
     rows <- list()
     
@@ -713,17 +717,23 @@ server <- function(input, output, session) {
           uk_rate = 0
         }
         
+        #arrow_icon <- if (uk_rate > 20) {
+        #  tags$span(icon("arrow-up", class = "fa-2x"), style = "color: green;")  # Green up arrow
+        #} else {
+        #  tags$span(icon("arrow-down", class = "fa-2x"), style = "color: red;")  # Red down arrow
+        #}
+        
         
         
         
         # Add this to the rows list, along with the other columns
-        rows[[i - 0]] <- fluidRow(
+        rows[[i]] <- fluidRow(
           threshold_column,  # Use the threshold_column variable
           
           column(6,
                  fluidRow(
                    column(3,
-                          div(style = "height: 12px;", p("")),
+                          div(style = "height: 18px;", p("")),
                           div(class = "grey-text-box", 
                               paste0("UK: ",uk_rate,"%"))
                    ),
@@ -733,6 +743,13 @@ server <- function(input, output, session) {
                               sliderInput(paste0("welsh_rate_", i), NULL, min = 0, max = 100, value = 20, step = 1))
                    )
                  )
+          ),
+          column(3,
+                 div(style = "height: 10px;", p("")),
+                 #arrow_icon
+                 #add the placeholder for the difference to be added later:
+                 uiOutput(paste0("arrow_and_number_", i))  # Placeholder for arrow and number
+                 
           )
         )
       }
@@ -749,11 +766,96 @@ server <- function(input, output, session) {
   })
   
   
+  ################################################################################
+  #Calculate the difference and add the arrow to placeholder in above function:  #
+  ################################################################################
+  observe( {
+    #
+    rate_1_t <- debounced_num_rows()
+    
+    num_rows <- input$num_rows
+    #tax_data <- static_data()
+    #tax_data <- calculate_income_tax_new()
+    # After the tax calculation logic
+    # Your custom function
+    
+    data <- values$income_tax_difference_list
+    print("LOOK HERE")
+    print(data)
+    
+    if (is.null(data)){
+      income_tax_differences <- calculate_income_tax_differences() 
+    }else{
+      income_tax_differences <- data
+    }
+    
+    print("========")
+    print(income_tax_differences[1])
+    print(income_tax_differences[2])
+    print(income_tax_differences[3])
+    #data <- calculate_income_tax_new()
+    
+    #income_tax_differences <- data$tax_differences_total
+    
+    for (i in 1:num_rows) {
+      local({
+        local_i <- i  # Create a local variable to capture the value of 'i' for this iteration
+        
+        # Calculate the difference for this row
+        difference <- income_tax_differences[local_i]
+        difference_rounded <- round(difference/1000000)
+        formatted_difference <- format(difference_rounded, big.mark = ",", scientific = FALSE)
+        print("difference:")
+        print(difference)
+        
+        # Determine the arrow direction
+        arrow_icon <- if (difference > 0) {
+          tags$span(icon("arrow-up", class = "fa-2x"), style = "color: green;")
+        } else if (difference == 0) {
+          tags$span(icon("arrow-right", class = "fa-2x"), style = "color: blue;")
+        } else {
+          tags$span(icon("arrow-down", class = "fa-2x"), style = "color: red;")
+        }
+        
+        # Update the arrow and number in the UI for this specific 'i'
+        output[[paste0("arrow_and_number_", local_i)]] <- renderUI({
+          tagList(
+            arrow_icon,
+            tags$span(style = "margin-left: 10px;", paste0("£", formatted_difference, " million"))
+          )
+        })
+      })
+    }
+    
+  })
+  
+  
+  debounced_num_rows <- reactive({
+    input$rate_1_t
+  }) %>% debounce(5000) 
+  
+  
+  calculate_income_tax_differences <- reactive({
+    
+    #data <- calculate_income_tax_new()
+    #tax_differences_total = tax_differences))#calculate_income_tax_new
+    #tax_differences <- data$tax_differences_total
+    num_rows = input$num_rows
+    tax_differences <- list()
+    for (i in 1:num_rows){
+      tax_differences[[i]] = 0
+    }
+    
+    return(tax_differences)
+  })
+  
+  
+  
   ###############################
   #New Income Tax calculations: #
   ###############################
   
-  calculate_income_tax_new <- function(){
+  calculate_income_tax_new <- reactive({
     PA <- input$pa_new
     PAlimit <- input$pa_limit
     num_rows <- input$num_rows
@@ -784,9 +886,6 @@ server <- function(input, output, session) {
         thresholds[i] <- input[[threshold_name]]
       }
     }
-    #print()
-    #print(thresholds)
-    #print(rates)
     
     
     # Import taxable income distribution
@@ -840,40 +939,62 @@ server <- function(input, output, session) {
     #Vector containing breakdown of the tax types for piechart:
     tax_columns <- grep("_tax$", names(TIDist_new), value = TRUE)  # Find column names ending with '_tax'
     tax_totals <- colSums(TIDist_new[tax_columns] * TIDist_new$N, na.rm = TRUE)    # Calculate column sums for each tax type
-    #print(tax_columns)
-    #print(tax_totals[1])
-    #print(tax_totals[2])
-    
-    #logic to calculate proportion of income tax which is devolved and not-devolved:
     
     #non_devolved_total <- 0
     if (input$income_tax_system_choice == "Current Settlement"){
-      #print(tax_totals[1])
-      #print(tax_totals[2])
-      #print(tax_totals[3])
-      #print(rates[1])
-      #print(rates[2])
-      #print(rates[3])
       non_devolved_total <- ((0.1/rates[1]) * unname(tax_totals[1])) + ((0.3/rates[2]) * unname(tax_totals[2])) + ((0.35/rates[3]) * unname(tax_totals[3]))
       devolved_total <- total_income_tax_new - non_devolved_total
     }else{
       non_devolved_total <- 0
       devolved_total <- total_income_tax_new
     }
-    #print("values:")
-    #print(total_income_tax_new)
-    #print("boop")
-    #print( 1 * sum(TIDist_new$r1_tax))
-    #print(non_devolved_total)
-    #print(devolved_total)
+    
+    
+    
+    #income_tax_difference_list
+    #values$income_tax_difference_list <- vector("list", length = num_rows)
+    
+    #difference:
+    #time to calculate the tax differences:
+    #tax_differences <- list()
+    
+    temp_list <- vector("list", length = num_rows)
+    
+    for (i in 1:num_rows){
+      if (i == 1){
+        values$income_tax_difference_list[i] = round(unname(tax_totals[1])) - 5097834587
+      }else if (i  == 2){
+        values$income_tax_difference_list[i] = round(unname(tax_totals[2])) - 1648440481
+      }else if (i == 3){
+        values$income_tax_difference_list[i] = round(unname(tax_totals[3])) - 426016140
+      }else{
+        values$income_tax_difference_list[i] = round(unname(tax_totals[i]))
+      }
+      
+      
+    }
+
+    
+    #for (i in 1:num_rows){
+    
+    #values$income_tax_difference_list[[1]] = 0
+    
+    
+    #for (i in 1:num_rows) {
+    #  temp_list[[i]] <- 0  # Example logic
+    #}
+    
+    #values$income_tax_difference_list <- temp_list
+    
+    
     
     #data for the piechart
-    reactive_income_tax_data_new <- reactive({
-      data.frame(
-        tax_type = tax_columns,
-        count = tax_totals
-      )
-    })
+    #reactive_income_tax_data_new <- reactive({
+    #  data.frame(
+    #    tax_type = tax_columns,
+    #    count = tax_totals
+    # )
+    #})
     
     
     output$income_tax_piechart <- renderPlotly({
@@ -1076,7 +1197,7 @@ server <- function(input, output, session) {
     #total_income_tax_new
     return(list(non_devolved_total = non_devolved_total, devolved_total = devolved_total))
     
-  }
+  })
   
   
   #get this new value to the main program:
@@ -1086,6 +1207,23 @@ server <- function(input, output, session) {
   #  paste("new value = ", new_total_income)  
   #})
   
+  
+  
+  #arrow:
+  
+  arrow_value <- reactive({
+    # Dummy condition: Replace with your own logic
+    up <- FALSE # Change this to FALSE to see the down arrow example
+    up
+  })
+  
+  output$arrowOutput <- renderUI({
+    if (arrow_value()) {
+      tags$span(icon("arrow-up", class = "fa-2x"), style = "color: green;")  # Green up arrow
+    } else {
+      tags$span(icon("arrow-down", class = "fa-2x"), style = "color: red;")  # Red down arrow
+    }
+  })
   
   
   ###################
