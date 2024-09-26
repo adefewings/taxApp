@@ -110,7 +110,7 @@
         }
         .pa_input_left label {
           flex: 0 0 130px; /* Fixed width for labels */
-          margin-right: 5px; /* Space between label and input */
+          margin-right: 8px; /* Space between label and input */
           font-size: 14px;
           font-weight: normal;
         }
@@ -121,6 +121,7 @@
           font-size: 14px; /* Font size for the input text */
           box-sizing: border-box; /* Ensures padding is included in the total width */
           height: 28px;
+          margin-top:8px;
         }
         
        .pa_input_right {
@@ -131,8 +132,8 @@
          
         }
         .pa_input_right label {
-          flex: 0 0 75px; /* Fixed width for labels */
-          margin-right: 5px; /* Space between label and input */
+          flex: 0 0 160px; /* Fixed width for labels */
+          margin-right: 8px; /* Space between label and input */
           font-size: 14px;
           font-weight: normal;
         }
@@ -144,6 +145,7 @@
           height: 28px;
           font-size: 14px; /* Font size for the input text */
           box-sizing: border-box; /* Ensures padding is included in the total width */
+          margin-top:8px;
         }
         
         .rates_input_left {
@@ -155,11 +157,11 @@
          
         }
         .rates_input_left label {
-          flex: 0 0 80px; /* Fixed width for labels */
+          flex: 0 0 10px; /* Fixed width for labels */
           margin-right: 1px; /* Space between label and input */
           font-size: 14px;
           font-weight: normal;
-          
+
         }
         .rates_input_left input {
           width: 65px; /* Optional: Set a maximum width for the input */
@@ -170,13 +172,39 @@
           box-sizing: border-box; /* Ensures padding is included in the total width */
           margin-right: 0px;
           height: 25px;
+        } 
+        
+        .number_of_bands {
+          display: flex;
+          align-items: center;
+          margin-top:0px;
+          margin-bottom: 0px; /* Space between input groups */
+          margin-right:0px;
+         
+        }
+        .number_of_bands label {
+          /*flex: 0 0 80px;  Fixed width for labels */
+          margin-right: 5px; /* Space between label and input */
+          font-size: 15px;
+          font-weight: normal;
+          
+        }
+        .number_of_bands input {
+          width: 35px; /* Optional: Set a maximum width for the input */
+          padding: 0px; /* Padding inside the input box */
+          margin-top:8px;
+          line-height: 14px;
+          font-size: 15px; /* Font size for the input text */
+          box-sizing: border-box; /* Ensures padding is included in the total width */
+          margin-right: 0px;
+          height: 25px;
         }
        
         .rates_input_middle {
           display: flex;
           align-items: center;
           margin-top:10px;
-          margin-bottom: 25px; /* Space between input groups */
+          margin-bottom: 15px; /* Space between input groups */
           margin-left: 0px;
          
         }
@@ -202,7 +230,7 @@
           margin-left:2px;
         }
         .rates_input_right_slider label {
-          flex: 0 0 50px; /* Fixed width for the label (adjust as needed) */
+          flex: 0 0 5px; /* Fixed width for the label (adjust as needed) */
           margin-right: 2px; /* Space between label and slider */
           margin-left:6px;
           font-size: 14px; /* Font size for the label */
@@ -232,7 +260,8 @@
         border-radius: 5px; /* Optional: Rounded corners */
         color: #333; /* Optional: Text color */
         font-size: 13px;
-        width: 58px;
+        width: 37px;
+        margin-left:20px;
         }
       .local_taxes_text_box {
         margin-top:3px;
@@ -327,7 +356,7 @@
          
         }
         .ltt_input_left label {
-          flex: 0 0 140px; /* Fixed width for labels */
+          flex: 0 0 15px; /* Fixed width for labels */
           margin-right: 3px; /* Space between label and input */
           font-size: 14px;
           font-weight: normal;
@@ -355,7 +384,7 @@
         }
         
         .ltt_input_middle label {
-          flex: 0 0 90px; /* Fixed width for labels */
+          flex: 0 0 0px; /* Fixed width for labels */
           margin-right: 3px; /* Space between label and input */
           font-size: 14px;
           font-weight: normal;
@@ -374,7 +403,7 @@
         
         .ltt_input_middle span {
           margin-left: 0px; /* Remove margin-left to position it close to the input */
-          margin-right:25px;
+          margin-right:55px;
           font-size: 14px; /* Match font size with input text */
         }
         
@@ -580,7 +609,4 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    #num_rows {
-      width: 50px;
-      font-size: 15px;
-    }
+    

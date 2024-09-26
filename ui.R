@@ -90,30 +90,77 @@ ui <- fluidPage(
                                #adding the new requested rows and columns for the inputs:
                                
                                
-                               numericInput("num_rows", "Number of Tax Bands:", value = 3, min = 1, max = 10),
-                               fluidRow(
+                      div(style = "height: 5px;", p("")), 
+                     
+                               tags$div(style = "font-size: 16px;font-weight: bold","Allowances:"),
+                      
+                      
+                              fluidRow(
                                  column(5,
                                         div(class = "pa_input_left",
                                             tags$label("Personal Allowance:", `for` = "pa_new"),
                                             numericInput("pa_new", NULL, 12500, step = 100)),
                                  ),
                                  
-                                 column(4,
+                                 column(2,
                                         div(style = "height: 20px;", p(""))
                                  ),
                                  
-                                 column(3,
+                                 column(5,
                                         div(class = "pa_input_right",
-                                            tags$label("PA Limit:", `for` = "pa_limit"),
+                                            tags$label("Personal Allowance Limit:", `for` = "pa_limit"),
                                             numericInput("pa_limit", NULL, 100000, step = 100)),
                                         
                                  ),
                                ),
                                
                                
-                              
-                              
+                            
+                      tags$div(style = "font-size: 16px;font-weight: bold","Income Tax Bands applied to Taxable Income:"),
 
+                      div(style = "height: 5px;", p("")),
+
+                      #number_of_bands
+                      div(class = "number_of_bands",
+                          tags$label("Number of Bands:"),
+                          numericInput("num_rows", NULL, value = 3, min = 1, max = 10)),
+                      div(style = "height: 15px;", p("")),
+
+                      fluidRow(
+                        
+                        #
+                        column(3,
+                               
+                               fluidRow(column(6,
+                                               div(style = "height: 5px;", p("")),       
+                                               
+                                               
+                               ),
+                               column(6,
+                                      tags$div(style = "font-size: 14px;font-weight: normal","Band Limit:"),
+                                      )
+                               )
+                        ),
+                        
+                        column(6,
+                               fluidRow(
+                                 column(3,
+                                        tags$div(style = "font-size: 14px;font-weight: normal","Uk Rate:"),
+                                 ),
+                                 column(9,
+                                        tags$div(style = "font-size: 14px;font-weight: normal","Welsh rate:"),
+                                 ),
+                                 
+                               )
+                               ),
+                        
+                        
+                        column(3,
+                               tags$div(style = "font-size: 14px;font-weight: normal","Difference from band baseline:"),
+                               )
+                      ),
+                      
+                      
                                uiOutput("dynamic_rows"),
                       
                               #fluidRow(
@@ -398,91 +445,144 @@ ui <- fluidPage(
                       tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                       tags$div(style = "font-size: 16px;","Land Transactional Tax:"),
                       div(style = "height: 10px;", p("")),
+                      
                       fluidRow(
                         column(4,
-                               div(class = "ltt_input_left",
-                                   tags$label(HTML("Rate 1 Threshold:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;£"), `for` = "ltt_rate1_th"),
-                                   numericInput("ltt_rate1_th", NULL, 50270, step = 100)),
-                               div(class = "ltt_input_left",
-                                   tags$label(HTML("Rate 2 Threshold:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;£"), `for` = "ltt_rate2_th"),
-                                   numericInput("ltt_rate2_th", NULL, 137710, step = 100)),
-                               div(class = "ltt_input_left",
-                                   tags$label(HTML("Rate 3 Threshold:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;£"), `for` = "ltt_rate3_th"),
-                                   numericInput("ltt_rate3_th", NULL, 137710, step = 100)),
-                               div(class = "ltt_input_left",
-                                   tags$label(HTML("Rate 4 Threshold:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;£"), `for` = "ltt_rate4_th"),
-                                   numericInput("ltt_rate4_th", NULL, 137710, step = 100)),
-                               div(class = "ltt_input_left",
-                                   tags$label(HTML("Rate 5 Threshold:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;£"), `for` = "ltt_rate5_th"),
-                                   numericInput("ltt_rate5_th", NULL, 137710, step = 100)),
-                               div(class = "ltt_input_left",
-                                   tags$label(HTML("Rate 6 Threshold:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;£"), `for` = "ltt_rate6_th"),
-                                   numericInput("ltt_rate6_th", NULL, 137710, step = 100)),
-                               div(class = "ltt_input_left",
-                                   tags$label(HTML("Rate 7 Threshold:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;£"), `for` = "ltt_rate7_th"),
-                                   numericInput("ltt_rate7_th", NULL, 0, step = 100)),
-                               
-                        ),
-                        column(7,
                                fluidRow(
                                  column(6,
+                                        tags$div(style = "font-size: 15px;",""),
+                                        ),
+                                 column(6,
+                                        tags$div(style = "font-size: 15px;","Band Limit:"),
+                                        )
+                               )
+                               ),
+                        column(4,
+                               fluidRow(
+                                 column(5,
+                                        tags$div(style = "font-size: 15px;","Main Rate:"),
+                                        ),
+                                 
+                                 column(6,
+                                        tags$div(style = "font-size: 15px;","Higher Rate:"),
+                                        )
+                               ))
+                        
+                      ),
+                      fluidRow(
+                        column(4,
+                               fluidRow(
+                                 column(6,
+                                        div(style = "height:3px;", p("")),
+                                        tags$div(style = "font-size: 15px;font-weight: bold;", "Band 1:"),
+                                        div(style = "height:16px;", p("")),
+                                        tags$div(style = "font-size: 15px;font-weight: bold;", "Band 2:"),
+                                        div(style = "height:16px;", p("")),
+                                        tags$div(style = "font-size: 15px;font-weight: bold;", "Band 3:"),
+                                        div(style = "height:16px;", p("")),
+                                        tags$div(style = "font-size: 15px;font-weight: bold;", "Band 4:"),
+                                        div(style = "height:16px;", p("")),
+                                        tags$div(style = "font-size: 15px;font-weight: bold;", "Band 5:"),
+                                        div(style = "height:16px;", p("")),
+                                        tags$div(style = "font-size: 15px;font-weight: bold;", "Band 6:"),
+                                        div(style = "height:16px;", p("")),
+                                        tags$div(style = "font-size: 15px;font-weight: bold;", "Band 7:"),
+                                        
+                                 ),
+                                 
+                                 
+                                 column(6,
+                                        div(class = "ltt_input_left",
+                                            tags$label(HTML("£"), `for` = "ltt_rate1_th"),
+                                            numericInput("ltt_rate1_th", NULL, 50270, step = 100)),
+                                        div(class = "ltt_input_left",
+                                            tags$label(HTML("£"), `for` = "ltt_rate2_th"),
+                                            numericInput("ltt_rate2_th", NULL, 137710, step = 100)),
+                                        div(class = "ltt_input_left",
+                                            tags$label(HTML("£"), `for` = "ltt_rate3_th"),
+                                            numericInput("ltt_rate3_th", NULL, 137710, step = 100)),
+                                        div(class = "ltt_input_left",
+                                            tags$label(HTML("£"), `for` = "ltt_rate4_th"),
+                                            numericInput("ltt_rate4_th", NULL, 137710, step = 100)),
+                                        div(class = "ltt_input_left",
+                                            tags$label(HTML("£"), `for` = "ltt_rate5_th"),
+                                            numericInput("ltt_rate5_th", NULL, 137710, step = 100)),
+                                        div(class = "ltt_input_left",
+                                            tags$label(HTML("£"), `for` = "ltt_rate6_th"),
+                                            numericInput("ltt_rate6_th", NULL, 137710, step = 100)),
+                                        div(class = "ltt_input_left",
+                                            tags$label(HTML("£"), `for` = "ltt_rate7_th"),
+                                            numericInput("ltt_rate7_th", NULL, 0, step = 100)),
+                                        
+                                 ),
+                               )
+                               ),
+                      
+                        column(3,
+                               fluidRow(
+                                 #column(1,
+                                #        div(style = "height:3px;", p("")),
+                                #        ),
+                                 column(5,
                                         div(class = "ltt_input_middle",
-                                            tags$label("Main Rate 1:", `for` = "ltt_main_rate1"),
+                                            tags$label("", `for` = "ltt_main_rate1"),
                                             numericInput("ltt_main_rate1", NULL, 0, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Main Rate 2:", `for` = "ltt_main_rate2"),
+                                            tags$label("", `for` = "ltt_main_rate2"),
                                             numericInput("ltt_main_rate2", NULL, 0, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Main Rate 3:", `for` = "ltt_main_rate3"),
+                                            tags$label("", `for` = "ltt_main_rate3"),
                                             numericInput("ltt_main_rate3", NULL, 6, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Main Rate 4:", `for` = "ltt_main_rate4"),
+                                            tags$label("", `for` = "ltt_main_rate4"),
                                             numericInput("ltt_main_rate4", NULL, 6, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Main Rate 5:", `for` = "ltt_main_rate5"),
+                                            tags$label("", `for` = "ltt_main_rate5"),
                                             numericInput("ltt_main_rate5", NULL, 7.5, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Main Rate 6:", `for` = "ltt_main_rate6"),
+                                            tags$label("", `for` = "ltt_main_rate6"),
                                             numericInput("ltt_main_rate6", NULL, 10, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Main Rate 7:", `for` = "ltt_main_rate7"),
+                                            tags$label("", `for` = "ltt_main_rate7"),
                                             numericInput("ltt_main_rate7", NULL, 12.5, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                  ), 
-                                 
-                                 column(6,
+                                 column(2,
+                                        div(style = "height:3px;", p("")),
+                                 ),
+                                 column(5,
                                         div(class = "ltt_input_middle",
-                                            tags$label("Higher rate 1:", `for` = "ltt_higher_rate1"),
+                                            tags$label("", `for` = "ltt_higher_rate1"),
                                             numericInput("ltt_higher_rate1", NULL, 4, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Higher rate 2:", `for` = "ltt_higher_rate2"),
+                                            tags$label("", `for` = "ltt_higher_rate2"),
                                             numericInput("ltt_higher_rate2", NULL, 7.5, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Higher rate 3:", `for` = "ltt_higher_rate3"),
+                                            tags$label("", `for` = "ltt_higher_rate3"),
                                             numericInput("ltt_higher_rate3", NULL, 7.5, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Higher rate 4:", `for` = "ltt_higher_rate4"),
+                                            tags$label("", `for` = "ltt_higher_rate4"),
                                             numericInput("ltt_higher_rate4", NULL, 9, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Higher rate 5:", `for` = "ltt_higher_rate5"),
+                                            tags$label("", `for` = "ltt_higher_rate5"),
                                             numericInput("ltt_higher_rate5", NULL, 11.5, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Higher rate 6:", `for` = "ltt_higher_rate6"),
+                                            tags$label("", `for` = "ltt_higher_rate6"),
                                             numericInput("ltt_higher_rate6", NULL, 14, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         div(class = "ltt_input_middle",
-                                            tags$label("Higher rate 7:", `for` = "ltt_higher_rate7"),
+                                            tags$label("", `for` = "ltt_higher_rate7"),
                                             numericInput("ltt_higher_rate7", NULL, 16, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                         

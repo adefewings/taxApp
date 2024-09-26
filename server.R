@@ -694,16 +694,41 @@ server <- function(input, output, session) {
       for (i in 1:num_rows) {
         # Create a column for the threshold part, depending on the condition
         threshold_column <- if (i == num_rows) {
-          column(3, 
-                 tags$div(style = "font-size: 14px;", paste0("Rate ", i, ":")),
-                 div(style = "height: 1px;", p("")),
-                 tags$div(style = "font-size: 14px;", "Threshold: unlimited"))
+          column(3,
+                 
+                 fluidRow(column(6,
+                                 div(style = "height:18px;", p("")),
+                                 tags$div(style = "font-size: 15px;font-weight: bold;", paste0("Band ", i, ":")),        
+                                 
+                                 
+                                 ),
+                          column(6,
+                                 div(style = "height:10px;", p("")),
+                                 #tags$div(style = "font-size: 14px;", paste0("Band ", i, ":")),
+                                 div(style = "height: 1px;", p("")),
+                                 tags$div(style = "font-size: 14px;", "Unlimited"))
+                                 )
+                          )
+                 
         } else {
           column(3,
-                 tags$div(style = "font-size: 14px;", paste0("Rate ", i, ":")),
-                 div(class = "rates_input_left",
-                     tags$label("Threshold: £", `for` = paste0("rate_", i, "_t")),
-                     numericInput(paste0("rate_", i, "_t"), NULL, 37500, step = 100))
+                 fluidRow(column(6,
+                                 div(style = "height:8px;", p("")),
+                                 tags$div(style = "font-size: 15px;font-weight: bold;", paste0("Band ", i, ":")),        
+                                 
+                                 
+                 ),
+                 column(6,
+                        #tags$div(style = "font-size: 14px;", paste0("Band ", i, ":")),
+                        div(style = "height:10px;", p("")),
+                        div(class = "rates_input_left",
+                            tags$label("£", `for` = paste0("rate_", i, "_t")),
+                            numericInput(paste0("rate_", i, "_t"), NULL, 37500, step = 100))
+                        )
+                 )
+                 
+                 
+             
           )
         }
         
@@ -728,6 +753,11 @@ server <- function(input, output, session) {
         
         # Add this to the rows list, along with the other columns
         rows[[i]] <- fluidRow(
+          
+          
+      
+          
+          
           threshold_column,  # Use the threshold_column variable
           
           column(6,
@@ -735,11 +765,11 @@ server <- function(input, output, session) {
                    column(3,
                           div(style = "height: 18px;", p("")),
                           div(class = "grey-text-box", 
-                              paste0("UK: ",uk_rate,"%"))
+                              paste0(uk_rate,"%"))
                    ),
                    column(9,
                           div(class = "rates_input_right_slider custom-numeric-input",
-                              tags$label(paste("Welsh:"), `for` = paste0("welsh_rate_", i)),
+                              tags$label(paste(""), `for` = paste0("welsh_rate_", i)),
                               sliderInput(paste0("welsh_rate_", i), NULL, min = 0, max = 100, value = 20, step = 1))
                    )
                  )
@@ -831,7 +861,7 @@ server <- function(input, output, session) {
   
   
   debounced_num_rows <- reactive({
-    input$rate_1_t
+    input$welsh_rate_1
   }) %>% debounce(5000) 
   
   
