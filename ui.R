@@ -126,37 +126,33 @@ ui <- fluidPage(
                           numericInput("num_rows", NULL, value = 3, min = 1, max = 10)),
                       div(style = "height: 15px;", p("")),
 
+                      #tags$div(style = "font-size: 15px;font-weight: normal","Band Limit:"),
+                      #tags$div(style = "font-size: 15px;font-weight: normal","Uk Rate:"),
+                      #  tags$div(style = "font-size: 15px;font-weight: normal","Welsh rate:"),
+                      #tags$div(style = "font-size: 15px;font-weight: normal","Difference from band baseline:"),
+
                       fluidRow(
-                        
-                        #
                         column(3,
-                               
-                               fluidRow(column(6,
-                                               div(style = "height: 5px;", p("")),       
-                                               
-                                               
-                               ),
-                               column(6,
-                                      tags$div(style = "font-size: 14px;font-weight: normal","Band Limit:"),
-                                      )
-                               )
-                        ),
-                        
-                        column(6,
                                fluidRow(
-                                 column(3,
-                                        tags$div(style = "font-size: 14px;font-weight: normal","Uk Rate:"),
-                                 ),
-                                 column(9,
-                                        tags$div(style = "font-size: 14px;font-weight: normal","Welsh rate:"),
-                                 ),
-                                 
+                                 column(6,
+                                        div(style = "height: 5px;", p("")),
+                                        ),
+                                 column(6,
+                                        tags$div(style = "font-size: 15px;font-weight: normal","Band Limit:"),
+                                        )
                                )
-                               ),
-                        
+                               
+                               
+                                ),
                         
                         column(3,
-                               tags$div(style = "font-size: 14px;font-weight: normal","Difference from band baseline:"),
+                               tags$div(style = "font-size: 15px;font-weight: normal","Uk Rate:"),
+                               ),
+                        column(3,
+                               tags$div(style = "font-size: 15px;font-weight: normal","Welsh rate:"),
+                               ),
+                        column(3,
+                               tags$div(style = "font-size: 15px;font-weight: normal","Difference from band baseline:"),
                                )
                       ),
                       

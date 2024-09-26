@@ -713,7 +713,7 @@ server <- function(input, output, session) {
         } else {
           column(3,
                  fluidRow(column(6,
-                                 div(style = "height:8px;", p("")),
+                                 div(style = "height:18px;", p("")),
                                  tags$div(style = "font-size: 15px;font-weight: bold;", paste0("Band ", i, ":")),        
                                  
                                  
