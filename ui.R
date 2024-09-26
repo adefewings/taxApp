@@ -9,15 +9,10 @@ ui <- fluidPage(
   title = "Welsh Tax Calculator 2024/25",
   useShinyjs(),  # Initialize shinyjs
   
-  #Custom css for formatting app items:
-  #These include the inputs, backgrounds and some formatting
- 
+  #Custom css for formatting app items - saved in custom.css:
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
   ),
-  #end of CSS
-  
-  
   
   #Start of the main page - default is the income tax page.
   #Title and translate button on top of screen
@@ -29,13 +24,10 @@ ui <- fluidPage(
     ),
     column(8,
            align = "right",
-           #The formatted rectangles for the top of the screen:
            tags$div(style = "background-color: #C50031; height: 20px; width: 100%; margin: 10px 0; padding: 0;"),
            tags$div(style = "background-color: #F6BC0A; height: 20px; width: 90%; margin: 10px 0; padding: 0;"),
-           #tags$div(style = "background-color: #C50031; height: 20px; width: 80%; margin: 10px 0; padding: 0;"),
            actionButton("contact_us_button", label = textOutput("contact_us_button")),
            actionButton("translateButton", textOutput("translate_button"))
-           
     ),
     
   ),
@@ -44,11 +36,9 @@ ui <- fluidPage(
     column(7, 
            titlePanel(textOutput("title"))
     ),
-    
-    
+
   ),
-  #br(),
-  
+
   fluidRow(
     column(6,
            #Main app intro/instructions are going in this section
@@ -66,104 +56,85 @@ ui <- fluidPage(
                       tags$div(style = "font-size: 16px;",textOutput("income_tax_intro")),
                                div(style = "height: 20px;", p("")), # Empty placeholder
                                tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                               ##Start with NDR:
-                               #div(class = "input-group-block custom-numeric-input",
-                               #   tags$label(textOutput("block_grant_input"), `for` = "block_grant_total"),
-                               #  numericInput("block_grant_total", NULL, 19000, step = 100)),
-                               
-                               # tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                               
+                              
                                fluidRow(column(6,
                                                radioButtons("income_tax_system_choice", textOutput("select_income_system"), 
                                                             choices = c("Current Settlement", "Scottish Model", "Full Devolution"), 
                                                             selected = "Current Settlement", 
                                                             inline = FALSE,
                                                             width = NULL)
+                                        ),
+                             
                                ),
-                               #column(6,
-                               #        div(style = "height: 20px;", p("")),
-                               #        div(class = "output1-container",
-                               #            verbatimTextOutput("totalTaxOutput")
-                               #        )
-                               #)
-                               ),
-                               #adding the new requested rows and columns for the inputs:
+
                                
-                               
-                      div(style = "height: 5px;", p("")), 
+                                div(style = "height: 5px;", p("")), 
                      
-                               tags$div(style = "font-size: 16px;font-weight: bold","Allowances:"),
+                                tags$div(style = "font-size: 16px;font-weight: bold","Allowances:"),
                       
                       
-                              fluidRow(
-                                 column(5,
-                                        div(class = "pa_input_left",
-                                            tags$label("Personal Allowance:", `for` = "pa_new"),
-                                            numericInput("pa_new", NULL, 12500, step = 100)),
+                                fluidRow(
+                                   column(5,
+                                          div(class = "pa_input_left",
+                                              tags$label("Personal Allowance:", `for` = "pa_new"),
+                                              numericInput("pa_new", NULL, 12500, step = 100)),
+                                   ),
+                                   
+                                   column(2,
+                                          div(style = "height: 20px;", p(""))
+                                   ),
+                                   
+                                   column(5,
+                                          div(class = "pa_input_right",
+                                              tags$label("Personal Allowance Limit:", `for` = "pa_limit"),
+                                              numericInput("pa_limit", NULL, 100000, step = 100)),
+                                          
+                                   ),
                                  ),
                                  
-                                 column(2,
-                                        div(style = "height: 20px;", p(""))
-                                 ),
-                                 
-                                 column(5,
-                                        div(class = "pa_input_right",
-                                            tags$label("Personal Allowance Limit:", `for` = "pa_limit"),
-                                            numericInput("pa_limit", NULL, 100000, step = 100)),
-                                        
-                                 ),
-                               ),
-                               
                                
                             
-                      tags$div(style = "font-size: 16px;font-weight: bold","Income Tax Bands applied to Taxable Income:"),
-
-                      div(style = "height: 5px;", p("")),
-
-                      #number_of_bands
-                      div(class = "number_of_bands",
-                          tags$label("Number of Bands:"),
-                          numericInput("num_rows", NULL, value = 3, min = 1, max = 10)),
-                      div(style = "height: 15px;", p("")),
-
-                      #tags$div(style = "font-size: 15px;font-weight: normal","Band Limit:"),
-                      #tags$div(style = "font-size: 15px;font-weight: normal","Uk Rate:"),
-                      #  tags$div(style = "font-size: 15px;font-weight: normal","Welsh rate:"),
-                      #tags$div(style = "font-size: 15px;font-weight: normal","Difference from band baseline:"),
-
-                      fluidRow(
-                        column(3,
-                               fluidRow(
-                                 column(6,
-                                        div(style = "height: 5px;", p("")),
-                                        ),
-                                 column(6,
-                                        tags$div(style = "font-size: 15px;font-weight: normal","Band Limit:"),
-                                        )
-                               )
-                               
-                               
+                                tags$div(style = "font-size: 16px;font-weight: bold","Income Tax Bands applied to Taxable Income:"),
+          
+                                div(style = "height: 5px;", p("")),
+          
+                                #number_of_bands
+                                div(class = "number_of_bands",
+                                    tags$label("Number of Bands:"),
+                                    numericInput("num_rows", NULL, value = 3, min = 1, max = 10)),
+                                div(style = "height: 15px;", p("")),
+          
+                                
+          
+                                fluidRow(
+                                  column(3,
+                                         fluidRow(
+                                           column(6,
+                                                  div(style = "height: 5px;", p("")),
+                                                  ),
+                                           column(6,
+                                                  tags$div(style = "font-size: 15px;font-weight: normal","Band Limit:"),
+                                                  )
+                                         )
+                                         
+                                         
+                                          ),
+                                  
+                                  column(3,
+                                         tags$div(style = "font-size: 15px;font-weight: normal","Uk Rate:"),
+                                         ),
+                                  column(3,
+                                         tags$div(style = "font-size: 15px;font-weight: normal","Welsh rate:"),
+                                         ),
+                                  column(3,
+                                         tags$div(style = "font-size: 15px;font-weight: normal","Difference from band baseline:"),
+                                         )
                                 ),
-                        
-                        column(3,
-                               tags$div(style = "font-size: 15px;font-weight: normal","Uk Rate:"),
-                               ),
-                        column(3,
-                               tags$div(style = "font-size: 15px;font-weight: normal","Welsh rate:"),
-                               ),
-                        column(3,
-                               tags$div(style = "font-size: 15px;font-weight: normal","Difference from band baseline:"),
-                               )
-                      ),
-                      
+                                
                       
                                uiOutput("dynamic_rows"),
                       
-                              #fluidRow(
-                              #  column(6, 
-                              #         uiOutput("arrowOutput")  # Output to display dynamic icon
-                              #  )
-                              #),
+                          
                                tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                                
                               fluidRow(
@@ -178,11 +149,7 @@ ui <- fluidPage(
                                       actionButton("toggleButton", label = textOutput("divide_by_people")),
                                       actionButton("viewButton", label = textOutput("show_breakdown")),
                                       ),
-                                      #div(class = "output1-container",
-                                       #   verbatimTextOutput("new_income_tax")
-                                      #),
-                                      
-                                      
+    
                                       plotlyOutput("stacked_plot_income_tax"),
                                       
                                       div(style = "height: 10px;", p("")), # Empty placeholder
@@ -192,12 +159,8 @@ ui <- fluidPage(
                                 ), 
                                 
                                 
-                                ),
+                            ),
                               
-        
-                               
-                      
-             
              ###################################
              #Local taxes tab                  #  
              ###################################
@@ -231,18 +194,20 @@ ui <- fluidPage(
                       #empty gap first:
                       div(style = "height: 20px;", p("")),
                       
-                      #tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                      
-                      
-                      
-                      #Start with NDR:
-                      
-                      
                       conditionalPanel(
                         condition = "input.ndr_toggle == true",
                         tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                         
-                        tags$div(style = "font-size: 16px;","Non-Domestic rates:"),
+                        fluidRow(
+                          column(9,
+                                 tags$div(style = "font-size: 16px;","Non-Domestic rates:"),
+                                 ),
+                          column(3,
+                                 uiOutput("ndr_arrow")
+                                 )
+                        ),
+                        
+                        
                         div(class = "local_taxes_numeric",
                             tags$label("Multiplier", `for` = "ndr_muliplier"),
                             numericInput("ndr_muliplier", NULL, 0.562, step = 0.001)),
@@ -280,7 +245,15 @@ ui <- fluidPage(
                       conditionalPanel(
                         condition = "input.council_toggle == true",
                         tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                        tags$div(style = "font-size: 16px;","Council Tax:"),
+                        fluidRow(
+                          column(9,
+                                 tags$div(style = "font-size: 16px;","Council Tax:"),
+                                  ),
+                          column(3,
+                                 uiOutput("council_arrow")
+                                 )
+                        ),
+                     
                         div(class = "local_taxes_numeric",
                             tags$label("Average Band D rate:", `for` = "av_band_d_rate"),
                             numericInput("av_band_d_rate", NULL, 2024, step = 1)),
@@ -358,7 +331,15 @@ ui <- fluidPage(
                         condition = "input.property_toggle == true",
                         
                         tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                        tags$div(style = "font-size: 16px;","Property Tax:"),
+                        fluidRow(column(9,
+                                        tags$div(style = "font-size: 16px;","Property Tax:"),
+                                        ),
+                                 column(3,
+                                        uiOutput("property_arrow")
+                                        )
+                                 ),
+                        
+                                                
                         fluidRow(column(5,
                                         div(class = "local_taxes-text-box", 
                                             "Residential Properties:"
@@ -424,13 +405,6 @@ ui <- fluidPage(
                       ),
                       
                       
-                      
-                      #tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                      #titlePanel(textOutput("council_tax_title")),
-                      
-                      
-                      
-                      
              ),
              ###################################
              #Other taxes tab                  #  
@@ -439,7 +413,14 @@ ui <- fluidPage(
                       tags$div(style = "font-size: 16px;","Other taxes intro..........."),
                       div(style = "height: 20px;", p("")),
                       tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                      tags$div(style = "font-size: 16px;","Land Transactional Tax:"),
+                      
+                      fluidRow(column(9,
+                                      tags$div(style = "font-size: 16px;","Land Transactional Tax:"),
+                      ),
+                      column(3,
+                             uiOutput("ltt_arrow")
+                      )
+                      ),
                       div(style = "height: 10px;", p("")),
                       
                       fluidRow(
@@ -516,9 +497,6 @@ ui <- fluidPage(
                       
                         column(3,
                                fluidRow(
-                                 #column(1,
-                                #        div(style = "height:3px;", p("")),
-                                #        ),
                                  column(5,
                                         div(class = "ltt_input_middle",
                                             tags$label("", `for` = "ltt_main_rate1"),
@@ -584,14 +562,21 @@ ui <- fluidPage(
                                         
                                  ),
                                ),
-                        ),
+                            ),
                         
                         
                         
-                      ),
+                         ),
                       
                       tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-                      tags$div(style = "font-size: 16px;","Landfill Disposals Tax:"),
+                      fluidRow(column(9,
+                                      tags$div(style = "font-size: 16px;","Landfill Disposals Tax:"),
+                      ),
+                      column(3,
+                             uiOutput("ldt_arrow")
+                      )
+                      ),
+                      
                       div(style = "height: 10px;", p("")),
                       div(class = "local_taxes_numeric",
                           tags$label("Standard rate per tonne:", `for` = "ldt_std_rate"),
@@ -607,8 +592,6 @@ ui <- fluidPage(
                       #empty gap:
                       div(style = "height: 40px;", p("")),
                       tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
-
-                      #tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
              )
              
            )
@@ -618,7 +601,6 @@ ui <- fluidPage(
     
     column(6,
            fluidRow(
-             #titlePanel(textOutput("piechart_title"))
              tags$div(style = "font-size: 18px; text-align: center;",textOutput("piechart_title"))
            ),    
            #Old and updated pie charts for the top right section of the screen:

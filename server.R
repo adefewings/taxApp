@@ -7,39 +7,17 @@
 ########################
 server <- function(input, output, session) {
   
-  income_tax_data <- read.csv("TaxableIncomeDistribution2023.csv", sep=";")
-  
   #Observe function to change Income Tax values depending on the choice
   observe({
     enabled_ids <- character(0)
     disabled_ids <- character(0)
     
-    
-    
-    
-    
-    
     if (input$income_tax_system_choice == "Current Settlement") {
-      
       disabled_ids <- c("pa_new", "pa_limit")
-      
-      #updateNumericInput(session, "BRthreshold", value = 37500)
-      #updateSliderInput(session, "HR", min = 0, max = 1, value = 0.40,step = 0.01)
-      
-      
-      #sliderInput("AR", NULL, min = 0, max = 1, value = 0.46, step = 0.01))
-      
     } else if (input$income_tax_system_choice == "Scottish Model"){
-      
-      #enabled_ids <- c("rate_3_t" )
       disabled_ids <- c("pa_new", "pa_limit")
-      
-      #updateNumericInput(session, "BRthreshold", value = 11000)
-      #updateSliderInput(session, "BR", min = 0, max = 1, value = 0.2,step = 0.01)
-      
     } else if (input$income_tax_system_choice == "Full Devolution"){
       enabled_ids <- c("pa_new", "pa_limit" )
-      #disabled_ids <- c(final_threshold)
     }
     
     # Enable sliders
@@ -53,8 +31,6 @@ server <- function(input, output, session) {
     })
   })
   
-  
-  
   observeEvent(input$show_income_tax_figures, {
     if (input$show_income_tax_figures %% 2 == 1) {
       updateActionButton(session, "show_income_tax_figures", label = "Hide figures")
@@ -65,23 +41,11 @@ server <- function(input, output, session) {
   
   
   
-  #Initialising the values for the income tax page to show previous and new amounts
-  latest_value <- reactiveVal(0)
-  
-  
-  
-  
-  
-  
   #piechart:
   output$old_tax_piechart <- renderPlotly({
     old_tax_data <- data.frame(
-      #labels = c("Income", "Council", "NDR", "LTT", "LDT", "NI", "VAT", "Corporation", "Duties", "Env Levy", "Other"),
       labels = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
-      
       count = c(app_parameters_list$current_blockgrant,app_parameters_list$current_income_tax_dev + app_parameters_list$current_income_tax_nondev,app_parameters_list$current_council,app_parameters_list$current_ndr,app_parameters_list$current_property,app_parameters_list$current_ldt,app_parameters_list$current_ltt,app_parameters_list$current_tourism)
-      
-      #count = c(3322, 2716, 1100, 271, 27, 6111, 9157, 2698, 2500, 1300, 2500)
     )
     
     # Calculate total sum
@@ -110,66 +74,9 @@ server <- function(input, output, session) {
   })
   
   
-  
-  output$totalTaxOutput <- renderText({
-    #total_income_tax_sum <- calculate_income_tax_new()
-    total_income_tax_sum <- 100000000
-    latest_value(total_income_tax_sum)
-    paste(text_resources[[values$language]]$total_income_title_1, "\n", text_resources[[values$language]]$total_income_title_2, round(total_income_tax_sum/1000000000, digits = 2), " billion")
-  })
-  
-  
-  
-  ###############
-  ###############
-  #Outputs for UI
-  ###############
-  ###############
-  #outputs in the top menu (Previous and current tax returns):
-  output$old_total_tax <- renderText({
-    paste(text_resources[[values$language]]$old_total_tax, "= £3Billion")
-  })
-  
-  output$updated_total_tax <- renderText({
-    paste(text_resources[[values$language]]$updated_total_tax, "= £5Billion")
-  })
-  
-  
-  
-  #toggle button for incometax barchart:
-  # Reactive value to keep track of button state
-  values <- reactiveValues(
-    divide = FALSE,
-    show_sum = FALSE,
-    language = "English",
-    total_income_tax = NULL,
-    total_council_tax = NULL,
-    new_total_income_tax = 0,
-    income_tax_difference_list = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    
-  )
-  
-  observe({
-    # Assuming calculate_income_tax and calculate_council_tax functions are called
-    values$total_income_tax <- 1000000000
-    values$total_council_tax <- 10000000000
-  })
-  
   output$updated_tax_piechart <- renderPlotly({
     
-    # Ensure totals are available
-    if (is.null(values$total_income_tax) || is.null(values$total_council_tax)) {
-      return(NULL)
-    }
-    
-    #ndr data:
-    total_ndr_tax <- 1000 * 1000000
-    tourism_levy_tax <- 1000 * 1000000
-    property_tax <- 1000 * 1000000
-    ltt_tax <- 1000 * 1000000
-    ldt_tax <- 10000 * 1000000
-    ni_tax <- 1000 * 1000000
-    vat_tax <- 10000 * 1000000
+
     
     #function call for incomeTax:
     income_tax_totals <- calculate_income_tax_new()
@@ -178,15 +85,9 @@ server <- function(input, output, session) {
     # Data for pie chart
     pie_data <- data.frame(
       category = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
-      #amount = c(values$total_income_tax, values$total_council_tax,total_ndr_tax,tourism_levy_tax, property_tax, ltt_tax, ldt_tax, ni_tax, vat_tax)
       amount= c(app_parameters_list$current_blockgrant,total_income_tax/1000000,calculate_council_tax_new()/1000000,calculate_ndr_tax_new()/1000000,(calculate_property_new()/1000000),round(calculate_ldt_tax_new()/1000000),calculate_ltt_tax_new()/1000000,round(calculate_tourism_tax_new()/1000000))
     )
-    
-    #
-    #labels = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
-    #count = c(app_parameters_list$current_blockgrant,app_parameters_list$current_income_tax_dev + app_parameters_list$current_income_tax_nondev,app_parameters_list$current_council,app_parameters_list$current_ndr,app_parameters_list$current_property,app_parameters_list$current_ldt,app_parameters_list$current_ltt,app_parameters_list$current_tourism)
-    
-    #
+   
     updated_total_count <- sum(pie_data$amount)
     pie_data$percentage <- round((pie_data$amount / updated_total_count) * 100, 2)
     
@@ -195,34 +96,48 @@ server <- function(input, output, session) {
             hoverinfo = 'text',
             text = ~paste0(category, ": ", percentage, "%"),
             texttemplate = ~ifelse(percentage >= 5, paste0(category, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
-            
-            
-            
-            #textinfo = 'percent',
-            #hoverinfo = 'percent+label',  # Show hoverinfo for all segments
-            #texttemplate = ~ifelse(percentage >= 5, paste0(labels, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
-            #automargin = TRUE) %>%
-            
-            
-            
-            
             automargin = TRUE) %>%
       layout(
         title = list(
           text = text_resources[[values$language]]$updated_tax_piechart,
           font = list(size = 15)
-          #x = 0,
-          #xanchor = 'left'
+        
         ),
-        #title = "Updated Tax Breakdown:",
         margin = list(l = 0, r = 0, b = 20, t = 40),  # Adjust margins
         paper_bgcolor = 'white',  # Background color of the plot area 
         plot_bgcolor = 'white',  # Background color of the chart area
         showlegend = FALSE
-        #width = 200px
       )
   })
   
+  
+  ###############
+  ###############
+  #Outputs for UI
+  ###############
+  ###############
+  #outputs in the top menu (Previous and current tax returns):
+
+
+  
+  #toggle button for incometax barchart:
+  # Reactive value to keep track of button state
+  values <- reactiveValues(
+    divide = FALSE,
+    show_sum = FALSE,
+    language = "English",
+    new_total_income_tax = 0,
+    income_tax_difference_list = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    ndr_difference = 0,
+    council_difference = 0,
+    property_difference = 0,
+    tourism_difference = 0,
+    ltt_difference = 0,
+    ldt_difference = 0
+    
+  )
+  
+
   
   
   observeEvent(input$toggleButton, {
@@ -250,15 +165,13 @@ server <- function(input, output, session) {
     values$language <- ifelse(values$language == "English", "Welsh", "English")
     updateButtonLabels()
   })
-  
-  
-  
+
   
   calculate_ndr_tax_new <- function(){
     
     if (input$ndr_toggle){
       
-      ndr_value <- 1000000000
+      ndr_value <- 1969500000
       
       multiplier <- input$ndr_muliplier
       small_business_relief <- input$small_business_relief
@@ -285,6 +198,9 @@ server <- function(input, output, session) {
       ndr_value <- 0
     }
     
+    #update the ndr difference:
+    values$ndr_difference = ndr_value - 1100000000
+    
     return(ndr_value)
     
   }
@@ -305,6 +221,9 @@ server <- function(input, output, session) {
     }else{
       property_tax <- 0
     }
+    #update property tax value:
+    values$property_difference = property_tax - 0
+    
     return(property_tax)
   }
   
@@ -363,6 +282,9 @@ server <- function(input, output, session) {
       council_tax <- 0
     }
     
+    #update dynamic_difference
+    values$council_difference = council_tax - 2715000000
+    
     return(council_tax)
   }
   
@@ -381,6 +303,8 @@ server <- function(input, output, session) {
     
     ltt_tax <- ltt_tax * input$ltt_higher_rate7
     
+    #update ltt:
+    values$ltt_difference = ltt_tax - 274000000
     
     return(ltt_tax)
   }
@@ -389,6 +313,9 @@ server <- function(input, output, session) {
   calculate_ldt_tax_new <- function(){
     ldt_tax <- 260000
     ldt_tax <- ldt_tax * input$ldt_std_rate
+    
+    #update value for arrow in UI
+    values$ldt_difference = ldt_tax - 27000000
     
   }
   
@@ -489,11 +416,9 @@ server <- function(input, output, session) {
       Millions = tax,
       current_estimates = c_estimates,
       est_tot= c_estimate_sum,
-      #blank_col = blank_col,
       updated_new = updated_estimates,
       upd_tot = c_updated_sum,
       stringsAsFactors = FALSE  # Ensure strings are not converted to factors
-      
     )
     
   })
@@ -742,22 +667,10 @@ server <- function(input, output, session) {
           uk_rate = 0
         }
         
-        #arrow_icon <- if (uk_rate > 20) {
-        #  tags$span(icon("arrow-up", class = "fa-2x"), style = "color: green;")  # Green up arrow
-        #} else {
-        #  tags$span(icon("arrow-down", class = "fa-2x"), style = "color: red;")  # Red down arrow
-        #}
-        
-        
-        
-        
+ 
         # Add this to the rows list, along with the other columns
         rows[[i]] <- fluidRow(
-          
-          
-      
-          
-          
+ 
           threshold_column,  # Use the threshold_column variable
           
           column(6,
@@ -776,18 +689,11 @@ server <- function(input, output, session) {
           ),
           column(3,
                  div(style = "height: 10px;", p("")),
-                 #arrow_icon
                  #add the placeholder for the difference to be added later:
                  uiOutput(paste0("arrow_and_number_", i))  # Placeholder for arrow and number
-                 
           )
         )
       }
-      
-      
-      #final row:
-      
-      
       
     }
     
@@ -804,28 +710,7 @@ server <- function(input, output, session) {
     rate_1_t <- debounced_num_rows()
     
     num_rows <- input$num_rows
-    #tax_data <- static_data()
-    #tax_data <- calculate_income_tax_new()
-    # After the tax calculation logic
-    # Your custom function
-    
-    data <- values$income_tax_difference_list
-    print("LOOK HERE")
-    print(data)
-    
-    if (is.null(data)){
-      income_tax_differences <- calculate_income_tax_differences() 
-    }else{
-      income_tax_differences <- data
-    }
-    
-    print("========")
-    print(income_tax_differences[1])
-    print(income_tax_differences[2])
-    print(income_tax_differences[3])
-    #data <- calculate_income_tax_new()
-    
-    #income_tax_differences <- data$tax_differences_total
+    income_tax_differences <- values$income_tax_difference_list
     
     for (i in 1:num_rows) {
       local({
@@ -834,10 +719,8 @@ server <- function(input, output, session) {
         # Calculate the difference for this row
         difference <- income_tax_differences[local_i]
         difference_rounded <- round(difference/1000000)
-        formatted_difference <- format(difference_rounded, big.mark = ",", scientific = FALSE)
-        print("difference:")
-        print(difference)
-        
+        formatted_difference <- format(abs(difference_rounded), big.mark = ",", scientific = FALSE)
+            
         # Determine the arrow direction
         arrow_icon <- if (difference > 0) {
           tags$span(icon("arrow-up", class = "fa-2x"), style = "color: green;")
@@ -847,17 +730,81 @@ server <- function(input, output, session) {
           tags$span(icon("arrow-down", class = "fa-2x"), style = "color: red;")
         }
         
+        if (difference == 0){
+          difference_output <- formatted_difference
+        }else{
+          difference_output <- paste0(formatted_difference, " million")
+        }
+        
+        
+        
         # Update the arrow and number in the UI for this specific 'i'
         output[[paste0("arrow_and_number_", local_i)]] <- renderUI({
           tagList(
             arrow_icon,
-            tags$span(style = "margin-left: 10px;", paste0("£", formatted_difference, " million"))
+            tags$span(style = "margin-left: 10px;", paste0("£", difference_output))
           )
         })
       })
     }
-    
   })
+  
+  
+  
+renderArrow <- function(difference, label) {
+  #print("boop:")
+  #print(difference)
+  
+  
+  
+  difference_4_processing <- round(difference/1000000)
+  
+  # Determine the arrow direction and color
+  arrow <- if (difference_4_processing > 0) {
+    tags$span(icon("arrow-up", class = "fa-2x"), style = "color: green;")
+  } else if (difference_4_processing == 0) {
+    tags$span(icon("arrow-right", class = "fa-2x"), style = "color: blue;")
+  } else {
+    tags$span(icon("arrow-down", class = "fa-2x"), style = "color: red;")
+  }
+  
+  # Format the difference output
+  if (difference_4_processing == 0) {
+    difference_output <- 0
+  } else {
+    difference_formatted <- format(round(abs(difference)/1000000), big.mark = ",", scientific = FALSE)
+    difference_output <- paste0(difference_formatted, " million")
+  }
+  
+  # Combine the arrow and the formatted number
+  tagList(
+    arrow,
+    tags$span(style = "margin-left: 10px;", paste0("£", difference_output))
+  )
+}
+
+
+
+# Define the outputs in a loop
+observe({
+  differences <- list(
+    ndr = values$ndr_difference,
+    council = values$council_difference,
+    property = values$property_difference,
+    tourism = values$tourism_difference,
+    ltt = values$ltt_difference,
+    ldt = values$ldt_difference
+    # Add other differences here
+  )
+  
+  lapply(names(differences), function(label) {
+    output[[paste0(label, "_arrow")]] <- renderUI({
+      renderArrow(differences[[label]], label)
+    })
+  })
+})
+
+  
   
   
   debounced_num_rows <- reactive({
@@ -865,20 +812,7 @@ server <- function(input, output, session) {
   }) %>% debounce(5000) 
   
   
-  calculate_income_tax_differences <- reactive({
-    
-    #data <- calculate_income_tax_new()
-    #tax_differences_total = tax_differences))#calculate_income_tax_new
-    #tax_differences <- data$tax_differences_total
-    num_rows = input$num_rows
-    tax_differences <- list()
-    for (i in 1:num_rows){
-      tax_differences[[i]] = 0
-    }
-    
-    return(tax_differences)
-  })
-  
+
   
   
   ###############################
@@ -904,11 +838,7 @@ server <- function(input, output, session) {
       }else{
         rates[i] <- (input[[rate_name]])/ 100
       }
-      
-      
-      
-      
-      
+
       if (i == num_rows){
         break
       }else{
@@ -961,10 +891,7 @@ server <- function(input, output, session) {
     # Calculate total tax payable
     TIDist_new$TotalTax <- rowSums(TIDist_new[grep("_tax$", names(TIDist_new))], na.rm = TRUE) * TIDist_new$N
     total_income_tax_new <- sum(TIDist_new$TotalTax, na.rm = TRUE)
-    
-    
-    
-    
+
     
     #Vector containing breakdown of the tax types for piechart:
     tax_columns <- grep("_tax$", names(TIDist_new), value = TRUE)  # Find column names ending with '_tax'
@@ -978,16 +905,7 @@ server <- function(input, output, session) {
       non_devolved_total <- 0
       devolved_total <- total_income_tax_new
     }
-    
-    
-    
-    #income_tax_difference_list
-    #values$income_tax_difference_list <- vector("list", length = num_rows)
-    
-    #difference:
-    #time to calculate the tax differences:
-    #tax_differences <- list()
-    
+  
     temp_list <- vector("list", length = num_rows)
     
     for (i in 1:num_rows){
@@ -1003,20 +921,6 @@ server <- function(input, output, session) {
       
       
     }
-
-    
-    #for (i in 1:num_rows){
-    
-    #values$income_tax_difference_list[[1]] = 0
-    
-    
-    #for (i in 1:num_rows) {
-    #  temp_list[[i]] <- 0  # Example logic
-    #}
-    
-    #values$income_tax_difference_list <- temp_list
-    
-    
     
     #data for the piechart
     reactive_income_tax_data_new <- reactive({
@@ -1025,7 +929,6 @@ server <- function(input, output, session) {
         count = tax_totals
      )
     })
-    
     
     output$income_tax_piechart <- renderPlotly({
       income_tax_pie_data <- reactive_income_tax_data_new()
@@ -1086,7 +989,6 @@ server <- function(input, output, session) {
             rates_list[[j]][counter] <- sum_list[[j]]
           }
           
-          
           counter <- counter + 1
           
           band_sum <- TIDist_new$TotalTax[i]
@@ -1096,7 +998,6 @@ server <- function(input, output, session) {
             tax_type <- paste0("r",j,"_tax")
             sum_list[[j]] <- (TIDist_new[[tax_type]][i] * TIDist_new$N[i])
           }
-          
         }
         #last band save:
         else{
@@ -1107,7 +1008,6 @@ server <- function(input, output, session) {
             tax_type <- paste0("r",j,"_tax")
             sum_list[[j]] <- sum_list[[j]] + (TIDist_new[[tax_type]][i] * TIDist_new$N[i])
           }
-          
           
           if (i == num_rows_in_data){
             results[counter] <- band_sum
@@ -1127,7 +1027,6 @@ server <- function(input, output, session) {
     #barchart:
     bar_data <- reactive({
       
-      
       #new list to hold the divided by people:
       rates_divided_list <- vector("list", total_rates)
       for (i in 1:total_rates) {
@@ -1139,15 +1038,11 @@ server <- function(input, output, session) {
         rates_divided_list[[j]] = c(rates_list[[j]]/divisor)
         
       }
-      
-      
+
       labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
-      #legend_vector = c(text_resources[[values$language]]$starter,text_resources[[values$language]]$basic, text_resources[[values$language]]$intermediate,text_resources[[values$language]]$higher, text_resources[[values$language]]$additional)
-      
+
       if (values$show_sum) {
         list(
-          #stacked = rbind(vector1, vector2, vector3,vector4, vector5),
-          
           stacked = do.call(rbind,rates_divided_list),
           labels = labels,
           legend_vector = tax_columns
@@ -1163,12 +1058,9 @@ server <- function(input, output, session) {
       }
     })
     
-    
     # Generate Stacked Bar Chart
     output$stacked_plot_income_tax <- renderPlotly({
       data <- bar_data()
-      
-      # Ensure x-axis categories are factors with the correct order
       x_categories <- factor(data$labels, levels = data$labels)
       
       if (values$show_sum){
@@ -1229,190 +1121,11 @@ server <- function(input, output, session) {
     
   })
   
+  #call transaltion data:
+  source("translations.R")
   
-  #get this new value to the main program:
-  #output$new_income_tax <- renderText({
-  # new_total_income <- calculate_income_tax_new()
-  #paste(text_resources[[values$language]]$total_income_title_1, "\n", text_resources[[values$language]]$total_income_title_2, round(total_income_tax_sum/1000000000, digits = 2), " billion")
-  #  paste("new value = ", new_total_income)  
-  #})
+  # Set the language translation outputs
+  set_translation_outputs(output, values, text_resources)
   
-  
-  
-  #arrow:
-  
-  arrow_value <- reactive({
-    # Dummy condition: Replace with your own logic
-    up <- FALSE # Change this to FALSE to see the down arrow example
-    up
-  })
-  
-  output$arrowOutput <- renderUI({
-    if (arrow_value()) {
-      tags$span(icon("arrow-up", class = "fa-2x"), style = "color: green;")  # Green up arrow
-    } else {
-      tags$span(icon("arrow-down", class = "fa-2x"), style = "color: red;")  # Red down arrow
-    }
-  })
-  
-  
-  ###################
-  #Translation data:#
-  ###################
-  #translate button:
-  output$translate_button <- renderText({
-    text_resources[[values$language]]$translate_button
-  })
-  #Main App title:
-  output$title <- renderText({
-    text_resources[[values$language]]$title
-  })
-  
-  
-  #Income Tax Page intro:
-  output$income_tax_intro <- renderText({
-    text_resources[[values$language]]$income_tax_intro
-  })
-  
-  #Inputs for income tax page: pa_box
-  output$pa_box <- renderText({
-    text_resources[[values$language]]$pa_box
-  })
-  output$pa_limit <- renderText({
-    text_resources[[values$language]]$pa_limit
-  })
-  output$sr_threshold <- renderText({
-    text_resources[[values$language]]$sr_threshold
-  })
-  output$br_threshold <- renderText({
-    text_resources[[values$language]]$br_threshold
-  })
-  output$ir_threshold <- renderText({
-    text_resources[[values$language]]$ir_threshold
-  })
-  output$hr_threshold <- renderText({
-    text_resources[[values$language]]$hr_threshold
-  })
-  output$sr <- renderText({
-    text_resources[[values$language]]$sr
-  })
-  output$br <- renderText({
-    text_resources[[values$language]]$br
-  })
-  output$ir <- renderText({
-    text_resources[[values$language]]$ir
-  })
-  output$hr <- renderText({
-    text_resources[[values$language]]$hr
-  })
-  output$ar <- renderText({
-    text_resources[[values$language]]$ar
-  })
-  
-  #Select income tax type:
-  output$select_income_system <- renderText({
-    text_resources[[values$language]]$select_income_system
-  })
-  #Buttons for income tax charts and graphs:
-  output$divide_by_people <- renderText({
-    text_resources[[values$language]]$divide_by_people
-  })
-  output$divide_button <- renderText({
-    text_resources[[values$language]]$divide_button
-  })
-  output$show_breakdown <- renderText({
-    text_resources[[values$language]]$show_breakdown
-  })
-  output$update_with_new_filters <- renderText({
-    text_resources[[values$language]]$update_with_new_filters
-  })
-  
-  
-  output$income_tax <- renderText({
-    text_resources[[values$language]]$income_tax
-  })
-  
-  
-  output$income_band_x <- renderText({
-    text_resources[[values$language]]$income_band_x
-  })
-  
-  output$income_band_y <- renderText({
-    text_resources[[values$language]]$income_band_y
-  })
-  output$total_income_title <- renderText({
-    text_resources[[values$language]]$total_income_title
-  })
-  output$previous_income_title <- renderText({
-    text_resources[[values$language]]$previous_income_title
-  })
-  
-  
-  #Tabs:
-  output$council_tax <- renderText({
-    text_resources[[values$language]]$council_tax
-  })
-  output$ndr <- renderText({
-    text_resources[[values$language]]$ndr
-  })
-  output$ltt <- renderText({
-    text_resources[[values$language]]$ltt
-  })
-  output$ldt <- renderText({
-    text_resources[[values$language]]$ldt
-  })
-  output$local_taxes_tab_label <- renderText({
-    text_resources[[values$language]]$local_taxes_tab_label
-  })
-  output$other_taxes_tab_label <- renderText({
-    text_resources[[values$language]]$other_taxes_tab_label
-  })
-  
-  #Income Tax_location choice:
-  output$current <- renderText({
-    text_resources[[values$language]]$current
-  })
-  output$fully_devolved <- renderText({
-    text_resources[[values$language]]$fully_devolved
-  })
-  output$scottish <- renderText({
-    text_resources[[values$language]]$scottish
-  })
-  
-  output$see_more_button <- renderText({
-    text_resources[[values$language]]$see_more_button
-  })
-  output$contact_us_button <- renderText({
-    text_resources[[values$language]]$contact_us_button
-  })
-  output$main_app_intro <- renderText({
-    text_resources[[values$language]]$main_app_intro
-  })
-  output$local_taxes_tab_intro <- renderText({
-    text_resources[[values$language]]$local_taxes_tab_intro
-  })
-  output$local_tax_system_selection <- renderText({
-    text_resources[[values$language]]$local_tax_system_selection
-  })
-  output$rate <- renderText({
-    text_resources[[values$language]]$rate
-  })
-  output$ndr_input <- renderText({
-    text_resources[[values$language]]$ndr_input
-  })
-  output$tourism_input <- renderText({
-    text_resources[[values$language]]$tourism_input
-  })
-  output$block_grant_input <- renderText({
-    text_resources[[values$language]]$block_grant_input
-  })
-  output$council_tax_title <- renderText({
-    text_resources[[values$language]]$council_tax_title
-  })
-  output$other_taxes_title <- renderText({
-    text_resources[[values$language]]$other_taxes_title
-  })
-  output$piechart_title <- renderText({
-    text_resources[[values$language]]$piechart_title
-  })
+
 }
