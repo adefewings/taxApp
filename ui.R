@@ -603,11 +603,11 @@ ui <- fluidPage(
            ),    
            #Old and updated pie charts for the top right section of the screen:
            fluidRow(
-             column(width = 6,
+             column(width = 5,
                     align = "right",
                     plotlyOutput("old_tax_piechart"),
              ),
-             column(width = 6,
+             column(width = 7,
                     align = "right",
                     plotlyOutput("updated_tax_piechart"),
              )

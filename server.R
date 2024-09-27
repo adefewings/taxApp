@@ -67,6 +67,8 @@ server <- function(input, output, session) {
           text = text_resources[[values$language]]$previous_tax_piechart,  # Set the title text
           font = list(size = 15)
         ),
+        height = 350,
+        width = 350,
         margin = list(l = 0, r = 10, b = 20, t = 40),  # Adjust margins
         paper_bgcolor = 'white',  # Background color of the plot area
         plot_bgcolor = 'white',  # Background color of the chart area 
@@ -99,11 +101,16 @@ server <- function(input, output, session) {
     
     updated_total_count <- sum(pie_data$amount)
     pie_data$percentage <- round((pie_data$amount / updated_total_count) * 100, 2)
+    print("Sum:")
+    print(sum(pie_data$amount))
     
-    #values$dynamic_radius_variable = ((sum(pie_data$amount)-30261)/30261)
+    values$dynamic_radius_variable = ((sum(pie_data$amount)-30261)/30261)
     
-    #dynamic_radius <- values$dynamic_radius_variable
+    dynamic_radius <- values$dynamic_radius_variable
+    print(dynamic_radius)
     
+    print("total height:")
+    print(350 * (1+dynamic_radius))
     plot_ly(pie_data, values = ~amount, type = 'pie',
             textinfo = 'label+percent',  # Ensure labels and percentage are shown
             hoverinfo = 'text',
@@ -117,6 +124,9 @@ server <- function(input, output, session) {
           text = text_resources[[values$language]]$updated_tax_piechart,
           font = list(size = 15)
         ),
+        
+        height = min(420,350 * (1+dynamic_radius)),
+        width = min(420,350 * (1+dynamic_radius)),
         margin = list(l = 0, r = 0, b = 20, t = 40),  # Adjust margins
         paper_bgcolor = 'white',  # Background color of the plot area 
         plot_bgcolor = 'white',  # Background color of the chart area
