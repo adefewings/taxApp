@@ -497,7 +497,7 @@ ui <- fluidPage(
                       
                         column(3,
                                fluidRow(
-                                 column(5,
+                                 column(7,
                                         div(class = "ltt_input_middle",
                                             tags$label("", `for` = "ltt_main_rate1"),
                                             numericInput("ltt_main_rate1", NULL, 0, step = 0.1),
@@ -527,9 +527,7 @@ ui <- fluidPage(
                                             numericInput("ltt_main_rate7", NULL, 12.5, step = 0.1),
                                             tags$span("%", style = "margin-left: 5px;")),
                                  ), 
-                                 column(2,
-                                        div(style = "height:3px;", p("")),
-                                 ),
+                                 
                                  column(5,
                                         div(class = "ltt_input_middle",
                                             tags$label("", `for` = "ltt_higher_rate1"),
@@ -612,6 +610,14 @@ ui <- fluidPage(
              column(width = 6,
                     align = "right",
                     plotlyOutput("updated_tax_piechart"),
+             )
+           ),
+           fluidRow(
+             column(6,
+                    div(style = "text-align: center;", textOutput("current_total_sum"))
+             ),
+             column(6,
+                    div(style = "text-align: center;", textOutput("updated_total_sum"))
              )
            ),
            fluidRow(

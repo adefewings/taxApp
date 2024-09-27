@@ -264,9 +264,10 @@
         margin-left:20px;
         }
       .local_taxes_text_box {
+        display:flex;
         margin-top:3px;
         margin-bottom: 20px;
-        width: 220px;
+        /*width: 220px;*/
         font-size:14px;
       }
       
@@ -402,8 +403,8 @@
         }
         
         .ltt_input_middle span {
-          margin-left: 0px; /* Remove margin-left to position it close to the input */
-          margin-right:55px;
+          margin-left: 20px; /* Remove margin-left to position it close to the input */
+          margin-right:35px;
           font-size: 14px; /* Match font size with input text */
         }
         

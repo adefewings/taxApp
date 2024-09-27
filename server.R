@@ -60,6 +60,7 @@ server <- function(input, output, session) {
             textinfo = 'percent',
             hoverinfo = 'text',  # Show hoverinfo for all segments
             texttemplate = ~ifelse(percentage >= 5, paste0(labels, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
+            textposition = 'inside',
             automargin = TRUE) %>%
       layout(
         title = list(
@@ -73,10 +74,16 @@ server <- function(input, output, session) {
       )
   })
   
+  #sum of the old tax data:
   
+  output$current_total_sum <- renderText({
+    total <- c(app_parameters_list$current_blockgrant,app_parameters_list$current_income_tax_dev + app_parameters_list$current_income_tax_nondev,app_parameters_list$current_council,app_parameters_list$current_ndr,app_parameters_list$current_property,app_parameters_list$current_ldt,app_parameters_list$current_ltt,app_parameters_list$current_tourism)
+    #formatted_difference <- format(abs(difference_rounded), big.mark = ",", scientific = FALSE)
+    total_formatted = format(sum(total), big.mark = ",", scientific = FALSE)
+    return(paste0("Total = £",total_formatted, " million"))
+  })
+ 
   output$updated_tax_piechart <- renderPlotly({
-    
-
     
     #function call for incomeTax:
     income_tax_totals <- calculate_income_tax_new()
@@ -87,21 +94,28 @@ server <- function(input, output, session) {
       category = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
       amount= c(app_parameters_list$current_blockgrant,total_income_tax/1000000,calculate_council_tax_new()/1000000,calculate_ndr_tax_new()/1000000,(calculate_property_new()/1000000),round(calculate_ldt_tax_new()/1000000),calculate_ltt_tax_new()/1000000,round(calculate_tourism_tax_new()/1000000))
     )
-   
+    
+    values$updated_total_tax_sum = round(sum(pie_data$amount))
+    
     updated_total_count <- sum(pie_data$amount)
     pie_data$percentage <- round((pie_data$amount / updated_total_count) * 100, 2)
     
+    #values$dynamic_radius_variable = ((sum(pie_data$amount)-30261)/30261)
+    
+    #dynamic_radius <- values$dynamic_radius_variable
+    
     plot_ly(pie_data, values = ~amount, type = 'pie',
-            textinfo = 'text', 
+            textinfo = 'label+percent',  # Ensure labels and percentage are shown
             hoverinfo = 'text',
             text = ~paste0(category, ": ", percentage, "%"),
-            texttemplate = ~ifelse(percentage >= 5, paste0(category, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
+            texttemplate = ~ifelse(percentage >= 5, paste0(category, ": ", percentage, "%"), ""),
+            textposition = 'inside',  # Keep the labels inside the segments
+            #hole = dynamic_radius,
             automargin = TRUE) %>%
       layout(
         title = list(
           text = text_resources[[values$language]]$updated_tax_piechart,
           font = list(size = 15)
-        
         ),
         margin = list(l = 0, r = 0, b = 20, t = 40),  # Adjust margins
         paper_bgcolor = 'white',  # Background color of the plot area 
@@ -110,6 +124,14 @@ server <- function(input, output, session) {
       )
   })
   
+  
+  output$updated_total_sum <-renderText({
+    updated_sum = values$updated_total_tax_sum
+    updated_sum_formatted = format(sum(updated_sum), big.mark = ",", scientific = FALSE)
+    
+    return(paste0("Total = £",updated_sum_formatted, " million"))
+    
+  })
   
   ###############
   ###############
@@ -133,7 +155,9 @@ server <- function(input, output, session) {
     property_difference = 0,
     tourism_difference = 0,
     ltt_difference = 0,
-    ldt_difference = 0
+    ldt_difference = 0,
+    updated_total_tax_sum = 0,
+    dynamic_radius_variable = 0
     
   )
   
