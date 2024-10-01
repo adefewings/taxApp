@@ -7,6 +7,10 @@ library(scales)
 library(DT)
 library(orca)
 library(magick)
+library(png)
+library(grid)
+library(webshot)
+
 
 #input csv file which contains the dictionary of words for translations:
 text_data <- read.csv("translations.csv", stringsAsFactors = FALSE)

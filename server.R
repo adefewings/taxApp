@@ -53,6 +53,8 @@ server <- function(input, output, session) {
     
     # Add percentage column calculated manually
     old_tax_data$percentage <- round((old_tax_data$count / total_count) * 100, 2)
+    segment_colors <- c("#3498DB", "#2ECC71", "#F1C40F", "#E67E22", 
+                        "#E74C3C", "#9B59B6", "#1ABC9C", "#FF6F61")
     
     # Modify plot_ly to hide labels for segments < 5%
     plot_ly(old_tax_data, values = ~count, type = 'pie',
@@ -61,6 +63,7 @@ server <- function(input, output, session) {
             hoverinfo = 'text',  # Show hoverinfo for all segments
             texttemplate = ~ifelse(percentage >= 5, paste0(labels, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
             textposition = 'inside',
+            marker = list(colors = segment_colors),
             automargin = TRUE) %>%
       layout(
         title = list(
@@ -84,56 +87,119 @@ server <- function(input, output, session) {
     total_formatted = format(sum(total), big.mark = ",", scientific = FALSE)
     return(paste0("Total = £",total_formatted, " million"))
   })
- 
-  output$updated_tax_piechart <- renderPlotly({
-    
-    #function call for incomeTax:
+  plot_data <- reactive({
+    # Function call for incomeTax:
     income_tax_totals <- calculate_income_tax_new()
     total_income_tax = income_tax_totals$non_devolved_total + income_tax_totals$devolved_total
     
     # Data for pie chart
     pie_data <- data.frame(
-      category = c("Block Grant","Income", "Council","NDR","Property","LDT","LTT","Tourism Levy"),
-      amount= c(app_parameters_list$current_blockgrant,total_income_tax/1000000,calculate_council_tax_new()/1000000,calculate_ndr_tax_new()/1000000,(calculate_property_new()/1000000),round(calculate_ldt_tax_new()/1000000),calculate_ltt_tax_new()/1000000,round(calculate_tourism_tax_new()/1000000))
+      category = c("Block Grant", "Income", "Council", "NDR", "Property", "LDT", "LTT", "Tourism Levy"),
+      amount = c(app_parameters_list$current_blockgrant, total_income_tax / 1000000, 
+                 calculate_council_tax_new() / 1000000, calculate_ndr_tax_new() / 1000000,
+                 (calculate_property_new() / 1000000), round(calculate_ldt_tax_new() / 1000000), 
+                 calculate_ltt_tax_new() / 1000000, round(calculate_tourism_tax_new() / 1000000))
     )
+    
+    pie_data$category <- factor(pie_data$category, levels = c("Block Grant", "Income", "Council", "NDR", "Property", "LDT", "LTT", "Tourism Levy"))
+    
     
     values$updated_total_tax_sum = round(sum(pie_data$amount))
     
     updated_total_count <- sum(pie_data$amount)
     pie_data$percentage <- round((pie_data$amount / updated_total_count) * 100, 2)
-    print("Sum:")
-    print(sum(pie_data$amount))
     
-    values$dynamic_radius_variable = ((sum(pie_data$amount)-30261)/30261)
+    values$dynamic_radius_variable = ((sum(pie_data$amount) - 30261) / 30261)
     
     dynamic_radius <- values$dynamic_radius_variable
     print(dynamic_radius)
     
-    print("total height:")
-    print(350 * (1+dynamic_radius))
-    plot_ly(pie_data, values = ~amount, type = 'pie',
-            textinfo = 'label+percent',  # Ensure labels and percentage are shown
-            hoverinfo = 'text',
-            text = ~paste0(category, ": ", percentage, "%"),
-            texttemplate = ~ifelse(percentage >= 5, paste0(category, ": ", percentage, "%"), ""),
-            textposition = 'inside',  # Keep the labels inside the segments
-            #hole = dynamic_radius,
-            automargin = TRUE) %>%
+    # Define colors for each segment
+    segment_colors <- c("#3498DB", "#2ECC71", "#F1C40F", "#E67E22", 
+                        "#E74C3C", "#9B59B6", "#1ABC9C", "#FF6F61")
+    
+    plot <- plot_ly(pie_data, values = ~amount, type = 'pie',
+                    textinfo = 'label+percent', 
+                    hoverinfo = 'text',
+                    text = ~paste0(category, ": ", percentage, "%"),
+                    texttemplate = ~ifelse(percentage >= 5, paste0(category, ": ", percentage, "%"), ""),
+                    textposition = 'inside', 
+                    marker = list(colors = segment_colors), 
+                    automargin = TRUE,
+                    sort = FALSE) %>%
       layout(
         title = list(
           text = text_resources[[values$language]]$updated_tax_piechart,
           font = list(size = 15)
         ),
-        
-        height = min(420,350 * (1+dynamic_radius)),
-        width = min(420,350 * (1+dynamic_radius)),
-        margin = list(l = 0, r = 0, b = 20, t = 40),  # Adjust margins
-        paper_bgcolor = 'white',  # Background color of the plot area 
-        plot_bgcolor = 'white',  # Background color of the chart area
+        height = min(450, 350 * (1 + dynamic_radius)),  # Increased height
+        width = min(450, 350 * (1 + dynamic_radius)),   # Increased width
+        margin = list(l = 0, r = 10, b = 20, t = 40),  # Increased top margin
+        paper_bgcolor = 'white', 
+        plot_bgcolor = 'white', 
         showlegend = FALSE
       )
+    
+    return(plot)
   })
   
+  output$updated_tax_piechart <- renderPlotly({
+    plot_data()  # Call the reactive expression
+  })
+  
+  output$download_plot <- downloadHandler(
+    filename = function() {
+      paste("tax_pie_chart", Sys.Date(), ".png", sep = "")
+    },
+    content = function(file) {
+      # Create a temporary HTML file to save the plot
+      temp_html_file <- tempfile(fileext = ".html")
+      temp_png_file <- tempfile(fileext = ".png")
+      
+      # Save the plot as an HTML file
+      htmlwidgets::saveWidget(as_widget(plot_data()), temp_html_file, selfcontained = TRUE)
+      
+      
+      # Read the content of the HTML file
+      html_content <- readLines(temp_html_file)
+      
+      # Wrap the plot in a div with CSS to shift it down and to the right
+      css_style <- "<style>div#piechart-wrapper { position: relative; top: 50px; left: 50px; }</style>"
+      div_wrapper_start <- "<div id='piechart-wrapper'>"
+      div_wrapper_end <- "</div>"
+      
+      # Add the CSS and wrap the plot in a div
+      html_content <- c(css_style, div_wrapper_start, html_content, div_wrapper_end)
+      
+      # Write the modified HTML back to the file
+      writeLines(html_content, temp_html_file)
+      
+      
+      # Use webshot to capture the HTML file as a PNG
+      webshot(temp_html_file, file = temp_png_file, vwidth = 500, vheight = 500)
+      
+      # Load the logo and the plot
+      logo <- image_read("businessLogo.png")  # Ensure the logo is in the working directory
+      plot_image <- image_read(temp_png_file)
+      
+      # Resize the logo for better positioning
+      logo_resized <- image_scale(logo, "120x120")  # Adjust size to make it bigger
+      
+      # Get dimensions of the plot image
+      plot_width <- image_info(plot_image)$width
+      plot_height <- image_info(plot_image)$height
+      
+      # Calculate position for the logo in the top right corner
+      logo_position_x <- plot_width - image_info(logo_resized)$width - 10  # 10 pixels padding from right
+      logo_position_y <- 10  # 10 pixels padding from top
+      
+      # Composite the plot image and the logo
+      combined_image <- image_composite(plot_image, logo_resized, offset = paste0("+", logo_position_x, "+", logo_position_y))
+      
+      # Save the final image with the logo
+      image_write(combined_image, path = file)
+    }
+  )
   
   output$updated_total_sum <-renderText({
     updated_sum = values$updated_total_tax_sum
@@ -852,7 +918,6 @@ observe({
   ###############################
   #New Income Tax calculations: #
   ###############################
-  
   calculate_income_tax_new <- reactive({
     PA <- input$pa_new
     PAlimit <- input$pa_limit
@@ -926,7 +991,6 @@ observe({
     TIDist_new$TotalTax <- rowSums(TIDist_new[grep("_tax$", names(TIDist_new))], na.rm = TRUE) * TIDist_new$N
     total_income_tax_new <- sum(TIDist_new$TotalTax, na.rm = TRUE)
 
-    
     #Vector containing breakdown of the tax types for piechart:
     tax_columns <- grep("_tax$", names(TIDist_new), value = TRUE)  # Find column names ending with '_tax'
     tax_totals <- colSums(TIDist_new[tax_columns] * TIDist_new$N, na.rm = TRUE)    # Calculate column sums for each tax type
@@ -953,29 +1017,9 @@ observe({
         values$income_tax_difference_list[i] = round(unname(tax_totals[i]))
       }
       
-      
     }
     
-    #data for the piechart
-    reactive_income_tax_data_new <- reactive({
-      data.frame(
-        tax_type = tax_columns,
-        count = tax_totals
-     )
-    })
     
-    output$income_tax_piechart <- renderPlotly({
-      income_tax_pie_data <- reactive_income_tax_data_new()
-      
-      plot_ly(income_tax_pie_data, labels = ~tax_type, values = ~count, type = 'pie') %>%
-        layout(
-          title = text_resources[[values$language]]$income_tax_pie,
-          margin = list(l = 20, r = 20, b = 10, t = 30),  # Adjust margins
-          paper_bgcolor = 'white',  # Background color of the plot area
-          plot_bgcolor = 'white'  # Background color of the chart area
-          #width = 200px
-        )
-    })
     
     #######################################
     #Bar chart stuff:                     #
@@ -1057,103 +1101,225 @@ observe({
     }
     
     #divide by number of people per band if button Pressed:
-    divisor <- if (values$divide) num_people else 1
-    #barchart:
-    bar_data <- reactive({
-      
-      #new list to hold the divided by people:
-      rates_divided_list <- vector("list", total_rates)
-      for (i in 1:total_rates) {
-        rates_divided_list[[i]] <- numeric(13)
-      }
-      
-      #now to work out the new values:
-      for (j in 1:total_rates){
-        rates_divided_list[[j]] = c(rates_list[[j]]/divisor)
-        
-      }
+   
 
-      labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
-
-      if (values$show_sum) {
-        list(
-          stacked = do.call(rbind,rates_divided_list),
-          labels = labels,
-          legend_vector = tax_columns
-        )
-      } else {
-        # Calculate sum of vectors
-        summed <- Reduce(`+`,rates_divided_list)
-        list(
-          stacked = summed,
-          labels = labels
-        )
-        
-      }
-    })
-    
-    # Generate Stacked Bar Chart
-    output$stacked_plot_income_tax <- renderPlotly({
-      data <- bar_data()
-      x_categories <- factor(data$labels, levels = data$labels)
-      
-      if (values$show_sum){
-        
-        colors <- c('rgba(255, 99, 132, 0.6)',  # First color
-                    'rgba(54, 162, 235, 0.6)',  # Second color
-                    'rgba(75, 192, 192, 0.6)',  # Third color
-                    'rgba(223, 192, 192, 0.6)', # Fourth color
-                    'rgba(23, 192, 192, 0.6)',  # Fifth color
-                    'rgba(192, 192, 75, 0.6)')  # Add more colors if necessary
-        p <- plot_ly(
-          x = x_categories,
-          y = ~data$stacked[1,],
-          type = 'bar',
-          name = ~data$legend_vector[1],
-          marker = list(color = 'rgba(255, 99, 132, 0.6)')
-        ) 
-        total_rates <- input$num_rows
-        for (i in 2:total_rates){
-          p <- p %>%
-            add_trace(
-              y = data$stacked[i,],
-              name = data$legend_vector[i],
-              marker = list(color = colors[i])
-            )
-        }
-        
-        p <- p %>%
-          layout(
-            barmode = 'stack',
-            title = text_resources[[values$language]]$income_stacked_graph_title,
-            xaxis = list(title = text_resources[[values$language]]$income_bar_x),
-            yaxis = list(title = text_resources[[values$language]]$income_bar_y)
-          )
-        
-        p
-      }else {
-        # Plot summed values
-        plot_ly(
-          x = x_categories,
-          y = ~data$stacked,
-          type = 'bar',
-          name = 'Sum',
-          marker = list(color = 'rgba(255, 99, 132, 0.6)')
-        ) %>%
-          layout(
-            barmode = 'group',
-            title = text_resources[[values$language]]$income_stacked_graph_title,
-            xaxis = list(title = text_resources[[values$language]]$income_bar_x),
-            yaxis = list(title = text_resources[[values$language]]$income_bar_y)
-          )
-        
-      }
-    })
     
     #total_income_tax_new
-    return(list(non_devolved_total = non_devolved_total, devolved_total = devolved_total))
+    return(list(non_devolved_total = non_devolved_total, 
+                devolved_total = devolved_total,
+                tax_columns = tax_columns, 
+                tax_totals=tax_totals,
+                total_rates = total_rates,
+                rates_list = rates_list,
+                num_people = num_people))
     
   })
+  
+  
+  #for the stacked graphs:
+  #barchart:
+  bar_data <- reactive({
+    
+    print("In the bar_data function")
+    print("total_rates:")
+    data <- calculate_income_tax_new()
+    divisor <- if (values$divide) data$num_people else 1
+    #new list to hold the divided by people:
+    rates_divided_list <- vector("list", data$total_rates)
+    for (i in 1:data$total_rates) {
+      rates_divided_list[[i]] <- numeric(13)
+    }
+    
+    #now to work out the new values:
+    for (j in 1:data$total_rates){
+      rates_divided_list[[j]] = c(data$rates_list[[j]]/divisor)
+      
+    }
+    print(rates_divided_list)
+    
+    labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
+    
+    if (values$show_sum) {
+      list(
+        stacked = do.call(rbind,rates_divided_list),
+        labels = labels,
+        legend_vector = data$tax_columns
+      )
+    } else {
+      # Calculate sum of vectors
+      summed <- Reduce(`+`,rates_divided_list)
+      list(
+        stacked = summed,
+        labels = labels
+      )
+      
+    }
+  })
+  
+  # Generate Stacked Bar Chart
+  output$stacked_plot_income_tax <- renderPlotly({
+    print("In the stacked function:")
+    data <- bar_data()
+    x_categories <- factor(data$labels, levels = data$labels)
+    total_rates <- input$num_rows
+    
+    #maybe add a warning message for when only 1 tax band is selected
+    #otherwise the && here patches the bug for now.
+    if (values$show_sum && total_rates > 1){
+      print("In show sum:")
+      colors <- c('rgba(255, 99, 132, 0.6)',  # First color
+                  'rgba(54, 162, 235, 0.6)',  # Second color
+                  'rgba(75, 192, 192, 0.6)',  # Third color
+                  'rgba(223, 192, 192, 0.6)', # Fourth color
+                  'rgba(23, 192, 192, 0.6)',  # Fifth color
+                  'rgba(192, 192, 75, 0.6)')  # Add more colors if necessary
+      p <- plot_ly(
+        x = x_categories,
+        y = ~data$stacked[1,],
+        type = 'bar',
+        name = ~data$legend_vector[1],
+        marker = list(color = 'rgba(255, 99, 132, 0.6)')
+      ) 
+      #
+      
+      #
+      #total_rates = 
+      
+      for (i in 2:total_rates){
+        p <- p %>%
+          add_trace(
+            y = data$stacked[i,],
+            name = data$legend_vector[i],
+            marker = list(color = colors[i])
+          )
+      }
+      
+      p <- p %>%
+        layout(
+          barmode = 'stack',
+          title = text_resources[[values$language]]$income_stacked_graph_title,
+          xaxis = list(title = text_resources[[values$language]]$income_bar_x),
+          yaxis = list(title = text_resources[[values$language]]$income_bar_y)
+        )
+      
+      p
+    }else {
+      print("Not in show sum")
+      # Plot summed values
+      plot_ly(
+        x = x_categories,
+        y = ~data$stacked,
+        type = 'bar',
+        name = 'Sum',
+        marker = list(color = 'rgba(255, 99, 132, 0.6)')
+      ) %>%
+        layout(
+          barmode = 'group',
+          title = text_resources[[values$language]]$income_stacked_graph_title,
+          xaxis = list(title = text_resources[[values$language]]$income_bar_x),
+          yaxis = list(title = text_resources[[values$language]]$income_bar_y)
+        )
+    }
+  })
+  
+  
+  
+  #Splitting Up income Tax function for better usability:
+
+  #reactive data for piechart:
+  reactive_income_tax_data_new <- reactive({
+    
+    income_tax_data <- calculate_income_tax_new()
+    data.frame(
+      tax_type = income_tax_data$tax_columns,
+      count = income_tax_data$tax_totals
+    )
+  })
+  
+  #Income Tax piechart output:
+  output$income_tax_piechart <- renderPlotly({
+    income_tax_pie_data <- reactive_income_tax_data_new()
+    
+    
+    
+    income_tax_segment_colours <- c("#008080","#FF6F61", "#FFC107", "#003366", "#66B2FF", 
+                                    "#E6E6FA", "#FFCC99", "#98FF98", "#CC5500", "#8E44AD")
+    
+    bands_list <- c("Band 1", "Band 2", "Band 3", "Band 4", "Band 5",
+                    "Band 6", "Band 7", "Band 8", "Band 9", "Band 10")
+    #texttemplate = ~ifelse(percentage >= 5, paste0(labels, ": ", percentage, "%"), ""),  # Show labels only if percentage >= 5%
+
+    
+    total_count <- sum(income_tax_pie_data$count)
+    
+    # Add percentage column calculated manually
+    income_tax_pie_data$percentage <- round((income_tax_pie_data$count / total_count) * 100, 2)
+    
+    plot_ly(income_tax_pie_data, 
+            labels = bands_list[1:length(income_tax_pie_data$count)], 
+            values = ~count, 
+            type = 'pie',
+            textinfo = 'label+percent',
+            texttemplate = ~ifelse(percentage >=1, paste0(bands_list[1:length(income_tax_pie_data$count)],": ",percentage, "%"), ""),
+            marker = list(colors  = income_tax_segment_colours),
+            showlegend = FALSE
+            ) %>%
+      layout(
+        title = text_resources[[values$language]]$income_tax_pie,
+        margin = list(l = 20, r = 20, b = 10, t = 30),  # Adjust margins
+        paper_bgcolor = 'white',  # Background color of the plot area
+        plot_bgcolor = 'white'  # Background color of the chart area
+        
+        #width = 200px
+      ) %>%
+      config(displayModeBar = FALSE)
+  })
+  
+  #and now to download the piechart for the income tax:
+  # Download handler for income tax pie chart
+    output$download_income_tax_piechart <- downloadHandler(
+    filename = function(){
+      print("in the file function")
+      paste0("income_tax_piechart_with_logo", ".png")
+    },
+    content = function(file){
+      print("in the content fucntion")
+      # Ensure pie_data is fetched correctly
+      pie_data <- reactive_income_tax_data_new()
+      
+      # Create the pie plot using ggplot2
+      pie_plot <- ggplot(pie_data, aes(x = "", y = count, fill = tax_type)) + 
+        geom_bar(stat = "identity", width = 1) +
+        coord_polar("y", start = 0) +  # Corrected coord_polar
+        theme_void() + 
+        theme(legend.position = "right")
+      
+      # Load the logo from the correct path
+      logo <- readPNG("logo2.png")  # Make sure this path is correct
+      
+      # Convert ggplot2 plot to grob (graphical object)
+      g <- ggplotGrob(pie_plot)
+      
+      # Open PNG device to save the image
+      png(file, width = 800, height = 600, res = 100)
+      
+      # Draw the plot
+      grid.draw(g)
+      
+      # Draw the logo on top (in the top-right corner)
+      grid.raster(logo, x = 0.9, y = 0.9, width = unit(0.2, "npc"), height = unit(0.2, "npc"))
+      
+      # Close the PNG device
+      dev.off()
+    }
+  )
+  
+  
+  #now lets sort out the download of the figure:
+  
+  
+  
+  
   
   #call transaltion data:
   source("translations.R")

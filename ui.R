@@ -143,6 +143,8 @@ ui <- fluidPage(
                                 conditionalPanel(
                                   condition = "input.show_income_tax_figures % 2 == 1",
                                   plotlyOutput("income_tax_piechart"),
+                                  downloadButton("download_income_tax_piechart", "Download piechart"),
+                                  
                                   tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                                   
                                   div(class = "calculate-button-container",
@@ -151,7 +153,6 @@ ui <- fluidPage(
                                       ),
     
                                       plotlyOutput("stacked_plot_income_tax"),
-                                      
                                       div(style = "height: 10px;", p("")), # Empty placeholder
                                       tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                                   ),
@@ -613,6 +614,7 @@ ui <- fluidPage(
              )
            ),
            fluidRow(
+             div(style = "height: 20px;", p("")),
              column(6,
                     div(style = "text-align: center;", textOutput("current_total_sum"))
              ),
@@ -620,6 +622,11 @@ ui <- fluidPage(
                     div(style = "text-align: center;", textOutput("updated_total_sum"))
              )
            ),
+           fluidRow(
+             
+             downloadButton("download_plot", "Download"),
+           ),
+           
            fluidRow(
              div(style = "height: 21px;", p("")),
              div(style = "display: flex; justify-content: center;",
