@@ -40,6 +40,8 @@ ui <- fluidPage(
   ),
 
   fluidRow(
+    #lets try this shinyjqui:
+    jqui_resizable(
     column(6,
            #Main app intro/instructions are going in this section
            align = "left",
@@ -597,6 +599,10 @@ ui <- fluidPage(
            
            
     ),
+    operation = "resizable"
+  ),
+  
+  jqui_resizable(
     
     column(6,
            fluidRow(
@@ -633,7 +639,9 @@ ui <- fluidPage(
                  tableOutput("tax_table")
              )
            )
-    )
+    ),
+    operation = "resizable"
+  )
   ),
   
   

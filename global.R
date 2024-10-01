@@ -10,6 +10,7 @@ library(magick)
 library(png)
 library(grid)
 library(webshot)
+library(shinyjqui)
 
 
 #input csv file which contains the dictionary of words for translations:
