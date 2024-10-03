@@ -1321,13 +1321,15 @@ observe({
  
     observeEvent(input$send_query, {
       mailto_link <- sprintf(
-        "mailto:a.fewings@bangor.ac.uk?subject=%s&body=%s",
+        "mailto:lvb19bnh@bangor.ac.uk?subject=%s&body=%s",
         URLencode("New question from Devolved Taxes App"),
         URLencode(input$query)  # assuming this is the input for the user's query
       )
       
       # Use the shinyjs package to open the link
       shinyjs::runjs(sprintf("window.location.href='%s';", mailto_link))
+      
+      removeModal()
     })
     
     
