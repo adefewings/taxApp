@@ -112,8 +112,7 @@ server <- function(input, output, session) {
     values$dynamic_radius_variable = ((sum(pie_data$amount) - 30261) / 30261)
     
     dynamic_radius <- values$dynamic_radius_variable
-    print(dynamic_radius)
-    
+
     # Define colors for each segment
     segment_colors <- c("#3498DB", "#2ECC71", "#F1C40F", "#E67E22", 
                         "#E74C3C", "#9B59B6", "#1ABC9C", "#FF6F61")
@@ -852,9 +851,6 @@ server <- function(input, output, session) {
   
   
 renderArrow <- function(difference, label) {
-  #print("boop:")
-  #print(difference)
-  
   
   
   difference_4_processing <- round(difference/1000000)
@@ -1120,8 +1116,7 @@ observe({
   #barchart:
   bar_data <- reactive({
     
-    print("In the bar_data function")
-    print("total_rates:")
+   
     data <- calculate_income_tax_new()
     divisor <- if (values$divide) data$num_people else 1
     #new list to hold the divided by people:
@@ -1135,8 +1130,7 @@ observe({
       rates_divided_list[[j]] = c(data$rates_list[[j]]/divisor)
       
     }
-    print(rates_divided_list)
-    
+
     labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
     
     if (values$show_sum) {
@@ -1158,7 +1152,6 @@ observe({
   
   # Generate Stacked Bar Chart
   output$stacked_plot_income_tax <- renderPlotly({
-    print("In the stacked function:")
     data <- bar_data()
     x_categories <- factor(data$labels, levels = data$labels)
     total_rates <- input$num_rows
@@ -1166,7 +1159,6 @@ observe({
     #maybe add a warning message for when only 1 tax band is selected
     #otherwise the && here patches the bug for now.
     if (values$show_sum && total_rates > 1){
-      print("In show sum:")
       colors <- c('rgba(255, 99, 132, 0.6)',  # First color
                   'rgba(54, 162, 235, 0.6)',  # Second color
                   'rgba(75, 192, 192, 0.6)',  # Third color
@@ -1181,10 +1173,9 @@ observe({
         marker = list(color = 'rgba(255, 99, 132, 0.6)')
       ) 
       #
-      
       #
-      #total_rates = 
-      
+      #
+
       for (i in 2:total_rates){
         p <- p %>%
           add_trace(
@@ -1204,7 +1195,6 @@ observe({
       
       p
     }else {
-      print("Not in show sum")
       # Plot summed values
       plot_ly(
         x = x_categories,
@@ -1279,11 +1269,9 @@ observe({
   # Download handler for income tax pie chart
     output$download_income_tax_piechart <- downloadHandler(
     filename = function(){
-      print("in the file function")
       paste0("income_tax_piechart_with_logo", ".png")
     },
     content = function(file){
-      print("in the content fucntion")
       # Ensure pie_data is fetched correctly
       pie_data <- reactive_income_tax_data_new()
       
@@ -1315,8 +1303,34 @@ observe({
   )
   
   
-  #now lets sort out the download of the figure:
+  #button and pop up window to send email:
+    observeEvent(input$contact_us_button, {
+      showModal(modalDialog(
+        
+        title = "Contact the Bangor Business School",
+        tags$img(src = "profile.png", height = "100px"),
+        tags$p("Please enter your question below:"),
+        textInput("query", label = NULL, placeholder = "Start typing ..."),
+        actionButton("send_query", "Send"),
+        footer = modalButton("Close")
+      
+        ))
+    })
   
+  
+ 
+    observeEvent(input$send_query, {
+      mailto_link <- sprintf(
+        "mailto:a.fewings@bangor.ac.uk?subject=%s&body=%s",
+        URLencode("New question from Devolved Taxes App"),
+        URLencode(input$query)  # assuming this is the input for the user's query
+      )
+      
+      # Use the shinyjs package to open the link
+      shinyjs::runjs(sprintf("window.location.href='%s';", mailto_link))
+    })
+    
+    
   
   
   

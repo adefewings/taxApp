@@ -17,17 +17,26 @@ ui <- fluidPage(
   #Start of the main page - default is the income tax page.
   #Title and translate button on top of screen
   fluidRow(
-    column(4,
+    column(12,
+           tags$div(style = "background-color: #C50031; height: 20px; width: 100%; margin: 10px 0; padding: 0;"),
+           )
+
+  ),
+  fluidRow(
+    column(2,
            align = "left",
            tags$img(src = "businessLogo.png", height = "100px", width = "auto"),
            
     ),
-    column(8,
+    column(10,
            align = "right",
-           tags$div(style = "background-color: #C50031; height: 20px; width: 100%; margin: 10px 0; padding: 0;"),
-           tags$div(style = "background-color: #F6BC0A; height: 20px; width: 90%; margin: 10px 0; padding: 0;"),
+           #tags$div(style = "background-color: #C50031; height: 20px; width: 100%; margin: 10px 0; padding: 0;"),
+           tags$div(style = "background-color: #F6BC0A; height: 20px; width: 100%; margin-top: 0px;margin-bottom: 10px; padding: 0;"),
            actionButton("contact_us_button", label = textOutput("contact_us_button")),
-           actionButton("translateButton", textOutput("translate_button"))
+           actionButton("translateButton", textOutput("translate_button")),
+           #tags$div(style = "background-color: #C50031; height: 20px; width: 25%; margin: 10px 0; padding: 0;"),
+           
+           
     ),
     
   ),
