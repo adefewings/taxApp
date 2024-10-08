@@ -158,4 +158,8 @@ set_translation_outputs <- function (output, values, text_resources){
   output$piechart_title <- renderText({
     text_resources[[values$language]]$piechart_title
   })
+  output$other_taxes_intro <- renderText({
+    text_resources[[values$language]]$other_taxes_intro
+  })
+  
 }

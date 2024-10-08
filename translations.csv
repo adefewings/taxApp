@@ -1,28 +1,23 @@
 key,english,welsh
-title,Welsh Tax Calculator 2024/25,Cyfrifydd Treth Cymru 2024/25
+title,Welsh Tax Calculator 2024/25 TEST,Cyfrifydd Treth Cymru 2024/25
 piechart_title,Welsh Government and Local Authorities' Combined Budgets,Cyfun gyllideb Llywodraeth Cymru a'r Awdurdodau Lleol
-main_app_intro,Hello and Welcome to Bangor University's Tax return App. You are able to view the previous years tax return breakdown as well as apply certain tax filters to see a potential breakdown for the next tax years return. MORE INTRO INFO ADDED HERE.,Croeso i Ap Ffurflen Dreth Prifysgol Bangor. Yma gallwch weld dadansoddiad eich ffurflen dreth y flwyddyn flaenorol yn ogystal â chymhwyso hidlwyr treth penodol i weld dadansoddiad posibl ar gyfer ffurflen dreth y flwyddyn nesaf. MWY O WYBODAETH RHAGARWEINIOL YMA.
+main_app_intro,"This tool has been developed by Dr Rhys ap Gwilym and Dr Edward Jones, economists at Bangor University’s Business School. It is intended to provide ‘rough and ready’ estimates of how changes to tax rates, thresholds, and more fundamental changes to the tax system in Wales might impact on revenues and, ultimately, the funding available for public services in Wales. <br>We intend to update and develop the calculator over time, so please do get in touch if you have suggestions for improvements. Inevitably, the analysis provided here is not detailed. So, again, please get in touch if you’re interested in more detailed analyses. <br>You can contact us at r.a.gwilym@bangor.ac.uk and e.t.jones@bangor.ac.uk.<br><br> Instructions:<br> The charts on the right, and the tables below them, show the total funds available to Welsh Government and Local Authorities in Wales under present plans and subject to any changes that you make in the tabs below. Click on the tabs below to make changes to tax rates, thresholds, and more fundamental changes to the tax system in three distinct areas:	","Croeso i Ap Ffurflen Dreth Prifysgol Bangor. Yma gallwch weld dadansoddiad eich ffurflen dreth y flwyddyn flaenorol yn ogystal â chymhwyso hidlwyr treth penodol i weld dadansoddiad posibl ar gyfer ffurflen dreth y flwyddyn nesaf. MWY O WYBODAETH RHAGARWEINIOL YMA."
 dataset,Choose Dataset:,Dewiswch Set Data:
 divide_button,Divide by 10,Rhannu trwy 10
 show_sum_button,Show Sum,Dangos Crynodeb
-translate_button,Translate,Cyfieithu
+translate_button,Cymraeg,English
 stacked_plot_title,Stacked Bar Chart with Plotly,Cynllun Bar Staciog gyda Plotly
 sum_plot_title,Sum of Values,Crynodeb o Werthoedd
 xaxis_title,Categories,Categori
 yaxis_title_stacked,Values,Gwerthoedd
 yaxis_title_sum,Sum,Crynodeb
-income_tax_intro,Income tax is paid by employers to the gov via employee salary. Some information about the block grant,Mae treth incwm yn cael ei thalu gan gyflogwyr i'r llywodraeth trwy gyflog yr weithwyr. Rhai gwybodaeth am y grant bloc.
+income_tax_intro,"Under the current devolution settlement, income tax payers in Wales pay a UK rate (set by the Westminster Government) and a Welsh rate (set by the Welsh Government) on non-savings, non-dividend (‘NSND’) income. The personal allowance (and personal allowance taper/limit) are set by the UK government, as are the thresholds for each income tax band. In Scotland, the devolved government has powers to alter the number of bands and adjust thresholds for NSND income tax. However, powers to set the personal allowance are reserved to Westminster, as is the taxation of savings and dividends income. <br><br>Instructions:<br>First choose whether you would like to make changes within the current settlement, according to the Scottish model, or where all powers over income tax (including personal allowance and savings/dividend income) are devolved. You will then be able to adjust the parameters that would be under Welsh Government control in your chosen scenario.","Yn ôl y setliad datganoli presennol, mae trethdalwyr incwm yng Nghymru yn talu cyfradd y DU (a bennir gan Lywodraeth San Steffan) a chyfradd Cymreig (a osodir gan Lywodraeth Cymru) ar incwm di-gynilion a di-ddifidend (‘NSND’). Mae’r lwfans personol (a thapr/terfyn lwfans personol) yn cael eu gosod gan lywodraeth y DU, yn ogystal â’r trothwyon ar gyfer pob band treth incwm. Yn yr Alban, mae gan y llywodraeth ddatganoledig bwerau i newid nifer y bandiau ac addasu trothwyon ar gyfer treth incwm NSND. Fodd bynnag, mae pwerau i osod y  lwfans personol yn cael eu hawlio gan San Steffan, yn ogystal â threthu incwm o gynilion a difidendau.<br><br>Cyfarwyddiadau:<br>Cychwynnwch wrth ddethol os hoffech wneud newidiadau o fewn y setliad presennol, yn unol â model yr Alban, neu lle mae’r holl bwerau dros dreth incwm (gan gynnwys lwfans personol ac incwm cynilion/difidend) wedi’u datganoli. Yna byddwch yn gallu addasu’r paramedrau a fyddai dan reolaeth Llywodraeth Cymru yn unol â’r detholiad hwnnw."
 pa_box,Personal Allowance:,Gwariant Bersonol:
 pa_limit,PA Limit:,Terfyn GB:
 sr_threshold,Starter Rate Threshold:,Y Derfyn Rhydd Y Cyntaf:
 ir_threshold,Intermediate Rate Threshold:,Y Derfyn Rheswm Canol:
 br_threshold,Basic Rate Threshold:,Y Derfyn Rheswm Sylfaenol:
 hr_threshold,Higher Rate Threshold:,Y Derfyn Rheswm Uchel:
-sr,Rate:,Cyfradd:
-br,Rate:,Cyfradd:
-ir,Rate:,Cyfradd:
-hr,Rate:,Cyfradd:
-ar,Rate:,Cyfradd:
 select_income_system,Select Income Tax System:,Dewis System Treth Incwm:
 divide_by_people,Divide by people per band,Rhannu gan bobl y band
 show_breakdown,Show Tax Breakdown,Dangos Dadansoddiad Treth
@@ -56,7 +51,15 @@ updated_total_tax,Updated Total Tax Return,Dychwelyd Treth Gyfan Diweddarwyd
 local_taxes_tab_label,Local Taxes,Trethi lleol
 other_taxes_tab_label,Other Taxes,Trethi Eraill
 contact_us_button,Contact the Business School,Cysylltwch â'r Ysgol Fusnes
-local_taxes_tab_intro,"Local taxes incluide Non Domestic Rates (NDR) tax, Council Tax and  proposed tourism Levy.","Trethi lleol yn cynnwys treth Rates Non-Domestic (NDR), Treth y Cyngor, a'r treth dwristiaeth a gynhelir."
+local_taxes_tab_intro,"In accordance with the Wales Act (2014), Welsh Government has full powers over Local Taxes in Wales.<br>Some of these powers are further devolved to Local Authorities, but Welsh Government has the legal right to cancel or alter these powers. Currently there are two Local Taxes, Council Tax and Non-Domestic Rates (NDR).<br>Legislation for a Visitor Levy is expected to be introduced imminently.<br><br>Instructions:<br>In this tab, you can keep or cancel the existing Local Taxes and complement or replace them with a Property Tax and/or Visitor Levy.","Yn ôl Deddf Cymru (2014), Llywodraeth Cymru
+
+sydd yn holl gyfrifol am Trethi Lleol yng
+
+Nghymru.<br>Mae rhai o’r bwerau yma wedi eu datganoli i Awdurdodau Lleol, ond mae gan Lywodraeth Cymru y rym i ddileu neu addasu y pwerau hyn. Yn bresennol, dau Treth Lleol sydd yn bodoli, sef Treth y Cyngor ac Ardrethi Annomestig. Disgwylir i Dreth Twristiaeth cael ei ddeddfu yn fuan.<br><br>Cyfarwyddiadau:<br>Yn y tab hwn cewch cadw neu diddymu y Trethi
+
+Lleol presennol a’u ategu neu ddisodli gan
+
+Dreth Eiddo a/neu Treth Ymwelwyr."
 local_tax_system_selection,Select system for local tax filters and calculations,Dewiswch system ar gyfer hidlwyr a chyfrifon treth leol
 devolved_taxes,Devolved Taxes (A),Trethi Datganoledig (A)
 property_tax,Property Tax,Treth Eiddo
@@ -79,4 +82,6 @@ block_grant_input,Block Grant (£millions) =,Grant Bloc (£miliynau) =
 council_tax_title,Council Tax:,Treth Gyngor:
 other_taxes_title,Other Taxes available with chosen system (all values in £millions):,Trethi eraill sydd ar gael gyda'r system ddewisol (pob gwerth yn £miliynau):
 previous_tax_piechart,Current Estimates:,Amcangyfrifon cyfredol:
-updated_tax_piechart,Estimates with you changes implemented:,Amcangyfrifon gyda'ch newidiadau wedi'u gweithredu:
+updated_tax_piechart,Estimates with your changes:,Amcangyfrifon gyda'ch newidiadau:
+other_taxes_intro,"At present, there are two other taxes within the Welsh Government’s control. These are the Land Transaction Tax and the Landfill Disposals Tax.<br><br>Instructions:<br>In this tab, you can vary the rates and thresholds of the Land Transaction Tax and the rates of the Landfill Disposals Tax.","Ar hyn o bryd, mae dau dreth arall o fewn rheolaeth Lywodraeth Cymru, sef y Treth Trafodiadau Tir a’r Treth Gwarediadau Tirlenwi.<br><br>Cyfarwyddiadau:<br>Yn y tab hwn cewch addasu cyfraddau a throthwyon y Treth Trafodiadau Tir a chyfraddau y Treth Gwarediadau Tirlenwi."
+
