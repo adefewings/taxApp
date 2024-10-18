@@ -157,8 +157,7 @@ ui <- fluidPage(
                                  )
                         ),
                         uiOutput("dynamic_rows"),
-                        
-                        
+
                         tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                         
                         fluidRow(
@@ -167,6 +166,7 @@ ui <- fluidPage(
                           conditionalPanel(
                             condition = "input.show_income_tax_figures % 2 == 1",
                             plotlyOutput("income_tax_piechart"),
+                            downloadButton("download_income_tax_piechart", "Download"),
                             #downloadButton("download_income_tax_piechart", "Download piechart"),
                             
                             tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
@@ -177,7 +177,8 @@ ui <- fluidPage(
                             ),
                             
                             plotlyOutput("stacked_plot_income_tax"),
-                            div(style = "height: 10px;", p("")), # Empty placeholder
+                            downloadButton("download_income_tax_barchart", "Download"),
+                            div(style = "height: 10px;", p("")), # Empty placehol der
                             tags$div(style = "background-color: #C50031; height: 2px; width: 100%; margin: 10px 0; padding: 0;"),
                           ),
                           
@@ -364,18 +365,20 @@ ui <- fluidPage(
                           )
                           ),
                           
+                          fluidRow(
+                            column(10,
+                                   htmlOutput("property_tax_intro"),
+                                   div(style = "height: 20px;", p("")),
+                            )
+                          ),
+                          fluidRow(
+                            column(7,
+                                    div(class = "local_taxes-text-box", 
+                                      "Residential Properties:"
+                                        ),
+                                    ),
+                          ),
                           
-                          fluidRow(column(5,
-                                          div(class = "local_taxes-text-box", 
-                                              "Residential Properties:"
-                                          ), 
-                          ),
-                          column(4,
-                                 div(class = "local_taxes-toggle",
-                                     switchInput(inputId = "residential_properties", value = FALSE)
-                                 ),
-                          )
-                          ),
                           fluidRow(
                             column(1,
                                    div(style = "height: 20px;", p("")),
@@ -383,14 +386,20 @@ ui <- fluidPage(
                             column(6,
                                    div(class = "property_tax_numeric",
                                        tags$label("Tax Free Allowance:", `for` = "tax_free_allowance"),
-                                       numericInput("tax_free_allowance", NULL, 0, step = 1000, min = 0)),
+                                       numericInput("tax_free_allowance", NULL, 0, step = 1000, min = 0, max = 100000)),
                                    div(class = "property_tax_numeric",
                                        tags$label("Tax Rate on land component:", `for` = "residential_land"),
-                                       numericInput("residential_land", NULL, 0, step = 0.1)),
+                                       numericInput("residential_land", NULL, 0, step = 0.01, min = 0, max = 5)),
                                    div(class = "property_tax_numeric",
                                        tags$label("Tax Rate on Buildings component:", `for` = "residential_building"),
-                                       numericInput("residential_building", NULL, 0, step = 0.1)),
+                                       numericInput("residential_building", NULL, 0, step = 0.01, min = 0, max = 5)),
                             ),
+                            column(3,
+                                   div(style = "height: 45px;", p("")),
+                                   uiOutput("property_residential_land_arrow"),
+                                   div(style = "height: 10px;", p("")),
+                                   uiOutput("property_residential_building_arrow")
+                                   )
                           ),
                           
                           fluidRow(column(5,
@@ -398,11 +407,7 @@ ui <- fluidPage(
                                               "Non-domestic Properties:"
                                           ), 
                           ),
-                          column(4,
-                                 div(class = "local_taxes-toggle",
-                                     switchInput(inputId = "non_residential_properties", value = FALSE)
-                                 ),
-                          )
+                          
                           ),
                           fluidRow(
                             column(1,

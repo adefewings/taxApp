@@ -11,6 +11,7 @@ server <- function(input, output, session) {
   ########################################### 
   #Reactive Values global to this function  #
   ###########################################
+  #These are updated throughout the app cycle.
   values <- reactiveValues(
     divide = FALSE,
     show_sum = FALSE,
@@ -24,7 +25,9 @@ server <- function(input, output, session) {
     ltt_difference = 0,
     ldt_difference = 0,
     updated_total_tax_sum = 0,
-    dynamic_radius_variable = 0
+    dynamic_radius_variable = 0,
+    property_residential_land = 0,
+    property_residential_building = 0
     
   )
   
@@ -175,8 +178,9 @@ server <- function(input, output, session) {
       property = values$property_difference,
       tourism = values$tourism_difference,
       ltt = values$ltt_difference,
-      ldt = values$ldt_difference
-      # Add other differences here
+      ldt = values$ldt_difference,
+      property_residential_land = values$property_residential_land,
+      property_residential_building = values$property_residential_building
     )
     
     lapply(names(differences), function(label) {
@@ -203,6 +207,7 @@ server <- function(input, output, session) {
   
   #Pull up email link after clicking "send" on the pop up/ modal box.
   observeEvent(input$send_query, {
+    
     mailto_link <- sprintf(
       "mailto:lvb19bnh@bangor.ac.uk?subject=%s&body=%s",
       URLencode("New question from Devolved Taxes App"),
@@ -243,6 +248,7 @@ server <- function(input, output, session) {
     PA <- input$pa_new
     PAlimit <- input$pa_limit
     num_rows <- input$num_rows
+    
     #Initialize thresholds and rates:
     #These are lists that will hold the threshold value and rate value from the bands users are entering
     thresholds <- numeric(num_rows -1)
@@ -271,7 +277,6 @@ server <- function(input, output, session) {
       }
     }
 
-    #next section works similar to how you intended:
     #populate a dataFrame and add income and tax columns for the number of bands.
     # Import taxable income distribution
     TIDist_new <- read.csv("TaxableIncomeDistribution2023.csv", sep=";")
@@ -344,6 +349,7 @@ server <- function(input, output, session) {
       }
       
     }
+    
     ############################
     # Income Tax Bar chart data:          
     ############################
@@ -355,7 +361,7 @@ server <- function(input, output, session) {
     band_people <- 0
     
     total_rates <- num_rows
-    rates_list <- vector("list", total_rates)  # Create a list with num_rows slots
+    rates_list <- vector("list", total_rates)  
     sum_list <- vector("list",total_rates)
     
     
@@ -475,14 +481,45 @@ server <- function(input, output, session) {
       property_tax <- 0
       #need to calculate based on the values:
       
-      if (input$residential_properties){
-        property_tax <- property_tax + 500000000
-      }
+      #First load the datasource:
+      Property_bins <- read.csv("ResPropBins.csv")
       
-      if(input$non_residential_properties){
-        property_tax <- property_tax + 500000000
-      }
+      #load the inputs from the ui function:
+      tax_free_allowance <- input$tax_free_allowance
+      land_tax_rate <- input$residential_land
+      buildings_tax_rate <- input$residential_building
+      
+      #adjust the tfa:
+      adjusted_tfa <- tax_free_allowance * 1041800 / 1478000
+      
+      # 2. Calaculate taxable land value net of tax free allowance, minimum zero
+      Property_bins$TaxableLandValue <- Property_bins$LandValue - adjusted_tfa
+      Property_bins$TaxableLandValue <- ifelse(Property_bins$TaxableLandValue < 0, 0, Property_bins$TaxableLandValue)
+      
+      # 3. Calculate taxable buildings value net of any remaining tax free allowance, minimum zero
+      Property_bins$TaxableBuildValue <- Property_bins$BuildValue - adjusted_tfa + Property_bins$TaxableLandValue - Property_bins$LandValue
+      Property_bins$TaxableBuildValue <- ifelse(Property_bins$TaxableBuildValue < 0, 0, Property_bins$TaxableBuildValue)
+      
+      # 4. Calculate land and buildings tax per property
+      Property_bins$LandTaxPerProp <- Property_bins$TaxableLandValue * land_tax_rate/100
+      Property_bins$BuildTaxPerProp <- Property_bins$TaxableBuildValue * buildings_tax_rate/100
+      
+      # 5. Calculate land and buildings tax per bin
+      Property_bins$LandTaxPerBin <- Property_bins$LandTaxPerProp * Property_bins$N
+      Property_bins$BuildTaxPerBin <- Property_bins$BuildTaxPerProp * Property_bins$N
+      
+      # 6. Sum across bins
+      total_land_tax <- sum(Property_bins$LandTaxPerBin, na.rm=TRUE)
+      total_build_tax <- sum(Property_bins$BuildTaxPerBin, na.rm=TRUE)
+      
+      values$property_residential_land <- total_land_tax
+      values$property_residential_building <- total_build_tax
+      
+      property_tax <- total_land_tax + total_build_tax
+      
     }else{
+      values$property_residential_land <- 0
+      values$property_residential_building <- 0
       property_tax <- 0
     }
     #update property tax value:
@@ -712,6 +749,40 @@ server <- function(input, output, session) {
     return(plot)
   })
   
+  #Income tax pie chart:
+  income_tax_piechart <- reactive({
+    income_tax_pie_data <- reactive_income_tax_data_new()
+    income_tax_segment_colours <- c("#008080","#FF6F61", "#FFC107", "#003366", "#66B2FF", 
+                                    "#E6E6FA", "#FFCC99", "#98FF98", "#CC5500", "#8E44AD")
+    bands_list <- c("Band 1", "Band 2", "Band 3", "Band 4", "Band 5",
+                    "Band 6", "Band 7", "Band 8", "Band 9", "Band 10")
+    total_count <- sum(income_tax_pie_data$count)
+    
+    # Add percentage column calculated manually
+    income_tax_pie_data$percentage <- round((income_tax_pie_data$count / total_count) * 100, 2)
+    
+    plot <- plot_ly(income_tax_pie_data, 
+            labels = bands_list[1:length(income_tax_pie_data$count)], 
+            values = ~count, 
+            type = 'pie',
+            textinfo = 'label+percent',
+            texttemplate = ~ifelse(percentage >=1, paste0(bands_list[1:length(income_tax_pie_data$count)],": ",percentage, "%"), ""),
+            marker = list(colors  = income_tax_segment_colours),
+            showlegend = FALSE
+    ) %>%
+      layout(
+        title = text_resources[[values$language]]$income_tax_pie,
+        margin = list(l = 20, r = 20, b = 10, t = 30), 
+        paper_bgcolor = 'white',
+        plot_bgcolor = 'white'
+        
+        #width = 200px
+      ) %>%
+      config(displayModeBar = FALSE)
+    
+    return(plot)
+  })
+  
   
   #income Tax bar chart:
   bar_data <- reactive({
@@ -732,20 +803,77 @@ server <- function(input, output, session) {
     labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120+")
     
     if (values$show_sum) {
-      list(
-        stacked = do.call(rbind,rates_divided_list),
-        labels = labels,
-        legend_vector = data$tax_columns
-      )
+      
+        stacked = do.call(rbind,rates_divided_list)
+        labels = labels
+        legend_vector = data$tax_column
+      
     } else {
       # Calculate sum of vectors
       summed <- Reduce(`+`,rates_divided_list)
-      list(
-        stacked = summed,
+        stacked = summed
         labels = labels
-      )
-      
+
     }
+    
+    #rest of the fun function:
+    x_categories <- factor(labels, levels = labels)
+    total_rates <- input$num_rows
+    
+    #maybe add a warning message for when only 1 tax band is selected
+    #otherwise the && here patches the bug for now.
+    if (values$show_sum && total_rates > 1){
+      colors <- c('rgba(255, 99, 132, 0.6)',  # First color
+                  'rgba(54, 162, 235, 0.6)',  # Second color
+                  'rgba(75, 192, 192, 0.6)',  # Third color
+                  'rgba(223, 192, 192, 0.6)', # Fourth color
+                  'rgba(23, 192, 192, 0.6)',  # Fifth color
+                  'rgba(192, 192, 75, 0.6)')  # Add more colors if necessary
+      p <- plot_ly(
+        x = x_categories,
+        y = stacked[1,],
+        type = 'bar',
+        name = legend_vector[1],
+        marker = list(color = 'rgba(255, 99, 132, 0.6)')
+      ) 
+      
+      for (i in 2:total_rates){
+        p <- p %>%
+          add_trace(
+            y = stacked[i,],
+            name = legend_vector[i],
+            marker = list(color = colors[i])
+          )
+      }
+      
+      p <- p %>%
+        layout(
+          barmode = 'stack',
+          title = text_resources[[values$language]]$income_stacked_graph_title,
+          xaxis = list(title = text_resources[[values$language]]$income_bar_x),
+          yaxis = list(title = text_resources[[values$language]]$income_bar_y)
+        )
+      
+      p
+    }else {
+      # Plot summed values
+      p <- plot_ly(
+        x = x_categories,
+        y = stacked,
+        type = 'bar',
+        name = 'Sum',
+        marker = list(color = 'rgba(255, 99, 132, 0.6)')
+      ) %>%
+        layout(
+          barmode = 'group',
+          title = text_resources[[values$language]]$income_stacked_graph_title,
+          xaxis = list(title = text_resources[[values$language]]$income_bar_x),
+          yaxis = list(title = text_resources[[values$language]]$income_bar_y)
+        )
+    }
+    
+    return(p)
+    
   })
   
 
@@ -789,10 +917,20 @@ server <- function(input, output, session) {
     updated_taxes <- calculate_all_taxes()
     
     
-    c_estimates <- c(NA, app_parameters_list$current_income_tax_dev, app_parameters_list$current_council, app_parameters_list$current_ndr, app_parameters_list$current_property, app_parameters_list$current_ltt, app_parameters_list$current_ldt, app_parameters_list$current_tourism, NA, NA, app_parameters_list$current_income_tax_nondev, app_parameters_list$current_ni, app_parameters_list$current_vat, app_parameters_list$current_corporation, app_parameters_list$current_duties, app_parameters_list$current_env_levy, app_parameters_list$current_other,NA,NA,NA,NA)
+    c_estimates <- c(NA, app_parameters_list$current_income_tax_dev, app_parameters_list$current_council, app_parameters_list$current_ndr, app_parameters_list$current_property, app_parameters_list$current_ltt, app_parameters_list$current_ldt, app_parameters_list$current_tourism, NA, NA, app_parameters_list$current_income_tax_nondev, app_parameters_list$current_ni, app_parameters_list$current_vat, app_parameters_list$current_corporation, app_parameters_list$current_duties, app_parameters_list$current_env_levy, app_parameters_list$current_other,NA,app_parameters_list$current_blockgrant,NA,NA)
     
-    updated_estimates <- c(NA, round((updated_taxes$income_tax_devolved)/1000000), round((updated_taxes$council_tax)/1000000), round((updated_taxes$ndr_tax)/1000000), round((updated_taxes$property_tax)/1000000), round(updated_taxes$ltt_tax)/1000000, round((updated_taxes$ldt_tax)/1000000), round((updated_taxes$tourism_tax)/1000000), NA, NA, round((updated_taxes$income_tax_non_devolved)/1000000), app_parameters_list$current_ni, app_parameters_list$current_vat, app_parameters_list$current_corporation, app_parameters_list$current_duties, app_parameters_list$current_env_levy, app_parameters_list$current_other,NA,NA,NA,NA)
+    #now calculate the totals:
+    c_estimates[9] <- sum(c_estimates[2:8], na.rm = TRUE)
+    c_estimates[18] <- sum(c_estimates[11:17], na.rm = TRUE)
+    c_estimates[20]<- sum(c_estimates[2:8]) + sum(c_estimates[11:17])
+    c_estimates[21] <- sum(c_estimates[2:8]) + app_parameters_list$current_blockgrant
     
+    updated_estimates <- c(NA, round((updated_taxes$income_tax_devolved)/1000000), round((updated_taxes$council_tax)/1000000), round((updated_taxes$ndr_tax)/1000000), round((updated_taxes$property_tax)/1000000), round(updated_taxes$ltt_tax)/1000000, round((updated_taxes$ldt_tax)/1000000), round((updated_taxes$tourism_tax)/1000000), 0, NA, round((updated_taxes$income_tax_non_devolved)/1000000), app_parameters_list$current_ni, app_parameters_list$current_vat, app_parameters_list$current_corporation, app_parameters_list$current_duties, app_parameters_list$current_env_levy, app_parameters_list$current_other,NA,app_parameters_list$current_blockgrant,NA,NA)
+    
+    updated_estimates[9] <- sum(updated_estimates[2:8], na.rm = TRUE)
+    updated_estimates[18] <- sum(updated_estimates[11:17], na.rm = TRUE)
+    updated_estimates[20]<- sum(updated_estimates[2:8]) + sum(updated_estimates[11:17])
+    updated_estimates[21] <- sum(updated_estimates[2:8]) + app_parameters_list$current_blockgrant
     
     c_estimate_sum <- c(
       NA, NA, NA, NA, NA, NA, NA, NA,  
@@ -816,9 +954,9 @@ server <- function(input, output, session) {
     data_frame <- data.frame(
       Millions = tax,
       current_estimates = c_estimates,
-      est_tot= c_estimate_sum,
+      #est_tot= c_estimate_sum,
       updated_new = updated_estimates,
-      upd_tot = c_updated_sum,
+      #upd_tot = c_updated_sum,
       stringsAsFactors = FALSE  # Ensure strings are not converted to factors
     )
     
@@ -928,34 +1066,7 @@ server <- function(input, output, session) {
   ##########################################################################################
   #Income Tax piechart output:
   output$income_tax_piechart <- renderPlotly({
-    income_tax_pie_data <- reactive_income_tax_data_new()
-    income_tax_segment_colours <- c("#008080","#FF6F61", "#FFC107", "#003366", "#66B2FF", 
-                                    "#E6E6FA", "#FFCC99", "#98FF98", "#CC5500", "#8E44AD")
-    bands_list <- c("Band 1", "Band 2", "Band 3", "Band 4", "Band 5",
-                    "Band 6", "Band 7", "Band 8", "Band 9", "Band 10")
-    total_count <- sum(income_tax_pie_data$count)
-    
-    # Add percentage column calculated manually
-    income_tax_pie_data$percentage <- round((income_tax_pie_data$count / total_count) * 100, 2)
-    
-    plot_ly(income_tax_pie_data, 
-            labels = bands_list[1:length(income_tax_pie_data$count)], 
-            values = ~count, 
-            type = 'pie',
-            textinfo = 'label+percent',
-            texttemplate = ~ifelse(percentage >=1, paste0(bands_list[1:length(income_tax_pie_data$count)],": ",percentage, "%"), ""),
-            marker = list(colors  = income_tax_segment_colours),
-            showlegend = FALSE
-    ) %>%
-      layout(
-        title = text_resources[[values$language]]$income_tax_pie,
-        margin = list(l = 20, r = 20, b = 10, t = 30), 
-        paper_bgcolor = 'white',
-        plot_bgcolor = 'white'
-        
-        #width = 200px
-      ) %>%
-      config(displayModeBar = FALSE)
+    income_tax_piechart()
   })
   
   #Current Estimate piechart:
@@ -984,6 +1095,87 @@ server <- function(input, output, session) {
     
     return(paste0("Total = £",updated_sum_formatted, " million"))
   })
+  
+  #downloadable png of the income tax piechart
+  output$download_income_tax_piechart <- downloadHandler(
+    filename = function() {
+      paste("income_tax_breakdown", Sys.Date(), ".png", sep = "")
+    },
+    content = function(file) {
+      income_tax_png <- tempfile(fileext = ".png")
+      temp_html_file <- tempfile(fileext = ".html")
+      htmlwidgets::saveWidget(as_widget(income_tax_piechart()), temp_html_file, selfcontained = TRUE)
+      webshot::webshot(temp_html_file, file = income_tax_png, vwidth = 400, vheight = 400)
+      updated_income_piechart_image <- image_read(income_tax_png)
+      
+      piechart_scaled <- image_scale(updated_income_piechart_image, "70%")
+      
+      # Add a white background to maintain a consistent canvas size (400x400)
+      final_piechart_with_background <- image_extent(piechart_scaled, geometry = "400x400", gravity = "center", color = "white")
+      
+      
+      # Load the logo and add it to the top-right corner
+      logo <- image_read("businessLogo.png")
+      logo_resized <- image_scale(logo, "120x120")
+      
+      # Get dimensions of the combined image
+      combined_width <- image_info(updated_income_piechart_image)$width
+      combined_height <- image_info(updated_income_piechart_image)$height
+      
+      # Calculate position for the logo
+      logo_position_x <- combined_width - image_info(logo_resized)$width - 10
+      logo_position_y <- 10
+      
+      # Composite the logo on the combined image
+      final_image <- image_composite(final_piechart_with_background, logo_resized, offset = paste0("+", logo_position_x, "+", logo_position_y))
+      
+      # Save the final image
+      image_write(final_image, path = file)
+      
+      
+    }
+  )
+  
+  #downloadable png of the income tax stacked bar chart:
+  output$download_income_tax_barchart <- downloadHandler(
+    filename = function() {
+      paste("income_tax_breakdown_barchart", Sys.Date(), ".png", sep = "")
+    },
+    content = function(file) {
+      income_tax_png <- tempfile(fileext = ".png")
+      temp_html_file <- tempfile(fileext = ".html")
+      htmlwidgets::saveWidget(as_widget(bar_data()), temp_html_file, selfcontained = TRUE)
+      webshot::webshot(temp_html_file, file = income_tax_png, vwidth = 400, vheight = 400)
+      updated_income_piechart_image <- image_read(income_tax_png)
+      
+      piechart_scaled <- image_scale(updated_income_piechart_image, "90%")
+      
+      # Add a white background to maintain a consistent canvas size (400x400)
+      final_piechart_with_background <- image_extent(piechart_scaled, geometry = "500x500", gravity = "center", color = "white")
+      
+      
+      # Load the logo and add it to the top-right corner
+      logo <- image_read("businessLogo.png")
+      logo_resized <- image_scale(logo, "110x110")
+      
+      # Get dimensions of the combined image
+      combined_width <- image_info(updated_income_piechart_image)$width
+      combined_height <- image_info(updated_income_piechart_image)$height
+      
+      # Calculate position for the logo
+      logo_position_x <- 500 - image_info(logo_resized)$width - 10
+      logo_position_y <- 10
+      
+      # Composite the logo on the combined image
+      final_image <- image_composite(final_piechart_with_background, logo_resized, offset = paste0("+", logo_position_x, "+", logo_position_y))
+      
+      # Save the final image
+      image_write(final_image, path = file)
+      
+      
+    }
+  )
+  
   
   #Download the current estimate and changes applied piecharts and totals:
   output$download_plot <- downloadHandler(
@@ -1022,22 +1214,22 @@ server <- function(input, output, session) {
       combined_image <- image_append(c(combined_pie_images, combined_totals_images), stack = TRUE)
       
       # Load the logo and add it to the top-right corner
-      logo <- image_read("businessLogo.png")
-      logo_resized <- image_scale(logo, "120x120")
-      
-      # Get dimensions of the combined image
-      combined_width <- image_info(combined_image)$width
-      combined_height <- image_info(combined_image)$height
-      
-      # Calculate position for the logo
-      logo_position_x <- combined_width - image_info(logo_resized)$width - 10
-      logo_position_y <- 10
-      
-      # Composite the logo on the combined image
-      final_image <- image_composite(combined_image, logo_resized, offset = paste0("+", logo_position_x, "+", logo_position_y))
-      
-      # Save the final image
-      image_write(final_image, path = file)
+        logo <- image_read("businessLogo.png")
+        logo_resized <- image_scale(logo, "120x120")
+        
+        # Get dimensions of the combined image
+        combined_width <- image_info(combined_image)$width
+        combined_height <- image_info(combined_image)$height
+        
+        # Calculate position for the logo
+        logo_position_x <- combined_width - image_info(logo_resized)$width - 10
+        logo_position_y <- 10
+        
+        # Composite the logo on the combined image
+        final_image <- image_composite(combined_image, logo_resized, offset = paste0("+", logo_position_x, "+", logo_position_y))
+        
+        # Save the final image
+        image_write(final_image, path = file)
     }
   )
   
@@ -1048,32 +1240,28 @@ server <- function(input, output, session) {
     # Rename columns
     colnames(combined_data)[colnames(combined_data) == "Millions"] <- "£Millions"
     colnames(combined_data)[colnames(combined_data) == "current_estimates"] <- "Current Estimates"
-    colnames(combined_data)[colnames(combined_data) == "updated_new"] <- "With your<br>changes implemented"
-    colnames(combined_data)[colnames(combined_data) == "est_tot"] <- "Current Total:"
-    colnames(combined_data)[colnames(combined_data) == "upd_tot"] <- "Updated Total:"
-    
+    colnames(combined_data)[colnames(combined_data) == "updated_new"] <- "With your changes implemented"
+   
     # Handle NAs first: Replace NAs with empty strings
     combined_data[is.na(combined_data)] <- ""
     
     # Format numeric columns with commas (skip already blank cells)
     combined_data$`Current Estimates` <- ifelse(combined_data$`Current Estimates` == "", "", comma(as.numeric(combined_data$`Current Estimates`)))
-    combined_data$`With your<br>changes implemented` <- ifelse(combined_data$`With your<br>changes implemented` == "", "", comma(as.numeric(combined_data$`With your<br>changes implemented`)))
-    combined_data$`Current Total:` <- ifelse(combined_data$`Current Total:` == "", "", comma(as.numeric(combined_data$`Current Total:`)))
-    combined_data$`Updated Total:` <- ifelse(combined_data$`Updated Total:` == "", "", comma(as.numeric(combined_data$`Updated Total:`)))
-    
+    combined_data$`With your changes implemented` <- ifelse(combined_data$`With your changes implemented` == "", "", comma(as.numeric(combined_data$`With your changes implemented`)))
+
     # Start building the HTML table
     html_table <- '<table style="width:100%; border-collapse:collapse;" border="1">'
     
     # Define the column widths (percentage of total table width)
-    col_width <- "20%"  # Set equal width for columns 2:5
+    col_width <- "30%"  # Set equal width for columns 2:5
     
     # Add header row with left-aligned column titles
     html_table <- paste0(html_table, '<tr>
-                                     <th style="text-align:left;">£Millions</th>
+                                     <th style="text-align:left;width: 40%">£Millions</th>
                                      <th style="text-align:left; width:', col_width, ';">Current Estimates</th>
-                                     <th style="text-align:left; width:', col_width, ';">Current Total:</th>
-                                     <th style="text-align:left; width:', col_width, ';">With your<br>changes implemented</th>
-                                     <th style="text-align:left; width:', col_width, ';">Updated Total:</th>
+                                     
+                                     <th style="text-align:left; width:', col_width, ';">With your changes implemented</th>
+                                     
                                      </tr>')
     
     # Loop through each row in combined_data
@@ -1084,7 +1272,7 @@ server <- function(input, output, session) {
       if (i == 1) {
         # Loop through each column in the first row
         for (j in 1:ncol(combined_data)) {
-          html_table <- paste0(html_table, '<td style="background-color:#FF4D4D; text-align:left; width:', col_width, '; font-weight: bold;">', combined_data[i, j], '</td>')
+          html_table <- paste0(html_table, '<td style="background-color:#FF6666; text-align:left; width:', col_width, '; font-weight: bold;">', combined_data[i, j], '</td>')
         }
       }else if(i %in% 2:8){
         for (j in 1:ncol(combined_data) ){
@@ -1097,8 +1285,8 @@ server <- function(input, output, session) {
           }
       }else if (i == 9){
         for (j in 1:ncol(combined_data)){
-          if (j == 3 || j == 5){
-            html_table <- paste0(html_table, '<td style="background-color:#FF9999; text-align:right; width:', col_width, ';">', combined_data[i, j], '</td>')
+          if (j == 2 || j == 3){
+            html_table <- paste0(html_table, '<td style="background-color:#FF9999; text-align:right; width:', col_width, ';font-weight: bold;">', combined_data[i, j], '</td>')
           }else{
             html_table <- paste0(html_table, '<td style="background-color:#FFFFFF; text-align:right; width:', col_width, ';">', combined_data[i, j], '</td>')
             
@@ -1120,10 +1308,19 @@ server <- function(input, output, session) {
         }
       }else if (i ==18){
         for (j in 1:ncol(combined_data)){
-          if (j == 3 || j == 5){
-            html_table <- paste0(html_table, '<td style="background-color:#A2E8D5; text-align:right; width:', col_width, ';">', combined_data[i, j], '</td>')
+          if (j == 2 || j == 3){
+            html_table <- paste0(html_table, '<td style="background-color:#A2E8D5; text-align:right; width:', col_width, ';font-weight: bold;">', combined_data[i, j], '</td>')
           }else{
             html_table <- paste0(html_table, '<td style="background-color:#FFFFFF; text-align:right; width:', col_width, ';">', combined_data[i, j], '</td>')
+            
+          }
+        }
+      }else if (i == 20 || i == 21){
+        for (j in 1:ncol(combined_data)){
+          if (j == 2 || j == 3){
+            html_table <- paste0(html_table, '<td style="background-color:#FFFFFF; text-align:right; width:', col_width, ';font-weight: bold;">', combined_data[i, j], '</td>')
+          }else{
+            html_table <- paste0(html_table, '<td style="background-color:#D3D3D3; text-align:left; width:', col_width, ';">', combined_data[i, j], '</td>')
             
           }
         }
@@ -1132,16 +1329,14 @@ server <- function(input, output, session) {
         html_table <- paste0(html_table, "<td style='background-color:#D3D3D3; text-align:left; width:", col_width, ";font-wight: bold'>", combined_data[i, 1], "</td>")
         html_table <- paste0(html_table, "<td style='text-align:right; width:", col_width, ";'>", combined_data[i, 2], "</td>")
         html_table <- paste0(html_table, "<td style='text-align:right; width:", col_width, ";'>", combined_data[i, 3], "</td>")
-        html_table <- paste0(html_table, "<td style='text-align:right; width:", col_width, ";'>", combined_data[i, 4], "</td>")
-        html_table <- paste0(html_table, "<td style='text-align:right; width:", col_width, ";'>", combined_data[i, 5], "</td>")
+        
       }
       
-      html_table <- paste0(html_table, "</tr>")
     }
     
     
     # Close the table
-    #html_table <- paste0(html_table, "</table>")
+    html_table <- paste0(html_table, "</table>")
     
     # Return the HTML table
     HTML(html_table)
@@ -1311,61 +1506,7 @@ server <- function(input, output, session) {
   
   # Generate Stacked Bar Chart for income tax:
   output$stacked_plot_income_tax <- renderPlotly({
-    data <- bar_data()
-    x_categories <- factor(data$labels, levels = data$labels)
-    total_rates <- input$num_rows
-    
-    #maybe add a warning message for when only 1 tax band is selected
-    #otherwise the && here patches the bug for now.
-    if (values$show_sum && total_rates > 1){
-      colors <- c('rgba(255, 99, 132, 0.6)',  # First color
-                  'rgba(54, 162, 235, 0.6)',  # Second color
-                  'rgba(75, 192, 192, 0.6)',  # Third color
-                  'rgba(223, 192, 192, 0.6)', # Fourth color
-                  'rgba(23, 192, 192, 0.6)',  # Fifth color
-                  'rgba(192, 192, 75, 0.6)')  # Add more colors if necessary
-      p <- plot_ly(
-        x = x_categories,
-        y = ~data$stacked[1,],
-        type = 'bar',
-        name = ~data$legend_vector[1],
-        marker = list(color = 'rgba(255, 99, 132, 0.6)')
-      ) 
-      
-      for (i in 2:total_rates){
-        p <- p %>%
-          add_trace(
-            y = data$stacked[i,],
-            name = data$legend_vector[i],
-            marker = list(color = colors[i])
-          )
-      }
-      
-      p <- p %>%
-        layout(
-          barmode = 'stack',
-          title = text_resources[[values$language]]$income_stacked_graph_title,
-          xaxis = list(title = text_resources[[values$language]]$income_bar_x),
-          yaxis = list(title = text_resources[[values$language]]$income_bar_y)
-        )
-      
-      p
-    }else {
-      # Plot summed values
-      plot_ly(
-        x = x_categories,
-        y = ~data$stacked,
-        type = 'bar',
-        name = 'Sum',
-        marker = list(color = 'rgba(255, 99, 132, 0.6)')
-      ) %>%
-        layout(
-          barmode = 'group',
-          title = text_resources[[values$language]]$income_stacked_graph_title,
-          xaxis = list(title = text_resources[[values$language]]$income_bar_x),
-          yaxis = list(title = text_resources[[values$language]]$income_bar_y)
-        )
-    }
+    bar_data()
   })
   
   

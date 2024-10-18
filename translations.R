@@ -161,5 +161,8 @@ set_translation_outputs <- function (output, values, text_resources){
   output$other_taxes_intro <- renderText({
     text_resources[[values$language]]$other_taxes_intro
   })
+  output$property_tax_intro <- renderText({
+    text_resources[[values$language]]$property_tax_intro
+  })
   
 }
