@@ -7,7 +7,7 @@
 ########################
 ui <- fluidPage(
   title = "Welsh Tax Calculator 2024/25",
-  useShinyjs(),  # Initialize shinyjs
+  useShinyjs(),  # Initialize shiny
   
   #Custom css for formatting app items - saved in custom.css:
   tags$head(
@@ -30,7 +30,6 @@ ui <- fluidPage(
     ),
     column(10,
            align = "right",
-           #tags$div(style = "background-color: #C50031; height: 20px; width: 100%; margin: 10px 0; padding: 0;"),
            tags$div(style = "background-color: #F6BC0A; height: 20px; width: 100%; margin-top: 0px;margin-bottom: 10px; padding: 0;"),
            actionButton("contact_us_button", 
                         label = textOutput("contact_us_button"),
@@ -38,15 +37,12 @@ ui <- fluidPage(
            actionButton("translateButton", 
                         label = textOutput("translate_button"),
                         style = "background-color: #C50031; font-weight: bold"),
-           #tags$div(style = "background-color: #C50031; height: 20px; width: 25%; margin: 10px 0; padding: 0;"),
-           
            
     ),
     
   ),
   
   fluidRow(
-    #lets try this shinyjqui:
     jqui_resizable(
     column(6,
            #Main app intro/instructions are going in this section

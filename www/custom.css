@@ -7,8 +7,8 @@
         /* Custom CSS for greyed-out inputs and sliders */
         .grey-out {
           pointer-events: none;
-          background-color: # !important; /* Grey background color */
-          color: #999999; /* Grey text color */
+          background-color: # !important; 
+          color: #999999; 
         }
         .grey-out .irs {
           pointer-events: none !important;
@@ -25,8 +25,8 @@
         }
         .grey-out-council {
           pointer-events: none;
-          background-color: # !important; /* Grey background color */
-          color: #999999; /* Grey text color */
+          background-color: # !important; 
+          color: #999999; 
         }
         .grey-out-council .irs {
           pointer-events: none !important;
@@ -73,28 +73,28 @@
         .council-slider {
           display: flex;
           align-items: center;
-          margin-bottom: 5px; /* Space between input groups */
+          margin-bottom: 5px; 
         }
         .council-slider label {
-          flex: 0 0 100px; /* Fixed width for the label (adjust as needed) */
-          margin-right: 5px; /* Space between label and slider */
-          font-size: 14px; /* Font size for the label */
+          flex: 0 0 100px; 
+          margin-right: 5px; 
+          font-size: 14px; 
         }
         .council-slider slider {
-              flex: 1; /* Takes up the remaining space */
+              flex: 1; 
     /* Optional: Styling the slider */
-    -webkit-appearance: none; /* Remove default styling */
-    height: 8px; /* Height of the slider track */
-    background: #ddd; /* Background color of the track */
-    border-radius: 4px; /* Rounded corners */
-    outline: none; /* Remove outline on focus */
+    -webkit-appearance: none; 
+    height: 8px; 
+    background: #ddd; 
+    border-radius: 4px; 
+    outline: none; 
         }
         .council-slider .shiny-input-container {
           flex-grow: 0.2; /* Let inputs take the remaining space */
           font-size: 14px;
         }
         .council-slider.custom-numeric-input .shiny-input-container input {
-          font-size: 14px; /* Adjust font size for the numeric input field */
+          font-size: 14px; 
         }
         
         
@@ -105,21 +105,21 @@
           display: flex;
           align-items: center;
           margin-top:10px;
-          margin-bottom: 30px; /* Space between input groups */
+          margin-bottom: 30px; 
          
         }
         .pa_input_left label {
-          flex: 0 0 130px; /* Fixed width for labels */
-          margin-right: 8px; /* Space between label and input */
+          flex: 0 0 130px; 
+          margin-right: 8px; 
           font-size: 14px;
           font-weight: normal;
         }
         .pa_input_left input {
-          width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 65px; /* Optional: Set a maximum width for the input */
-          padding: 2px; /* Padding inside the input box */
-          font-size: 14px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          width: 100%; 
+          max-width: 65px; 
+          padding: 2px; 
+          font-size: 14px; 
+          box-sizing: border-box; 
           height: 28px;
           margin-top:8px;
         }
@@ -128,23 +128,23 @@
           display: flex;
           align-items: center;
           margin-top:10px;
-          margin-bottom: 30px; /* Space between input groups */
+          margin-bottom: 30px; 
          
         }
         .pa_input_right label {
-          flex: 0 0 160px; /* Fixed width for labels */
-          margin-right: 8px; /* Space between label and input */
+          flex: 0 0 160px; 
+          margin-right: 8px; 
           font-size: 14px;
           font-weight: normal;
         }
         .pa_input_right input {
-          width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 70px; /* Optional: Set a maximum width for the input */
-          padding: 0px; /* Padding inside the input box */
+          width: 100%; 
+          max-width: 70px; 
+          padding: 0px; 
           line-height: 14px;
           height: 28px;
-          font-size: 14px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          font-size: 14px; 
+          box-sizing: border-box; 
           margin-top:8px;
         }
         
@@ -152,24 +152,24 @@
           display: flex;
           align-items: center;
           margin-top:0px;
-          margin-bottom: 25px; /* Space between input groups */
+          margin-bottom: 25px; 
           margin-right:0px;
          
         }
         .rates_input_left label {
-          flex: 0 0 10px; /* Fixed width for labels */
-          margin-right: 1px; /* Space between label and input */
+          flex: 0 0 10px; 
+          margin-right: 1px; 
           font-size: 14px;
           font-weight: normal;
 
         }
         .rates_input_left input {
-          width: 65px; /* Optional: Set a maximum width for the input */
-          padding: 0px; /* Padding inside the input box */
+          width: 65px; 
+          padding: 0px; 
           margin-top:8px;
           line-height: 14px;
-          font-size: 14px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          font-size: 14px; 
+          box-sizing: border-box; 
           margin-right: 0px;
           height: 25px;
         } 
@@ -178,24 +178,24 @@
           display: flex;
           align-items: center;
           margin-top:0px;
-          margin-bottom: 0px; /* Space between input groups */
+          margin-bottom: 0px; 
           margin-right:0px;
          
         }
         .number_of_bands label {
           /*flex: 0 0 80px;  Fixed width for labels */
-          margin-right: 5px; /* Space between label and input */
+          margin-right: 5px; 
           font-size: 15px;
           font-weight: normal;
           
         }
         .number_of_bands input {
-          width: 35px; /* Optional: Set a maximum width for the input */
-          padding: 0px; /* Padding inside the input box */
+          width: 35px;
+          padding: 0px; 
           margin-top:8px;
           line-height: 14px;
-          font-size: 15px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          font-size: 15px; 
+          box-sizing: border-box; 
           margin-right: 0px;
           height: 25px;
         }
@@ -204,61 +204,61 @@
           display: flex;
           align-items: center;
           margin-top:10px;
-          margin-bottom: 15px; /* Space between input groups */
+          margin-bottom: 15px; 
           margin-left: 0px;
          
         }
         .rates_input_middle label {
-          flex: 0 0 25px; /* Fixed width for labels */
-          margin-right: 5px; /* Space between label and input */
+          flex: 0 0 25px; 
+          margin-right: 5px; 
           font-size: 14px;
           font-weight: normal;
           margin-left: 0px;
         }
         .rates_input_middle input {
-          width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 65px; /* Optional: Set a maximum width for the input */
-          padding: 2px; /* Padding inside the input box */
-          font-size: 14px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          width: 100%; 
+          max-width: 65px; 
+          padding: 2px; 
+          font-size: 14px; 
+          box-sizing: border-box; 
         }
        .rates_input_right_slider {
           display: flex;
           align-items: center;
-          margin-bottom: 0px; /* Space between input groups */
+          margin-bottom: 0px; 
           margin-top: 7px;
           margin-left:2px;
         }
         .rates_input_right_slider label {
-          flex: 0 0 5px; /* Fixed width for the label (adjust as needed) */
-          margin-right: 2px; /* Space between label and slider */
+          flex: 0 0 5px; 
+          margin-right: 2px; 
           margin-left:6px;
-          font-size: 14px; /* Font size for the label */
+          font-size: 14px; 
           font-weight: normal;
         }
         .rates_input_right_slider slider {
-              flex: 1; /* Takes up the remaining space */
-    /* Optional: Styling the slider */
-    -webkit-appearance: none; /* Remove default styling */
-    height: 8px; /* Height of the slider track */
-    background: #ddd; /* Background color of the track */
-    border-radius: 4px; /* Rounded corners */
-    outline: none; /* Remove outline on focus */
+              flex: 1; 
+    /* Styling the slider */
+    -webkit-appearance: none; 
+    height: 8px; 
+    background: #ddd; 
+    border-radius: 4px; 
+    outline: none; 
         }
         .rates_input_right_slider .shiny-input-container {
-          flex-grow: 0.2; /* Let inputs take the remaining space */
+          flex-grow: 0.2; 
           font-size: 14px;
         }
         .rates_input_right_slider.custom-numeric-input .shiny-input-container input {
-          font-size: 14px; /* Adjust font size for the numeric input field */
+          font-size: 14px; 
         }
         
         .grey-text-box {
-        background-color: #f0f0f0; /* Light grey background */
-        padding: 2px; /* Add some padding */
-        border: 1px solid #d3d3d3; /* Optional: Light grey border */
-        border-radius: 5px; /* Optional: Rounded corners */
-        color: #333; /* Optional: Text color */
+        background-color: #f0f0f0; 
+        padding: 2px; 
+        border: 1px solid #d3d3d3; 
+        border-radius: 5px; 
+        color: #333; 
         font-size: 13px;
         width: 37px;
         margin-left:20px;
@@ -267,29 +267,28 @@
         display:flex;
         margin-top:3px;
         margin-bottom: 20px;
-        /*width: 220px;*/
         font-size:14px;
       }
       
       .custom-toggle .bootstrap-switch-container {
-      line-height: 15px; /* Match this to the height of the switch to center text */
+      line-height: 15px; 
     }
     
     
     .local_taxes-toggle .bootstrap-switch {
-      width: 50px; /* Adjust the width of the entire toggle switch */
-      height: 24px; /* Adjust height of the toggle */
+      width: 50px; 
+      height: 24px;
       margin-bottom:1px;
     }
     .local_taxes-toggle .bootstrap-switch-handle-on,
     .custom-toggle .bootstrap-switch-handle-off {
-      font-size: 14px; /* Smaller font for ON/OFF text */
+      font-size: 14px; 
       line-height: 0px;
       padding-bottom: 15px;
     }
     .local_taxes-toggle .bootstrap-switch-handle-off,
     .custom-toggle .bootstrap-switch-handle-on {
-      font-size: 14px; /* Smaller font for ON/OFF text */
+      font-size: 14px; 
       line-height: 0px;
       padding-bottom: 15px;
     }
@@ -298,25 +297,25 @@
           display: flex;
           align-items: center;
           margin-top:2px;
-          margin-bottom: 2px; /* Space between input groups */
+          margin-bottom: 2px; 
           margin-right:0px;
          
         }
         .local_taxes_numeric label {
-          flex: 0 0 260px; /* Fixed width for labels */
-          margin-right: 3px; /* Space between label and input */
+          flex: 0 0 260px; 
+          margin-right: 3px; 
           font-size: 14px;
           font-weight: normal;
           
         }
         .local_taxes_numeric input {
-          width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 65px; /* Optional: Set a maximum width for the input */
-          padding: 0px; /* Padding inside the input box */
+          width: 100%; 
+          max-width: 65px; 
+          padding: 0px; 
           margin-top:8px;
           line-height: 14px;
-          font-size: 14px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          font-size: 14px; 
+          box-sizing: border-box; 
           margin-right: 0px;
           height: 25px;
         }
@@ -325,25 +324,25 @@
           display: flex;
           align-items: center;
           margin-top:2px;
-          margin-bottom: 2px; /* Space between input groups */
+          margin-bottom: 2px; 
           margin-right:0px;
          
         }
         .property_tax_numeric label {
-          flex: 0 0 225px; /* Fixed width for labels */
-          margin-right: 3px; /* Space between label and input */
+          flex: 0 0 225px; 
+          margin-right: 3px; 
           font-size: 14px;
           font-weight: normal;
           
         }
         .property_tax_numeric input {
-          width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 65px; /* Optional: Set a maximum width for the input */
-          padding: 0px; /* Padding inside the input box */
+          width: 100%; 
+          max-width: 65px; 
+          padding: 0px; 
           margin-top:8px;
           line-height: 14px;
-          font-size: 14px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          font-size: 14px; 
+          box-sizing: border-box; 
           margin-right: 0px;
           height: 25px;
         }
@@ -352,25 +351,25 @@
           display: flex;
           align-items: center;
           margin-top:0px;
-          margin-bottom: 0px; /* Space between input groups */
+          margin-bottom: 0px; 
           margin-right:0px;
          
         }
         .ltt_input_left label {
-          flex: 0 0 15px; /* Fixed width for labels */
-          margin-right: 3px; /* Space between label and input */
+          flex: 0 0 15px; 
+          margin-right: 3px; 
           font-size: 14px;
           font-weight: normal;
           
         }
         .ltt_input_left input {
-          width: 100%; /* Ensures the input is as wide as its container */
-          max-width: 65px; /* Optional: Set a maximum width for the input */
-          padding: 0px; /* Padding inside the input box */
+          width: 100%; 
+          max-width: 65px; 
+          padding: 0px; 
           margin-top:8px;
           line-height: 14px;
-          font-size: 14px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          font-size: 14px; 
+          box-sizing: border-box; 
           margin-right: 0px;
           height: 25px;
         }
@@ -380,32 +379,32 @@
           display: flex;
           align-items: center;
           margin-top: 0px;
-          margin-bottom: 0px; /* Space between input groups */
+          margin-bottom: 0px; 
           margin-right: 0px;
         }
         
         .ltt_input_middle label {
-          flex: 0 0 0px; /* Fixed width for labels */
-          margin-right: 3px; /* Space between label and input */
+          flex: 0 0 0px; 
+          margin-right: 3px; 
           font-size: 14px;
           font-weight: normal;
         }
         
         .ltt_input_middle input {
           width: 45px;
-          padding: 0px; /* Padding inside the input box */
+          padding: 0px; 
           line-height: 14px;
-          font-size: 14px; /* Font size for the input text */
-          box-sizing: border-box; /* Ensures padding is included in the total width */
+          font-size: 14px; 
+          box-sizing: border-box; 
           height: 25px;
-          margin-right: 1px; /* Small space between input and "%" symbol */
+          margin-right: 1px; 
           margin-top:8px;
         }
         
         .ltt_input_middle span {
-          margin-left: 20px; /* Remove margin-left to position it close to the input */
+          margin-left: 20px; 
           margin-right:35px;
-          font-size: 14px; /* Match font size with input text */
+          font-size: 14px; 
         }
         
         
@@ -414,101 +413,100 @@
           display: flex;
           align-items: center;
           margin-top:10px;
-          margin-bottom: 30px; /* Space between input groups */
+          margin-bottom: 30px; 
          
         }
         .input-group-thresholds label {
-          flex: 0 0 200px; /* Fixed width for labels */
-          margin-right: 5px; /* Space between label and input */
+          flex: 0 0 200px; 
+          margin-right: 5px; 
           font-size: 14px;
         }
         .input-group-thresholds input {
-          width: 100%; /* Ensures the input is as wide as its container */
-    max-width: 100px; /* Optional: Set a maximum width for the input */
-    padding: 5px; /* Padding inside the input box */
-    font-size: 14px; /* Font size for the input text */
-    box-sizing: border-box; /* Ensures padding is included in the total width */
+          width: 100%; 
+    max-width: 100px; 
+    padding: 5px; 
+    font-size: 14px; 
+    box-sizing: border-box; 
         }
         
         .input-group-thresholds.custom-numeric-input .shiny-input-container input {
-          font-size: 14px; /* Adjust font size for the numeric input field */
+          font-size: 14px; 
         }
         .input-group-block {
           display: flex;
           align-items: center;
           margin-top:10px;
-          margin-bottom: 5px; /* Space between input groups */
+          margin-bottom: 5px; 
          
         }
         .input-group-block label {
-          flex: 0 0 200px; /* Fixed width for labels */
-          margin-right: 5px; /* Space between label and input */
+          flex: 0 0 200px; 
+          margin-right: 5px; 
           font-size: 15px;
         }
         .input-group-block input {
-          width: 100%; /* Ensures the input is as wide as its container */
-    max-width: 100px; /* Optional: Set a maximum width for the input */
-    padding: 5px; /* Padding inside the input box */
-    font-size: 15px; /* Font size for the input text */
-    box-sizing: border-box; /* Ensures padding is included in the total width */
+          width: 100%; 
+    max-width: 100px; 
+    padding: 5px; 
+    font-size: 15px; 
+    box-sizing: border-box; 
         }
         
         .input-group-block-numeric-input .shiny-input-container input {
-          font-size: 16px; /* Adjust font size for the numeric input field */
+          font-size: 16px; 
         }
         
         .input-group-slider {
           display: flex;
           align-items: center;
-          margin-bottom: 5px; /* Space between input groups */
+          margin-bottom: 5px; 
         }
         .input-group-slider label {
-          flex: 0 0 70px; /* Fixed width for the label (adjust as needed) */
-          margin-right: 5px; /* Space between label and slider */
-          font-size: 14px; /* Font size for the label */
+          flex: 0 0 70px; 
+          margin-right: 5px; 
+          font-size: 14px; 
         }
         .input-group-slider slider {
-              flex: 1; /* Takes up the remaining space */
-    /* Optional: Styling the slider */
-    -webkit-appearance: none; /* Remove default styling */
-    height: 8px; /* Height of the slider track */
-    background: #ddd; /* Background color of the track */
-    border-radius: 4px; /* Rounded corners */
-    outline: none; /* Remove outline on focus */
+              flex: 1; 
+    -webkit-appearance: none; 
+    height: 8px; 
+    background: #ddd; 
+    border-radius: 4px; 
+    outline: none; 
         }
         .input-group-slider .shiny-input-container {
-          flex-grow: 0.2; /* Let inputs take the remaining space */
+          flex-grow: 0.2; 
           font-size: 14px;
         }
         .input-group-slider.custom-numeric-input .shiny-input-container input {
-          font-size: 14px; /* Adjust font size for the numeric input field */
+          font-size: 14px; 
         }
        
         .input-group-ndr {
             display: flex;
             align-items: center;
-            margin-bottom: 15px; /* Increased spacing between input groups */
-            padding: 5px; /* Added padding for better spacing */
-            border: 1px solid #ddd; /* Light border to define input group */
-            border-radius: 5px; /* Rounded corners for a softer look */
-            background-color: #f9f9f9; /* Light background for contrast */
+            margin-bottom: 15px; 
+            padding: 5px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            background-color: #f9f9f9; 
         }
 
 
         .input-group-ndr label {
-            width: 1000px; /* Adjusted to a more standard width */
-            margin-right: 15px; /* Increased margin for better separation */
-            font-weight: bold; /* Make labels more prominent */
-            text-align: left; /* Align labels to the right for consistency */
+            width: 1000px; 
+            margin-right: 15px; 
+            font-weight: bold; 
+            text-align: left; 
         }
         
         
         .input-group-ndr input {
-            /*flex: 1;  Allow inputs to take up remaining space */
-            margin-right: 0; /* Removed margin-right to use full width */
-            padding: 8px; /* Added padding for better input readability */
-            border: 1px solid #ccc; /* Light border for inputs */
-            border-radius: 4px; /* Rounded corners for inputs */
+            
+            margin-right: 0; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
         }
 
         .input-group-landfill {
@@ -547,10 +545,10 @@
         }
           .output1-container {
        
-        background-color: #ffffff; /* Light background color */
-        width: 300px; /* Make sure it uses the full width available */
-        box-sizing: border-box; /* Ensure padding and border are included in the total height */
-        display: flex; /* Use Flexbox to manage layout */
+        background-color: #ffffff; 
+        width: 300px; 
+        box-sizing: border-box; 
+        display: flex; 
           }
           .calculate-button-container{
           background-color: #FFFFFF;
@@ -583,11 +581,10 @@
         font-weight: bold;
         }
       
-      /* local taxes CSS: */
        .switch-label .bootstrap-switch{
       display: inline-block;
-      width: 100px; /* Adjust width as needed */
-      margin-bottom: 10px; /* Add space between toggles */
+      width: 100px; 
+      margin-bottom: 10px; 
     }
     .switch-label .switch {
       display: flex;
@@ -598,22 +595,22 @@
       width: auto;
     }
     .switch-label .switch .slider {
-      width: 50px; /* Adjust width of the switch part if needed */
-      height: 24px; /* Adjust height if needed */
+      width: 50px; 
+      height: 24px; 
     }
     .switch-label .switch .label {
       width: 100px;
     }
     .switch-label .switch .label-text {
-      margin-left: 10px; /* Space between switch and label text */
+      margin-left: 10px; 
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
     .bordered-column {
-      border: 1px solid #C50031; /* Change color as needed */
-      padding: 10px; /* Adds space inside the border */
-      background-color: #f8f9fa; /* Light shading */
-      border-radius: 5px; /* Optional: adds rounded corners */
+      border: 1px solid #C50031; 
+      padding: 10px; 
+      background-color: #f8f9fa; 
+      border-radius: 5px;
     }
     
