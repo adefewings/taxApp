@@ -11,6 +11,8 @@ ui <- fluidPage(
   
   #Custom css for formatting app items - saved in custom.css:
   tags$head(
+    tags$script(src="https://www.googletagmanager.com/gtag/js?id=G-3VYXCPRW33", async=""),
+    tags$script(src="static/js/gtag.js"),
     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
   ),
   
